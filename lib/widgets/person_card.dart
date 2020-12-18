@@ -27,6 +27,8 @@ class _PersonCardState extends State<PersonCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 2.0,
       margin: EdgeInsets.all(10.0),
       child: Container(
         margin: EdgeInsets.all(8.0),
@@ -39,10 +41,9 @@ class _PersonCardState extends State<PersonCard> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Image.asset(
-                      "assets/avatars/rdj.png",
-                      height: 50,
-                      width: 50,
+                    CircleAvatar(
+                      radius: 30.0,
+                      backgroundImage: AssetImage("assets/avatars/rdj.png"),
                     ),
                     SizedBox(width: 10.0),
                     Text(
@@ -124,20 +125,10 @@ class _PersonCardState extends State<PersonCard> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () {
-                        showAlertDialog(context);
+                        showTitleUpdateDialog(context);
                       },
                       child: Icon(
                         Icons.edit,
-                        size: 30.0,
-                      ),
-                    ),
-                    SizedBox(width: 10.0),
-                    GestureDetector(
-                      onTap: () {
-                        showDeleteDialog(context);
-                      },
-                      child: Icon(
-                        Icons.delete,
                         size: 30.0,
                       ),
                     ),
@@ -188,7 +179,6 @@ class _PersonCardState extends State<PersonCard> {
 
   showGiveNameDialog(BuildContext context) {
     String name;
-    final nameController = TextEditingController();
     // set up the button
     Widget okButton = FlatButton(
       child: Text("Save"),
@@ -235,7 +225,7 @@ class _PersonCardState extends State<PersonCard> {
     );
   }
 
-  showAlertDialog(BuildContext context) {
+  showTitleUpdateDialog(BuildContext context) {
     // set up the button
     Widget okButton = FlatButton(
       child: Text("Update"),
@@ -260,42 +250,6 @@ class _PersonCardState extends State<PersonCard> {
         keyboardType: TextInputType.text,
       ),
       actions: [
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  showDeleteDialog(BuildContext context) {
-    // set up the button
-    Widget cancelButton = FlatButton(
-      child: Text("Cancel"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-
-    Widget okButton = FlatButton(
-      child: Text("Delete"),
-      onPressed: () async {
-        await dbHelper.deletePerson(widget.person.id);
-        Navigator.pop(context);
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Deleting " + widget.person.title + "'s Profile"),
-      content: Text("Are you sure about deleting this profile?"),
-      actions: [
-        cancelButton,
         okButton,
       ],
     );

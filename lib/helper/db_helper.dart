@@ -27,17 +27,10 @@ class DBHelper {
     );
   }
 
-  Future<int> insertPerson(Person person) async {
-    int personId = 0;
+  Future<void> insertPerson(Person person) async {
     Database db = await database();
-    await db
-        .insert('persons', person.toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace)
-        .then((value) {
-      personId = value;
-    });
-    print(person.creationDateTime);
-    return personId;
+    await db.insert('persons', person.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<int> insertEducation(Education education) async {

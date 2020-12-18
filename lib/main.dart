@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
   ThemeData themeData(ThemeData theme) {
     return theme.copyWith(
       textTheme: theme.textTheme,
+      canvasColor: Colors.transparent,
     );
   }
 }
