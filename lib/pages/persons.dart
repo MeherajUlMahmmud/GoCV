@@ -208,15 +208,6 @@ class _PersonPageState extends State<PersonPage> {
         );
         await dbHelper.insertPerson(newPerson);
 
-        // Fluttertoast.showToast(
-        //     msg: "Profile Created",
-        //     toastLength: Toast.LENGTH_SHORT,
-        //     gravity: ToastGravity.CENTER,
-        //     timeInSecForIosWeb: 1,
-        //     backgroundColor: Colors.red,
-        //     textColor: Colors.white,
-        //     fontSize: 16.0);
-
         Navigator.push(
           context,
           MaterialPageRoute(
