@@ -50,14 +50,14 @@ class _PersonPageState extends State<PersonPage> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
-        color: Colors.transparent,
+        color: Colors.grey,
         child: Container(
           clipBehavior: Clip.antiAlias,
           decoration: new BoxDecoration(
-            color: Colors.white,
+            color: Colors.grey,
             borderRadius: new BorderRadius.only(
-              topLeft: const Radius.circular(10.0),
-              topRight: const Radius.circular(10.0),
+              topLeft: const Radius.circular(100.0),
+              topRight: const Radius.circular(100.0),
             ),
           ),
           child: Column(
@@ -65,61 +65,79 @@ class _PersonPageState extends State<PersonPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               header(person),
-              Divider(color: Colors.grey),
-              Container(
-                margin: EdgeInsets.all(12.0),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NewPerson(person: person),
+              Divider(color: Colors.black),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 5.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(color: Colors.black),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewPerson(person: person),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit,
+                            color: Colors.black,
+                            size: 25,
+                          ),
+                          SizedBox(width: 10.0),
+                          Text(
+                            "Edit",
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.edit,
-                        color: Colors.grey,
-                        size: 25,
-                      ),
-                      SizedBox(width: 10.0),
-                      Text(
-                        "Edit",
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              Divider(
-                indent: 10.0,
-                endIndent: 10.0,
-                color: Colors.grey,
-              ),
-              Container(
-                padding: EdgeInsets.all(12.0),
-                child: InkWell(
-                  onTap: () {
-                    showDeleteDialog(context, person);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        color: Colors.grey,
-                        size: 25,
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 5.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(color: Colors.black),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        showDeleteDialog(context, person);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete,
+                            color: Colors.black,
+                            size: 25,
+                          ),
+                          SizedBox(width: 10.0),
+                          Text(
+                            "Delete",
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10.0),
-                      Text(
-                        "Delete",
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
               Container(
                 padding: EdgeInsets.only(bottom: 5.0, right: 5.0),
@@ -129,7 +147,7 @@ class _PersonPageState extends State<PersonPage> {
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 10.0,
-                    color: Colors.grey,
+                    color: Colors.black,
                   ),
                 ),
               ),
