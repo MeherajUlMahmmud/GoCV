@@ -96,7 +96,7 @@ class _PersonPageState extends State<PersonPage> {
                           ),
                           SizedBox(width: 10.0),
                           Text(
-                            "Edit",
+                            "Edit Resume",
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.black,
@@ -127,7 +127,7 @@ class _PersonPageState extends State<PersonPage> {
                           ),
                           SizedBox(width: 10.0),
                           Text(
-                            "Delete",
+                            "Delete Resume",
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.black,
