@@ -110,22 +110,21 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: currentTabIndex,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-              Feather.credit_card,
-            ),
-            title: Text("Resumes"),
-          ),
+              icon: Icon(
+                Feather.credit_card,
+              ),
+              label: "Resumes"),
           BottomNavigationBarItem(
             icon: Icon(
               Feather.grid,
             ),
-            title: Text("Samples"),
+            label: "Samples",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Feather.user,
             ),
-            title: Text("Persons"),
+            label: "Persons",
           ),
         ],
       ),
