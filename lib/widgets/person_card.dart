@@ -146,39 +146,50 @@ class _PersonCardState extends State<PersonCard> {
     );
   }
 
+  savePdf() {
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            children: [
+              pw.Text(
+                widget.person.firstName != null
+                    ? widget.person.firstName
+                    : "FirstName" + " " + widget.person.surname != null
+                        ? widget.person.surname
+                        : "LastName",
+                style: pw.TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.Divider(indent: 10, endIndent: 10),
+            ],
+          ); // Center
+        },
+      ),
+    );
+
+    showGiveNameDialog(context);
+  }
+
   convertToPdf() async {
     if (await Permission.storage.request().isGranted) {
-      pdf.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return pw.Column(
-              children: [
-                pw.Text(
-                  widget.person.firstName + " " + widget.person.surname,
-                  style: pw.TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.Divider(indent: 10, endIndent: 10),
-              ],
-            ); // Center
-          },
-        ),
-      );
-
-      showGiveNameDialog(context);
+      savePdf();
 
       // Directory tempDir = await getTemporaryDirectory();
       // String tempPath = tempDir.path;
       // final File file =
       //     File("/storage/emulated/0/Download/${widget.person.title}.pdf");
       // await file.writeAsBytes(pdf.save());
+    } else {
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.storage,
+      ].request();
+
+      savePdf();
     }
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.storage,
-    ].request();
   }
 
   showGiveNameDialog(BuildContext context) {
@@ -190,6 +201,9 @@ class _PersonCardState extends State<PersonCard> {
         final File file = File("/storage/emulated/0/Download/$name.pdf");
         await file.writeAsBytes(pdf.save());
         Navigator.pop(context);
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("PDF Saved"),
+        ));
       },
     );
 
