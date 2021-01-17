@@ -1,9 +1,6 @@
 import 'package:cv_builder/utils/functions.dart';
-import 'package:cv_builder/utils/theme_config.dart';
-import 'package:cv_builder/view_models/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -18,12 +15,7 @@ class _SettingsState extends State<Settings> {
     super.initState();
     items = [
       {
-        'icon': Feather.moon,
-        'title': 'Dark Mode',
-        'function': () => _pushPage(showAbout()),
-      },
-      {
-        'icon': Feather.info,
+        'icon': Feather.mail,
         'title': 'Contact Us',
         'function': () => showAbout(),
       },
@@ -60,10 +52,6 @@ class _SettingsState extends State<Settings> {
           physics: NeverScrollableScrollPhysics(),
           itemCount: items.length,
           itemBuilder: (BuildContext context, int index) {
-            if (items[index]['title'] == 'Dark Mode') {
-              return _buildThemeSwitch(items[index]);
-            }
-
             return ListTile(
               onTap: items[index]['function'],
               leading: Icon(
@@ -79,29 +67,6 @@ class _SettingsState extends State<Settings> {
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildThemeSwitch(Map item) {
-    return SwitchListTile(
-      secondary: Icon(
-        item['icon'],
-      ),
-      title: Text(
-        item['title'],
-      ),
-      value: Provider.of<AppProvider>(context).theme == ThemeConfig.lightTheme
-          ? false
-          : true,
-      onChanged: (v) {
-        if (v) {
-          Provider.of<AppProvider>(context, listen: false)
-              .setTheme(ThemeConfig.darkTheme, 'dark');
-        } else {
-          Provider.of<AppProvider>(context, listen: false)
-              .setTheme(ThemeConfig.lightTheme, 'light');
-        }
-      },
     );
   }
 
