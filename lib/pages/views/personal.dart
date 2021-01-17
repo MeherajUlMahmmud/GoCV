@@ -121,7 +121,7 @@ class _PersonalState extends State<Personal> {
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff211551),
+                          color: Colors.white,
                         ),
                       ),
                       // Expanded(
