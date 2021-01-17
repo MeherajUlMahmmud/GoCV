@@ -21,6 +21,7 @@ class _PersonCardState extends State<PersonCard> {
   TextEditingController titleController = TextEditingController();
 
   DBHelper dbHelper = DBHelper();
+  String title;
 
   final pdf = pw.Document();
 
@@ -28,7 +29,7 @@ class _PersonCardState extends State<PersonCard> {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: 2.0,
+      elevation: 5.0,
       margin: EdgeInsets.all(10.0),
       child: Container(
         margin: EdgeInsets.all(8.0),
@@ -125,6 +126,9 @@ class _PersonCardState extends State<PersonCard> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () {
+                        setState(() {
+                          title = widget.person.title;
+                        });
                         showTitleUpdateDialog(context);
                       },
                       child: Icon(
@@ -240,12 +244,12 @@ class _PersonCardState extends State<PersonCard> {
       title: Text("Profile title"),
       content: TextFormField(
         autofocus: true,
-        controller: titleController,
+        controller: titleController..text = title,
         decoration: InputDecoration(
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.blue),
           ),
-          hintText: "Change title",
+          hintText: "New title",
         ),
         keyboardType: TextInputType.text,
       ),
@@ -257,8 +261,15 @@ class _PersonCardState extends State<PersonCard> {
     // show the dialog
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return alert;
+      // builder: (BuildContext context) {
+      //   return alert;
+      // },
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return alert;
+          },
+        );
       },
     );
   }
