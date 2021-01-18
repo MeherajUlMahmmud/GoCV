@@ -1,22 +1,13 @@
 import 'package:cv_builder/screens/homescreen.dart';
-import 'package:cv_builder/utils/theme_config.dart';
 import 'package:cv_builder/view_models/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// void main() {
-//   runApp(MyApp());
-// }
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppProvider()),
-//          ChangeNotifierProvider(create: (_) => HomeProvider()),
-//          ChangeNotifierProvider(create: (_) => DetailsProvider()),
-//          ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-//          ChangeNotifierProvider(create: (_) => GenreProvider()),
       ],
       child: MyApp(),
     ),
@@ -32,17 +23,24 @@ class MyApp extends StatelessWidget {
         key: appProvider.key,
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        theme: themeData(ThemeConfig.darkTheme),
-        darkTheme: themeData(ThemeConfig.darkTheme),
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black,
+          primarySwatch: Colors.blue,
+          primaryColor: Colors.black,
+          accentColor: Colors.blueAccent,
+          cursorColor: Colors.blueAccent,
+          tabBarTheme: TabBarTheme(
+            labelColor: Colors.black,
+            labelStyle: TextStyle(color: Colors.white),
+            unselectedLabelColor: Colors.grey,
+            unselectedLabelStyle: TextStyle(color: Colors.grey),
+          ),
+          scaffoldBackgroundColor: Colors.black,
+          dividerColor: Colors.black54,
+        ),
         home: HomeScreen(),
       );
     });
-  }
-
-  ThemeData themeData(ThemeData theme) {
-    return theme.copyWith(
-      textTheme: theme.textTheme,
-      canvasColor: Colors.transparent,
-    );
   }
 }
