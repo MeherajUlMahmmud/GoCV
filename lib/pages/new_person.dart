@@ -41,87 +41,99 @@ class _NewPersonState extends State<NewPerson>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              TabBar(
-                controller: tabController,
-                indicatorColor: Colors.blueAccent,
-                indicatorWeight: 3.0,
-                labelColor: Theme.of(context).accentColor,
-                unselectedLabelColor: Colors.grey,
-                isScrollable: true,
-                tabs: <Widget>[
-                  Tab(
-                    child: Text(
-                      "Personal",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Contact",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Education",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Work Experience",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Expertise",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "References",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Cover Letter",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      "Portfolio",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Container(
-                  child: TabBarView(
-                    controller: tabController,
-                    children: <Widget>[
-                      Personal(type: widget.type, person: widget.person),
-                      Contact(person: widget.person),
-                      Educational(type: widget.type, person: widget.person),
-                      Experience(type: widget.type, person: widget.person),
-                      Expertise(type: widget.type, person: widget.person),
-                      Reference(type: widget.type, person: widget.person),
-                      CoverLetter(type: widget.type, person: widget.person),
-                      Portfolio(type: widget.type, person: widget.person),
-                    ],
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "Resume",
+            ),
+            Text(
+              "Information",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ],
+        )
+      ),
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            TabBar(
+              controller: tabController,
+              indicatorColor: Colors.blueAccent,
+              indicatorWeight: 3.0,
+              labelColor: Theme.of(context).accentColor,
+              unselectedLabelColor: Colors.grey,
+              isScrollable: true,
+              tabs: <Widget>[
+                Tab(
+                  child: Text(
+                    "Personal",
+                    style: TextStyle(fontSize: 16.0),
                   ),
                 ),
-              )
-            ],
-          ),
+                Tab(
+                  child: Text(
+                    "Contact",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Education",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Work Experience",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Expertise",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "References",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Cover Letter",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Portfolio",
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Container(
+                child: TabBarView(
+                  controller: tabController,
+                  children: <Widget>[
+                    Personal(type: widget.type, person: widget.person),
+                    Contact(person: widget.person),
+                    Educational(type: widget.type, person: widget.person),
+                    Experience(type: widget.type, person: widget.person),
+                    Expertise(type: widget.type, person: widget.person),
+                    Reference(type: widget.type, person: widget.person),
+                    CoverLetter(type: widget.type, person: widget.person),
+                    Portfolio(type: widget.type, person: widget.person),
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
