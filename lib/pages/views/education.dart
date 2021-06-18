@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class Educational extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  Educational({this.type, this.person});
+  Educational({this.isEditing, this.person});
 
   @override
   _EducationalState createState() => _EducationalState();
