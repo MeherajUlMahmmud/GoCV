@@ -2,10 +2,10 @@ import 'package:cv_builder/models/person.dart';
 import 'package:flutter/material.dart';
 
 class Portfolio extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  Portfolio({this.type, this.person});
+  Portfolio({this.isEditing, this.person});
 
   @override
   _PortfolioState createState() => _PortfolioState();
