@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class Contact extends StatefulWidget {
+  final bool isEditing;
   final Person person;
 
-  Contact({this.person});
+  Contact({this.isEditing, this.person});
 
   @override
   _ContactState createState() => _ContactState();
@@ -34,7 +35,7 @@ class _ContactState extends State<Contact> {
   void initState() {
     super.initState();
 
-    if (widget.person != null) {
+    if (widget.isEditing == true) {
       id = widget.person.id;
       phoneNumber = widget.person.phone;
       email = widget.person.email;
@@ -50,6 +51,22 @@ class _ContactState extends State<Contact> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.save),
+        onPressed: () async {
+          await dbHelper.updateContactInformation(
+              id,
+              phoneNumberController.text,
+              emailController.text,
+              addressController.text,
+              linkedinController.text,
+              facebookController.text,
+              githubController.text);
+          Scaffold.of(context).showSnackBar(SnackBar(
+              duration: const Duration(seconds: 3),
+              content: Text('Data Updated')));
+        },
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -228,37 +245,37 @@ class _ContactState extends State<Contact> {
               ),
             ),
             SizedBox(height: 10.0),
-            GestureDetector(
-              onTap: () async {
-                await dbHelper.updateContactInformation(
-                    id,
-                    phoneNumberController.text,
-                    emailController.text,
-                    addressController.text,
-                    linkedinController.text,
-                    facebookController.text,
-                    githubController.text);
-              },
-              child: Container(
-                height: 60.0,
-                width: width - 10,
-                child: Material(
-                  borderRadius: BorderRadius.circular(30.0),
-                  color: Theme.of(context).accentColor,
-                  child: Center(
-                    child: Text(
-                      "Save Changes",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10.0),
+            // GestureDetector(
+            //   onTap: () async {
+            //     await dbHelper.updateContactInformation(
+            //         id,
+            //         phoneNumberController.text,
+            //         emailController.text,
+            //         addressController.text,
+            //         linkedinController.text,
+            //         facebookController.text,
+            //         githubController.text);
+            //   },
+            //   child: Container(
+            //     height: 60.0,
+            //     width: width - 10,
+            //     child: Material(
+            //       borderRadius: BorderRadius.circular(30.0),
+            //       color: Theme.of(context).accentColor,
+            //       child: Center(
+            //         child: Text(
+            //           "Save Changes",
+            //           style: TextStyle(
+            //             fontWeight: FontWeight.bold,
+            //             fontSize: 18.0,
+            //             color: Colors.white,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(height: 10.0),
           ],
         ),
       ),
