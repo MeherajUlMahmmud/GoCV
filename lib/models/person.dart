@@ -3,9 +3,7 @@ class Person {
   final String title;
   final String firstName;
   final String surname;
-  final String jobTitle;
   final String aboutMe;
-  final String gender;
   final String dob;
   final String nationality;
   final String country;
@@ -23,9 +21,7 @@ class Person {
     this.title,
     this.firstName,
     this.surname,
-    this.jobTitle,
     this.aboutMe,
-    this.gender,
     this.dob,
     this.nationality,
     this.country,
@@ -45,9 +41,7 @@ class Person {
       "title": title,
       "firstName": firstName,
       "surname": surname,
-      "jobTitle": jobTitle,
       "aboutMe": aboutMe,
-      "gender": gender,
       "dob": dob,
       "nationality": nationality,
       "country": country,
