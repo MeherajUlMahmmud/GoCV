@@ -33,15 +33,15 @@ class _PersonCardState extends State<PersonCard> {
       margin: EdgeInsets.all(10.0),
       child: Container(
         margin: EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Row(
-                  children: <Widget>[
+                  children: [
                     CircleAvatar(
                       radius: 30.0,
                       backgroundImage: AssetImage("assets/avatars/rdj.png"),
@@ -56,54 +56,6 @@ class _PersonCardState extends State<PersonCard> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10.0),
-                Text(
-                  "Created on:",
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.calendar_today,
-                          size: 20.0,
-                        ),
-                        Text(
-                          widget.person.creationDateTime.toString(),
-                          // "10:15",
-                          style: TextStyle(
-                            fontSize: 12.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 5.0),
-                    // Row(
-                    //   children: <Widget>[
-                    //     Icon(
-                    //       Icons.watch_later,
-                    //       size: 20.0,
-                    //     ),
-                    //     Text(
-                    //       "10:11 am",
-                    //       style: TextStyle(
-                    //         fontSize: 12.0,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
@@ -121,25 +73,36 @@ class _PersonCardState extends State<PersonCard> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.0),
-                Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          title = widget.person.title;
-                        });
-                        showTitleUpdateDialog(context);
-                      },
-                      child: Icon(
-                        Icons.edit,
-                        size: 30.0,
-                      ),
-                    ),
-                  ],
-                )
               ],
-            )
+            ),
+            SizedBox(height: 10.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.person.creationDateTime.toString(),
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black54,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      title = widget.person.title;
+                    });
+                    showTitleUpdateDialog(context);
+                  },
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 16.0),
+                      SizedBox(width: 10.0),
+                      Text("Edit Title"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
