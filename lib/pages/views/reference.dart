@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class Reference extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  Reference({this.type, this.person});
+  Reference({this.isEditing, this.person});
 
   @override
   _ReferenceState createState() => _ReferenceState();
