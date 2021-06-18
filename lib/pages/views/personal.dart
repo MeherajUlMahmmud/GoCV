@@ -1,15 +1,13 @@
 import 'package:cv_builder/helper/db_helper.dart';
 import 'package:cv_builder/models/person.dart';
-import 'package:dropdownfield/dropdownfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class Personal extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  Personal({this.type, this.person});
+  Personal({this.isEditing, this.person});
 
   @override
   _PersonalState createState() => _PersonalState();
@@ -18,9 +16,7 @@ class Personal extends StatefulWidget {
 class _PersonalState extends State<Personal> {
   TextEditingController firstNameController = new TextEditingController();
   TextEditingController surnameController = new TextEditingController();
-  TextEditingController jobTitleController = new TextEditingController();
   TextEditingController aboutMeController = new TextEditingController();
-  TextEditingController genderController = new TextEditingController();
   TextEditingController dobController = new TextEditingController();
   TextEditingController nationalityController = new TextEditingController();
   TextEditingController countryController = new TextEditingController();
@@ -30,58 +26,88 @@ class _PersonalState extends State<Personal> {
   String title = "";
   String firstName = "";
   String surname = "";
-  String jobTitle = "";
   String aboutMe = "";
-  String gender = "Male";
+  String dob = "";
   String nationality = "";
-  String country = "Bangladesh";
+  String country = "";
   String city = "";
   String creationDateTime = "";
 
-  String selectedGender;
-  List<String> genderList = <String>[
-    "Male",
-    "Female",
-  ];
 
   DBHelper dbHelper = DBHelper();
 
   DateTime selectedDate = DateTime.now();
 
-  // String formattedDate = DateFormat.yMMMd().format(DateTime.now());
-  String formattedDate;
-
-  String dob = DateFormat.yMMMd().format(DateTime.now());
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1899, 1),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-        formattedDate = DateFormat.yMMMd().format(selectedDate);
-      });
-  }
-
   @override
   void initState() {
     super.initState();
+    // print(widget.person.title);
+    // print(widget.person.firstName);
+    // print(widget.person.surname);
+    // print(widget.person.email);
+    // print(widget.person.aboutMe);
+    // print(widget.person.firstName);
+    // print(widget.person.firstName);
 
-    if (widget.person != null) {
+    if (widget.isEditing == true) {
+      firstNameController.value = firstNameController.value.copyWith(
+        text: widget.person.firstName,
+        selection: widget.person.firstName != null
+            ? TextSelection.collapsed(offset: widget.person.firstName.length)
+            : null,
+      );
+
+      surnameController.value = surnameController.value.copyWith(
+        text: widget.person.surname,
+        selection: widget.person.surname != null
+            ? TextSelection.collapsed(offset: widget.person.surname.length)
+            : null,
+      );
+
+      aboutMeController.value = aboutMeController.value.copyWith(
+        text: widget.person.aboutMe,
+        selection: widget.person.aboutMe != null
+            ? TextSelection.collapsed(offset: widget.person.aboutMe.length)
+            : null,
+      );
+
+      dobController.value = dobController.value.copyWith(
+        text: widget.person.dob,
+        selection: widget.person.dob != null
+            ? TextSelection.collapsed(offset: widget.person.dob.length)
+            : null,
+      );
+
+      nationalityController.value = nationalityController.value.copyWith(
+        text: widget.person.nationality,
+        selection: widget.person.nationality != null
+            ? TextSelection.collapsed(offset: widget.person.nationality.length)
+            : null,
+      );
+
+      countryController.value = countryController.value.copyWith(
+        text: widget.person.country,
+        selection: widget.person.country != null
+            ? TextSelection.collapsed(offset: widget.person.country.length)
+            : null,
+      );
+
+      cityController.value = cityController.value.copyWith(
+        text: widget.person.city,
+        selection: widget.person.city != null
+            ? TextSelection.collapsed(offset: widget.person.city.length)
+            : null,
+      );
+
       id = widget.person.id;
       title = widget.person.title;
-      firstName = widget.person.firstName;
-      surname = widget.person.surname;
-      jobTitle = widget.person.jobTitle;
-      aboutMe = widget.person.aboutMe;
-      gender = widget.person.gender;
-      dob = widget.person.dob;
-      nationality = widget.person.nationality;
-      country = widget.person.country;
-      city = widget.person.city;
+      // firstName = widget.person.firstName;
+      // surname = widget.person.surname;
+      // aboutMe = widget.person.aboutMe;
+      // dob = widget.person.dob;
+      // nationality = widget.person.nationality;
+      // country = widget.person.country;
+      // city = widget.person.city;
       creationDateTime = widget.person.creationDateTime;
     }
   }
@@ -94,253 +120,95 @@ class _PersonalState extends State<Personal> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Container(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Icon(
-                            Icons.arrow_back,
-                            size: 30.0,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      // Expanded(
-                      //   child: TextField(
-                      //     controller: TextEditingController()..text = title,
-                      //     onSubmitted: (value) async {
-                      //       if (value.isNotEmpty) {
-                      //         if (widget.person == null) {
-                      //           Person newPerson = Person(
-                      //             title: value,
-                      //             creationDateTime: DateFormat.yMd()
-                      //                 .add_jm()
-                      //                 .format(DateTime.now()),
-                      //           );
-                      //           id = await dbHelper.insertPerson(newPerson);
-                      //           print("inserted");
-                      //         } else {
-                      //           await dbHelper.updateTitle(
-                      //               widget.person.id, value);
-                      //           print("Updated");
-                      //         }
-                      //       }
-                      //     },
-                      //     decoration: InputDecoration(
-                      //       hintText: "Profile Title",
-                      //       border: InputBorder.none,
-                      //     ),
-                      //     style: TextStyle(
-                      //       fontSize: 22.0,
-                      //       fontWeight: FontWeight.bold,
-                      //       color: Color(0xff211551),
-                      //     ),
-                      //   ),
-                      // )
-                    ],
-                  ),
-                ),
-                // image and name
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.save),
+        onPressed: () async {
+          firstName = firstNameController.text;
+          surname = surnameController.text;
+          aboutMe = aboutMeController.text;
+          dob = dobController.text;
+          nationality = nationalityController.text;
+          country = countryController.text;
+          city = cityController.text;
+          print(firstName);
+          print(firstNameController.text);
+          print(surname);
+          print(aboutMe);
+          print(dob);
+          print(nationality);
+          print(country);
+          print(city);
+          await dbHelper.updatePersonalInformation(
+              id,
+              firstNameController.text,
+              surnameController.text,
+              aboutMeController.text,
+              dobController.text,
+              nationalityController.text,
+              countryController.text,
+              cityController.text);
+          Scaffold.of(context).showSnackBar(SnackBar(
+              duration: const Duration(seconds: 3),
+              content: Text('Data Updated')));
+        },
+      ),
+      body: Container(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: Row(
                   children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      height: 110,
-                      width: 123,
-                      child: Image.asset("assets/avatars/rdj.png"),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(5.0),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            width: (width - 10) / 1.8,
-                            child: Theme(
-                              child: TextFormField(
-                                maxLines: null,
-                                textCapitalization:
-                                    TextCapitalization.sentences,
-                                controller: firstNameController
-                                  ..text = firstName,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person_outline),
-                                  labelText: "First Name",
-                                  labelStyle: TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                  border: new OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(25.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(25.0),
-                                    borderSide:
-                                        BorderSide(color: Colors.blueAccent),
-                                  ),
-                                ),
-                              ),
-                              data: Theme.of(context).copyWith(
-                                primaryColor: Colors.blueAccent,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 5.0),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            width: (width - 10) / 1.8,
-                            child: Theme(
-                              child: TextFormField(
-                                maxLines: null,
-                                keyboardType: TextInputType.name,
-                                controller: surnameController..text = surname,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person_outline),
-                                  labelText: "Surname",
-                                  labelStyle: TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                  border: new OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(25.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(25.0),
-                                    borderSide:
-                                        BorderSide(color: Colors.blueAccent),
-                                  ),
-                                ),
-                              ),
-                              data: Theme.of(context).copyWith(
-                                primaryColor: Colors.blueAccent,
-                              ),
-                            ),
-                          ),
-                        ],
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: 30.0,
+                        ),
                       ),
-                    )
+                    ),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
                   ],
                 ),
-
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  width: (width - 10) / 1,
-                  child: Theme(
-                    child: TextFormField(
-                      maxLines: null,
-                      controller: jobTitleController..text = jobTitle,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline),
-                        labelText: "Job Title",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                        ),
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Colors.blueAccent,
-                    ),
+              ),
+              // image and name
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    height: 110,
+                    width: 123,
+                    child: Image.asset("assets/avatars/rdj.png"),
                   ),
-                ),
-                SizedBox(height: 10.0),
-                // about me
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  width: (width - 10) / 1,
-                  child: Theme(
-                    child: TextFormField(
-                      maxLines: null,
-                      controller: aboutMeController..text = aboutMe,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline),
-                        labelText: "About Me",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                        ),
-                      ),
-                      keyboardType: TextInputType.multiline,
-                    ),
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Colors.blueAccent,
-                    ),
-                  ),
-                ),
-                // gender
-                Container(
-                  padding: EdgeInsets.all(10.0),
-                  child: DropDownField(
-                    controller: genderController
-                      ..text = gender == null ? genderList[0] : gender,
-                    enabled: true,
-                    onValueChanged: (value) {
-                      setState(() {
-                        selectedGender = value;
-                        genderController..text = selectedGender;
-                      });
-                    },
-                    value: selectedGender,
-                    required: false,
-                    labelText: 'Gender',
-                    items: genderList,
-                  ),
-                ),
-                Container(
-                  child: Row(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 8.0),
-                        width: (width - 10) / 1.2,
-                        child: Theme(
-                          child: AbsorbPointer(
+                  Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8.0),
+                          width: (width - 10) / 1.8,
+                          child: Theme(
                             child: TextFormField(
-                              // onSaved: (val) {
-                              //   creationDateTime = formattedDate;
-                              // },
-                              // enabled: false,
-                              // readOnly: true,
-                              controller: dobController
-                                ..text =
-                                    formattedDate == null ? dob : formattedDate,
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: firstNameController,
                               decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.calendar_today),
-                                labelText: "Date of Birth",
+                                prefixIcon: Icon(Icons.person_outline),
+                                labelText: "First Name",
                                 labelStyle: TextStyle(
                                   color: Colors.grey,
                                 ),
@@ -353,148 +221,201 @@ class _PersonalState extends State<Personal> {
                                       BorderSide(color: Colors.blueAccent),
                                 ),
                               ),
-                              keyboardType: TextInputType.text,
+                            ),
+                            data: Theme.of(context).copyWith(
+                              primaryColor: Colors.blueAccent,
                             ),
                           ),
-                          data: Theme.of(context).copyWith(
-                            primaryColor: Colors.blueAccent,
+                        ),
+                        SizedBox(height: 5.0),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8.0),
+                          width: (width - 10) / 1.8,
+                          child: Theme(
+                            child: TextFormField(
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              keyboardType: TextInputType.name,
+                              controller: surnameController,
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.person_outline),
+                                labelText: "Surname",
+                                labelStyle: TextStyle(
+                                  color: Colors.grey,
+                                ),
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(25.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(25.0),
+                                  borderSide:
+                                      BorderSide(color: Colors.blueAccent),
+                                ),
+                              ),
+                            ),
+                            data: Theme.of(context).copyWith(
+                              primaryColor: Colors.blueAccent,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 10.0),
+              // about me
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                width: (width - 10) / 1,
+                child: Theme(
+                  child: TextFormField(
+                    maxLines: null,
+                    textCapitalization: TextCapitalization.sentences,
+                    controller: aboutMeController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: "About Me",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.calendar_today),
-                        onPressed: () => _selectDate(context),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                // nationality
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  width: (width - 10) / 1,
-                  child: Theme(
-                    child: TextFormField(
-                      maxLines: null,
-                      controller: nationalityController..text = nationality,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline),
-                        labelText: "Nationality",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                        ),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
                       ),
-                      keyboardType: TextInputType.text,
-                    ),
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Colors.blueAccent,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                // country
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  width: (width - 10) / 1,
-                  child: Theme(
-                    child: TextFormField(
-                      maxLines: null,
-                      controller: countryController..text = country,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline),
-                        labelText: "Country",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                        ),
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Colors.blueAccent,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                // city
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                  width: (width - 10) / 1,
-                  child: Theme(
-                    child: TextFormField(
-                      maxLines: null,
-                      controller: cityController..text = city,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.location_city),
-                        labelText: "City",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                        ),
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Colors.blueAccent,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                GestureDetector(
-                  onTap: () async {
-                    await dbHelper.updatePersonalInformation(
-                        id,
-                        firstNameController.text,
-                        surnameController.text,
-                        jobTitleController.text,
-                        aboutMeController.text,
-                        genderController.text,
-                        dobController.text,
-                        nationalityController.text,
-                        countryController.text,
-                        cityController.text);
-                  },
-                  child: Container(
-                    height: 60.0,
-                    width: width - 10,
-                    child: Material(
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Theme.of(context).accentColor,
-                      child: Center(
-                        child: Text(
-                          "Save Changes",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
-                            color: Colors.white,
-                          ),
-                        ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: BorderSide(color: Colors.blueAccent),
                       ),
                     ),
+                    keyboardType: TextInputType.multiline,
+                  ),
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Colors.blueAccent,
                   ),
                 ),
-                SizedBox(height: 10.0)
-              ],
-            ),
+              ),
+              SizedBox(height: 10.0),
+              // gender
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                width: (width - 10) / 1,
+                child: Theme(
+                  child: TextFormField(
+                    controller: dobController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.calendar_today),
+                      labelText: "Date of Birth",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide:
+                            BorderSide(color: Colors.blueAccent),
+                      ),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Colors.blueAccent,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              // nationality
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                width: (width - 10) / 1,
+                child: Theme(
+                  child: TextFormField(
+                    maxLines: null,
+                    controller: nationalityController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: "Nationality",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: BorderSide(color: Colors.blueAccent),
+                      ),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Colors.blueAccent,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              // country
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                width: (width - 10) / 1,
+                child: Theme(
+                  child: TextFormField(
+                    maxLines: null,
+                    controller: countryController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: "Country",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: BorderSide(color: Colors.blueAccent),
+                      ),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Colors.blueAccent,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              // city
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                width: (width - 10) / 1,
+                child: Theme(
+                  child: TextFormField(
+                    maxLines: null,
+                    controller: cityController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.location_city),
+                      labelText: "City",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: BorderSide(color: Colors.blueAccent),
+                      ),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Colors.blueAccent,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+            ],
           ),
         ),
       ),
