@@ -22,6 +22,14 @@ class AddExperience extends StatelessWidget {
         ),
         centerTitle: true,
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.save),
+        onPressed: () {
+          Scaffold.of(context).showSnackBar(SnackBar(
+              duration: const Duration(seconds: 3),
+              content: Text('Data Updated')));
+        },
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -60,8 +68,6 @@ class AddExperience extends StatelessWidget {
               iconText: Icon(Icons.person_outline),
               ratio: 1.0,
             ),
-            SizedBox(height: 10.0),
-            Button(btnText: "Save Changes"),
             SizedBox(height: 10.0),
           ],
         ),
