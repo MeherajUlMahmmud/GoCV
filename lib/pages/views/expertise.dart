@@ -3,10 +3,10 @@ import 'package:cv_builder/widgets/custom_text_view.dart';
 import 'package:flutter/material.dart';
 
 class Expertise extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  Expertise({this.type, this.person});
+  Expertise({this.isEditing, this.person});
 
   @override
   _ExpertiseState createState() => _ExpertiseState();
