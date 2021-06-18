@@ -83,7 +83,7 @@ class _PersonPageState extends State<PersonPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NewPerson(person: person),
+                            builder: (context) => NewPerson(isEditing: true, person: person),
                           ),
                         );
                       },
@@ -207,14 +207,14 @@ class _PersonPageState extends State<PersonPage> {
 
   void showAddDialog(BuildContext context) {
     // set up the button
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = ElevatedButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
-    Widget okButton = FlatButton(
+    Widget okButton = ElevatedButton(
       child: Text("Save"),
       onPressed: () async {
         String title = titleController.text;
@@ -229,7 +229,7 @@ class _PersonPageState extends State<PersonPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NewPerson(type: 1, person: newPerson),
+            builder: (context) => NewPerson(isEditing: false, person: newPerson),
           ),
         ).then((value) {
           setState(() {});
