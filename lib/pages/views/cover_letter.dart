@@ -3,10 +3,10 @@ import 'package:cv_builder/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class CoverLetter extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  CoverLetter({this.type, this.person});
+  CoverLetter({this.isEditing, this.person});
 
   @override
   _CoverLetterState createState() => _CoverLetterState();
