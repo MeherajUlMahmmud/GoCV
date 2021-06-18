@@ -6,16 +6,17 @@ import 'package:cv_builder/pages/views/portfolio.dart';
 import 'package:cv_builder/pages/views/reference.dart';
 import 'package:flutter/material.dart';
 
+import '../models/person.dart';
 import 'views/contact.dart';
 import 'views/cover_letter.dart';
 import 'views/personal.dart';
 import 'views/work_experience.dart';
 
 class NewPerson extends StatefulWidget {
-  final int type;
+  final bool isEditing;
   final Person person;
 
-  NewPerson({this.type, this.person});
+  NewPerson({this.isEditing, this.person});
 
   @override
   _NewPersonState createState() => _NewPersonState();
@@ -45,15 +46,9 @@ class _NewPersonState extends State<NewPerson>
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              "Resume",
-            ),
-            Text(
-              "Information",
-              style: TextStyle(color: Colors.blue),
-            ),
+            Text("Resume Information"),
           ],
-        )
+        ),
       ),
       body: Container(
         child: Column(
@@ -121,14 +116,14 @@ class _NewPersonState extends State<NewPerson>
                 child: TabBarView(
                   controller: tabController,
                   children: <Widget>[
-                    Personal(type: widget.type, person: widget.person),
-                    Contact(person: widget.person),
-                    Educational(type: widget.type, person: widget.person),
-                    Experience(type: widget.type, person: widget.person),
-                    Expertise(type: widget.type, person: widget.person),
-                    Reference(type: widget.type, person: widget.person),
-                    CoverLetter(type: widget.type, person: widget.person),
-                    Portfolio(type: widget.type, person: widget.person),
+                    Personal(isEditing: widget.isEditing, person: widget.person),
+                    Contact(isEditing: widget.isEditing, person: widget.person),
+                    Educational(isEditing: widget.isEditing, person: widget.person),
+                    Experience(isEditing: widget.isEditing, person: widget.person),
+                    Expertise(isEditing: widget.isEditing, person: widget.person),
+                    Reference(isEditing: widget.isEditing, person: widget.person),
+                    CoverLetter(isEditing: widget.isEditing, person: widget.person),
+                    Portfolio(isEditing: widget.isEditing, person: widget.person),
                   ],
                 ),
               ),
