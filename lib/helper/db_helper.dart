@@ -9,8 +9,8 @@ class DBHelper {
       join(await getDatabasesPath(), 'person.db'),
       onCreate: (db, version) async {
         await db.execute(
-            "CREATE TABLE persons(id INTEGER PRIMARY KEY, title TEXT, firstName TEXT, surname TEXT,"
-            "jobTitle TEXT, aboutMe TEXT, gender TEXT, dob TEXT, nationality TEXT,"
+            "CREATE TABLE persons(id INTEGER PRIMARY KEY, title TEXT, firstName TEXT,"
+            "surname TEXT, jobTitle TEXT, aboutMe TEXT, gender TEXT, dob TEXT, nationality TEXT,"
             "country TEXT, city TEXT, creationDateTime TEXT, phone TEXT, email TEXT,"
             "address TEXT, linkedin TEXT, facebook TEXT, github TEXT)");
 
@@ -63,9 +63,7 @@ class DBHelper {
         title: personMap[i]['title'],
         firstName: personMap[i]['firstName'],
         surname: personMap[i]['surname'],
-        jobTitle: personMap[i]['jobTitle'],
         aboutMe: personMap[i]['aboutMe'],
-        gender: personMap[i]['gender'],
         dob: personMap[i]['dob'],
         nationality: personMap[i]['nationality'],
         country: personMap[i]['country'],
@@ -90,29 +88,22 @@ class DBHelper {
       int id,
       String firstName,
       String surname,
-      String jobTitle,
       String aboutMe,
-      String gender,
       String dob,
       String nationality,
       String country,
       String city) async {
     Database db = await database();
-    await db.rawUpdate(
-        "update persons set firstName = '$firstName', surname = '$surname', jobTitle = '$jobTitle',"
-        "aboutMe = '$aboutMe', gender = '$gender', dob = '$dob', nationality = '$nationality',"
-        "country = '$country', city = '$city' where id = '$id'");
-    print("Updated");
-
-    // print(firstName +
-    //     surname +
-    //     jobTitle +
-    //     aboutMe +
-    //     gender +
-    //     dob +
-    //     nationality +
-    //     country +
-    //     city);
+    print(firstName + surname);
+    try {
+      await db.rawUpdate(
+          "update persons set firstName = '$firstName', surname = '$surname',"
+          "aboutMe = '$aboutMe', dob = '$dob', nationality = '$nationality',"
+          "country = '$country', city = '$city' where id = '$id'");
+      print("Updated");
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> updateContactInformation(
