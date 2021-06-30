@@ -41,8 +41,8 @@ class _PersonalState extends State<Personal> {
   @override
   void initState() {
     super.initState();
-    // print(widget.person.title);
-    // print(widget.person.firstName);
+    print(widget.person.title);
+    print(widget.person.firstName);
     // print(widget.person.surname);
     // print(widget.person.email);
     // print(widget.person.aboutMe);

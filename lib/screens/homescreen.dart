@@ -2,6 +2,7 @@ import 'package:cv_builder/pages/home.dart';
 import 'package:cv_builder/pages/persons.dart';
 import 'package:cv_builder/pages/samples.dart';
 import 'package:cv_builder/pages/settings.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
@@ -44,42 +45,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         elevation: 1.0,
         title: currentTabIndex == 0
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Resume",
-                  ),
-                  Text(
-                    "Builder",
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ],
+            ? Text(
+                "Resume Builder",
               )
             : currentTabIndex == 1
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Sample",
-                      ),
-                      Text(
-                        "Resumes",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ],
+                ? Text(
+                    "Sample Resumes",
                   )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Created",
-                      ),
-                      Text(
-                        "Profiles",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ],
+                : Text(
+                    "Created Profiles",
                   ),
         centerTitle: true,
         actions: <Widget>[
@@ -103,9 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         backgroundColor: Theme.of(context).primaryColor,
-        selectedItemColor: Theme.of(context).accentColor,
-        unselectedItemColor: Colors.grey[500],
-        elevation: 3.0,
+        selectedItemColor: Colors.white,
+        // unselectedItemColor: Colors.grey[500],
+        elevation: 0.0,
         type: BottomNavigationBarType.fixed,
         currentIndex: currentTabIndex,
         items: <BottomNavigationBarItem>[

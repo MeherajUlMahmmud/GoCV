@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.edit,
+                          Feather.edit,
                           color: Colors.black,
                           size: 25,
                         ),
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.delete,
+                          Feather.delete,
                           color: Colors.black,
                           size: 25,
                         ),
