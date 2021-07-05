@@ -1,7 +1,7 @@
 import 'package:cv_builder/helper/db_helper.dart';
 import 'package:cv_builder/models/person.dart';
-import 'package:cv_builder/pages/new_person.dart';
-import 'package:cv_builder/pages/settings.dart';
+import 'package:cv_builder/screens/new_person.dart';
+import 'package:cv_builder/screens/settings.dart';
 import 'package:cv_builder/utils/uidata.dart';
 import 'package:cv_builder/widgets/empty_view.dart';
 import 'package:cv_builder/widgets/person_card.dart';
@@ -18,53 +18,117 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController titleController = TextEditingController();
 
-  DBHelper dbHelper = DBHelper();
 
-  Widget header(Person person) => Ink(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: UIData.kitGradients2),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              CircleAvatar(
-                radius: 30.0,
-                backgroundImage: AssetImage("assets/avatars/rdj.png"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ProfileTile(
-                  title: person.title,
-                  subtitle: "abcd",
-                  // textColor: Colors.white,
-                ),
-              )
-            ],
+  DBHelper dbHelper = DBHelper();
+  Future<List<Person>> persons;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    persons = dbHelper.getPersons();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Resume Builder"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Feather.settings,
+            ),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => Settings()));
+            },
           ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showAddDialog(context);
+        },
+        child: Icon(
+          Feather.plus,
+          size: 35.0,
+          color: Colors.white,
         ),
-      );
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: Container(
+        width: double.infinity,
+        child: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder(
+                initialData: [],
+                future: persons,
+                builder: (context, snapshot) {
+                  return snapshot.data.length > 0
+                      ? ListView.builder(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, index) {
+                            // print(snapshot.data[3].toString());
+                            return InkWell(
+                              splashColor: Colors.orange,
+                              onTap: () => _showModalBottomSheet(
+                                  context, snapshot.data[index]),
+                              child: PersonCard(
+                                person: snapshot.data[index],
+                              ),
+                            );
+                            // return;
+                          },
+                        )
+                      : EmptyView();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showModalBottomSheet(BuildContext context, Person person) {
     showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(20.0),
+          topRight: const Radius.circular(20.0),
+        ),
+      ),
+      backgroundColor: Colors.white,
       context: context,
       builder: (context) => Container(
-        // color: Colors.grey,
-        clipBehavior: Clip.antiAlias,
-        decoration: new BoxDecoration(
-          // color: Colors.grey,
-          borderRadius: new BorderRadius.only(
-            topLeft: const Radius.circular(100.0),
-            topRight: const Radius.circular(100.0),
-          ),
-        ),
+        height: 180.0,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            header(person),
-            Divider(color: Colors.black),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 30.0,
+                    backgroundImage: AssetImage("assets/avatars/rdj.png"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ProfileTile(
+                      title: person.title,
+                      subtitle: "abcd",
+                      // textColor: Colors.white,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            // Divider(color: Colors.black),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -82,7 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NewPerson(isEditing: true, person: person),
+                          builder: (context) =>
+                              NewPerson(isEditing: true, person: person),
                         ),
                       );
                     },
@@ -152,69 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Resume Builder"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Feather.settings,
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => Settings()));
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAddDialog(context);
-        },
-        child: Icon(
-          Feather.plus,
-          size: 35.0,
-          color: Colors.white,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          children: [
-            Expanded(
-              child: FutureBuilder(
-                initialData: [],
-                future: dbHelper.getPersons(),
-                builder: (context, snapshot) {
-                  return snapshot.data.length > 0
-                      ? ListView.builder(
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (context, index) {
-                            // print(snapshot.data[3].toString());
-                            return InkWell(
-                              splashColor: Colors.orange,
-                              onTap: () => _showModalBottomSheet(
-                                  context, snapshot.data[index]),
-                              child: PersonCard(
-                                person: snapshot.data[index],
-                              ),
-                            );
-                            // return;
-                          },
-                        )
-                      : EmptyView();
-                },
-              ),
-            ),
-          ],
-        ),
+        // ),
       ),
     );
   }
@@ -243,7 +246,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NewPerson(isEditing: false, person: newPerson),
+            builder: (context) =>
+                NewPerson(isEditing: false, person: newPerson),
           ),
         ).then((value) {
           setState(() {});
@@ -288,14 +292,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void showDeleteDialog(BuildContext context, Person person) {
     // set up the button
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
-    Widget okButton = FlatButton(
+    Widget okButton = TextButton(
       child: Text("Delete"),
       onPressed: () async {
         await dbHelper.deletePerson(person.id);

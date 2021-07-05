@@ -1,6 +1,6 @@
 class Education {
-  final int personId;
   final int id;
+  final int personId;
   final String years;
   final String school;
   final String faculty;
@@ -9,8 +9,8 @@ class Education {
   final String notes;
 
   Education({
-    this.personId,
     this.id,
+    this.personId,
     this.years,
     this.school,
     this.faculty,
@@ -21,8 +21,8 @@ class Education {
 
   Map<String, dynamic> toMap() {
     return {
-      "personId": personId,
       "id": id,
+      "personId": personId,
       "years": years,
       "school": school,
       "faculty": faculty,

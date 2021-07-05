@@ -1,26 +1,24 @@
 import 'package:cv_builder/models/person.dart';
-import 'package:cv_builder/pages/views/nested_views/add_experience.dart';
+import 'package:cv_builder/pages/nested_views/add_reference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
-class Experience extends StatefulWidget {
+class Reference extends StatefulWidget {
   final bool isEditing;
   final Person person;
 
-  Experience({this.isEditing, this.person});
+  Reference({this.isEditing, this.person});
 
   @override
-  _ExperienceState createState() => _ExperienceState();
+  _ReferenceState createState() => _ReferenceState();
 }
 
-class _ExperienceState extends State<Experience> {
+class _ReferenceState extends State<Reference> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[],
-        ),
+      body: Column(
+        children: <Widget>[],
       ),
       floatingActionButton: FloatingActionButton(
         child: IconButton(
@@ -29,18 +27,18 @@ class _ExperienceState extends State<Experience> {
             color: Colors.white,
           ),
           onPressed: () {
-            takeToAddExperience();
+            takeToAddReference();
           },
         ),
       ),
     );
   }
 
-  takeToAddExperience() {
+  takeToAddReference() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddExperience(),
+        builder: (context) => AddReference(),
       ),
     );
   }

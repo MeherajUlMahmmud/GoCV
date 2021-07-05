@@ -1,19 +1,19 @@
 import 'package:cv_builder/models/person.dart';
-import 'package:cv_builder/pages/views/nested_views/add_reference.dart';
+import 'package:cv_builder/pages/nested_views/add_education.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
-class Reference extends StatefulWidget {
+class Educational extends StatefulWidget {
   final bool isEditing;
   final Person person;
 
-  Reference({this.isEditing, this.person});
+  Educational({this.isEditing, this.person});
 
   @override
-  _ReferenceState createState() => _ReferenceState();
+  _EducationalState createState() => _EducationalState();
 }
 
-class _ReferenceState extends State<Reference> {
+class _EducationalState extends State<Educational> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,18 +27,18 @@ class _ReferenceState extends State<Reference> {
             color: Colors.white,
           ),
           onPressed: () {
-            takeToAddReference();
+            takeToAddEducation();
           },
         ),
       ),
     );
   }
 
-  takeToAddReference() {
+  takeToAddEducation() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddReference(),
+        builder: (context) => AddEducation(),
       ),
     );
   }

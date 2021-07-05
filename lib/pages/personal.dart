@@ -1,7 +1,7 @@
 import 'package:cv_builder/helper/db_helper.dart';
 import 'package:cv_builder/models/person.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Personal extends StatefulWidget {
   final bool isEditing;
@@ -33,7 +33,6 @@ class _PersonalState extends State<Personal> {
   String city = "";
   String creationDateTime = "";
 
-
   DBHelper dbHelper = DBHelper();
 
   DateTime selectedDate = DateTime.now();
@@ -41,8 +40,8 @@ class _PersonalState extends State<Personal> {
   @override
   void initState() {
     super.initState();
-    print(widget.person.title);
-    print(widget.person.firstName);
+    // print(widget.person.title);
+    // print(widget.person.firstName);
     // print(widget.person.surname);
     // print(widget.person.email);
     // print(widget.person.aboutMe);
@@ -112,6 +111,20 @@ class _PersonalState extends State<Personal> {
     }
   }
 
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1901, 1),
+        lastDate: DateTime(2100));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        dobController.value = TextEditingValue(
+            text: DateFormat("yyyy-MM-dd").format(picked).toString());
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -130,26 +143,37 @@ class _PersonalState extends State<Personal> {
           nationality = nationalityController.text;
           country = countryController.text;
           city = cityController.text;
-          print(firstName);
-          print(firstNameController.text);
-          print(surname);
-          print(aboutMe);
-          print(dob);
-          print(nationality);
-          print(country);
-          print(city);
+          // print(firstName);
+          // print(firstNameController.text);
+          // print(surname);
+          // print(aboutMe);
+          // print(dob);
+          // print(nationality);
+          // print(country);
+          // print(city);
+          // await dbHelper.updatePersonalInformation(
+          //     id,
+          //     firstNameController.text,
+          //     surnameController.text,
+          //     aboutMeController.text,
+          //     dobController.text,
+          //     nationalityController.text,
+          //     countryController.text,
+          //     cityController.text,
+          // );
           await dbHelper.updatePersonalInformation(
-              id,
-              firstNameController.text,
-              surnameController.text,
-              aboutMeController.text,
-              dobController.text,
-              nationalityController.text,
-              countryController.text,
-              cityController.text);
+            id,
+            firstName,
+            surname,
+            aboutMe,
+            dob,
+            nationality,
+            country,
+            city,
+          );
           Scaffold.of(context).showSnackBar(SnackBar(
               duration: const Duration(seconds: 3),
-              content: Text('Data Updated')));
+              content: Text('Personal Information Updated')));
         },
       ),
       body: Container(
@@ -158,30 +182,14 @@ class _PersonalState extends State<Personal> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(top: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Icon(
-                          Icons.arrow_back,
-                          size: 30.0,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+                padding: EdgeInsets.all(15.0),
+                child: Text(
+                  widget.person.title,
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
               // image and name
@@ -300,24 +308,28 @@ class _PersonalState extends State<Personal> {
                 margin: EdgeInsets.symmetric(horizontal: 8.0),
                 width: (width - 10) / 1,
                 child: Theme(
-                  child: TextFormField(
-                    controller: dobController,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.calendar_today),
-                      labelText: "Date of Birth",
-                      labelStyle: TextStyle(
-                        color: Colors.grey,
-                      ),
-                      border: new OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(25.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(25.0),
-                        borderSide:
-                            BorderSide(color: Colors.blueAccent),
+                  child: GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        controller: dobController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.calendar_today),
+                          labelText: "Date of Birth",
+                          labelStyle: TextStyle(
+                            color: Colors.grey,
+                          ),
+                          border: new OutlineInputBorder(
+                            borderRadius: new BorderRadius.circular(25.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: new BorderRadius.circular(25.0),
+                            borderSide: BorderSide(color: Colors.blueAccent),
+                          ),
+                        ),
+                        keyboardType: TextInputType.text,
                       ),
                     ),
-                    keyboardType: TextInputType.text,
                   ),
                   data: Theme.of(context).copyWith(
                     primaryColor: Colors.blueAccent,
@@ -332,6 +344,7 @@ class _PersonalState extends State<Personal> {
                 child: Theme(
                   child: TextFormField(
                     maxLines: null,
+                    textCapitalization: TextCapitalization.sentences,
                     controller: nationalityController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person_outline),
@@ -362,6 +375,7 @@ class _PersonalState extends State<Personal> {
                 child: Theme(
                   child: TextFormField(
                     maxLines: null,
+                    textCapitalization: TextCapitalization.sentences,
                     controller: countryController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person_outline),
@@ -392,6 +406,7 @@ class _PersonalState extends State<Personal> {
                 child: Theme(
                   child: TextFormField(
                     maxLines: null,
+                    textCapitalization: TextCapitalization.sentences,
                     controller: cityController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.location_city),

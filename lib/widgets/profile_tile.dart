@@ -16,14 +16,14 @@ class ProfileTile extends StatelessWidget {
           style: TextStyle(
               fontSize: 20.0, fontWeight: FontWeight.w700, color: textColor),
         ),
-        SizedBox(
-          height: 5.0,
-        ),
-        Text(
-          subtitle,
-          style: TextStyle(
-              fontSize: 15.0, fontWeight: FontWeight.normal, color: textColor),
-        ),
+        // SizedBox(
+        //   height: 5.0,
+        // ),
+        // Text(
+        //   subtitle,
+        //   style: TextStyle(
+        //       fontSize: 15.0, fontWeight: FontWeight.normal, color: textColor),
+        // ),
       ],
     );
   }
