@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Heading extends StatefulWidget {
-
   final String title;
-
 
   Heading({this.title});
 
