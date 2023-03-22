@@ -8,16 +8,13 @@ class AddReference extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 1.0,
-        title: Text(
-          "Add Reference"
-        ),
+        title: Text("Add Reference"),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.save),
         onPressed: () {
-
-          Scaffold.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               duration: const Duration(seconds: 3),
               content: Text('Data Updated')));
         },

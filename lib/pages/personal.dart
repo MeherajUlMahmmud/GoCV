@@ -171,7 +171,7 @@ class _PersonalState extends State<Personal> {
             country,
             city,
           );
-          Scaffold.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               duration: const Duration(seconds: 3),
               content: Text('Personal Information Updated')));
         },

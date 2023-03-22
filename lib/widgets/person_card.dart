@@ -138,8 +138,8 @@ class _PersonCardState extends State<PersonCard> {
                 widget.person.firstName != null
                     ? widget.person.firstName
                     : "FirstName" + " " + widget.person.surname != null
-                    ? widget.person.surname
-                    : "LastName",
+                        ? widget.person.surname
+                        : "LastName",
                 style: pw.TextStyle(
                   fontSize: 20.0,
                   fontWeight: pw.FontWeight.bold,
@@ -158,19 +158,19 @@ class _PersonCardState extends State<PersonCard> {
   showGiveNameDialog(BuildContext context) {
     String name;
     // set up the button
-    Widget okButton = FlatButton(
+    Widget okButton = ElevatedButton(
       child: Text("Save"),
       onPressed: () async {
         final File file = File("/storage/emulated/0/Download/$name.pdf");
         await file.writeAsBytes(pdf.save());
         Navigator.pop(context);
-        Scaffold.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("PDF Saved"),
         ));
       },
     );
 
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = ElevatedButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
@@ -208,7 +208,7 @@ class _PersonCardState extends State<PersonCard> {
 
   showTitleUpdateDialog(BuildContext context) {
     // set up the button
-    Widget okButton = FlatButton(
+    Widget okButton = ElevatedButton(
       child: Text("Update"),
       onPressed: () async {
         await dbHelper.updateTitle(widget.person.id, titleController.text);

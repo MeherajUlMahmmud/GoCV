@@ -35,11 +35,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Settings"
-        )
-      ),
+      appBar: AppBar(title: Text("Settings")),
       body: ListView.separated(
         padding: EdgeInsets.symmetric(horizontal: 10),
         shrinkWrap: true,
@@ -89,8 +85,7 @@ class _SettingsState extends State<Settings> {
             'CV and Resume Builder App',
           ),
           actions: <Widget>[
-            FlatButton(
-              textColor: Theme.of(context).accentColor,
+            TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Close',

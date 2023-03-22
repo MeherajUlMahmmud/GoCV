@@ -123,9 +123,9 @@ class _ContactState extends State<Contact> {
 
           await dbHelper.updateContactInformation(id, phoneNumber, email,
               address, linkedin, facebookController.text, github);
-          Scaffold.of(context).showSnackBar(SnackBar(
-              duration: const Duration(seconds: 3),
-              content: Text('Contact Information Updated')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Contact Information Saved"),
+          ));
         },
       ),
       body: SingleChildScrollView(

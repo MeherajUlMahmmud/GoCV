@@ -21,14 +21,12 @@ class _EducationalState extends State<Educational> {
         children: <Widget>[],
       ),
       floatingActionButton: FloatingActionButton(
-        child: IconButton(
-          icon: Icon(
-            Feather.plus,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            takeToAddEducation();
-          },
+        onPressed: () {
+          takeToAddEducation();
+        },
+        child: Icon(
+          Feather.plus,
+          color: Colors.white,
         ),
       ),
     );
