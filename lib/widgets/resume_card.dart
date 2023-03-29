@@ -1,29 +1,20 @@
-import 'dart:io';
-
-import 'package:cv_builder/helper/db_helper.dart';
-import 'package:cv_builder/models/person.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:permission_handler/permission_handler.dart';
 
-class PersonCard extends StatefulWidget {
-  final Person person;
+class ResumeCard extends StatefulWidget {
+  final Map<String, dynamic> resume;
 
-  PersonCard({this.person});
+  ResumeCard({required this.resume});
 
   @override
-  _PersonCardState createState() => _PersonCardState();
+  _ResumeCardState createState() => _ResumeCardState();
 }
 
-class _PersonCardState extends State<PersonCard> {
+class _ResumeCardState extends State<ResumeCard> {
   TextEditingController titleController = TextEditingController();
 
-  DBHelper dbHelper = DBHelper();
-  String title;
+  late String title;
 
-  final pdf = pw.Document();
+  // final pdf = pw.Document();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +39,7 @@ class _PersonCardState extends State<PersonCard> {
                     ),
                     SizedBox(width: 10.0),
                     Text(
-                      widget.person.title,
+                      widget.resume['name'],
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20.0,
@@ -56,23 +47,23 @@ class _PersonCardState extends State<PersonCard> {
                     ),
                   ],
                 ),
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: InkWell(
-                    onTap: () => convertToPdf(),
-                    child: Text(
-                      "Convert to PDF",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.all(8.0),
+                //   decoration: BoxDecoration(
+                //     color: Colors.blueAccent,
+                //     borderRadius: BorderRadius.circular(15.0),
+                //   ),
+                //   child: InkWell(
+                //     onTap: () => convertToPdf(),
+                //     child: Text(
+                //       "Convert to PDF",
+                //       style: TextStyle(
+                //         color: Colors.white,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 10.0),
@@ -80,7 +71,7 @@ class _PersonCardState extends State<PersonCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.person.creationDateTime.toString(),
+                  "Last Updated: " + widget.resume['updated_at'].toString(),
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.black54,
@@ -89,7 +80,7 @@ class _PersonCardState extends State<PersonCard> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      title = widget.person.title;
+                      title = widget.resume['name'];
                     });
                     showTitleUpdateDialog(context);
                   },
@@ -110,47 +101,47 @@ class _PersonCardState extends State<PersonCard> {
   }
 
   convertToPdf() async {
-    if (await Permission.storage.request().isGranted) {
-      savePdf();
+    // if (await Permission.storage.request().isGranted) {
+    //   savePdf();
 
-      // Directory tempDir = await getTemporaryDirectory();
-      // String tempPath = tempDir.path;
-      // final File file =
-      //     File("/storage/emulated/0/Download/${widget.person.title}.pdf");
-      // await file.writeAsBytes(pdf.save());
-    } else {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.storage,
-      ].request();
+    // Directory tempDir = await getTemporaryDirectory();
+    // String tempPath = tempDir.path;
+    // final File file =
+    //     File("/storage/emulated/0/Download/${widget.resume.title}.pdf");
+    // await file.writeAsBytes(pdf.save());
+    // } else {
+    //   Map<Permission, PermissionStatus> statuses = await [
+    //     Permission.storage,
+    //   ].request();
 
-      savePdf();
-    }
+    //   savePdf();
+    // }
   }
 
   savePdf() {
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              pw.Text(
-                widget.person.firstName != null
-                    ? widget.person.firstName
-                    : "FirstName" + " " + widget.person.surname != null
-                        ? widget.person.surname
-                        : "LastName",
-                style: pw.TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.Divider(indent: 10, endIndent: 10),
-            ],
-          ); // Center
-        },
-      ),
-    );
+    // pdf.addPage(
+    //   pw.Page(
+    //     pageFormat: PdfPageFormat.a4,
+    //     build: (pw.Context context) {
+    //       return pw.Column(
+    //         children: [
+    //           pw.Text(
+    //             widget.resume.firstName != null
+    //                 ? widget.resume.firstName
+    //                 : "FirstName" + " " + widget.resume.surname != null
+    //                     ? widget.resume.surname
+    //                     : "LastName",
+    //             style: pw.TextStyle(
+    //               fontSize: 20.0,
+    //               fontWeight: pw.FontWeight.bold,
+    //             ),
+    //           ),
+    //           pw.Divider(indent: 10, endIndent: 10),
+    //         ],
+    //       ); // Center
+    //     },
+    //   ),
+    // );
 
     showGiveNameDialog(context);
   }
@@ -161,8 +152,8 @@ class _PersonCardState extends State<PersonCard> {
     Widget okButton = ElevatedButton(
       child: Text("Save"),
       onPressed: () async {
-        final File file = File("/storage/emulated/0/Download/$name.pdf");
-        await file.writeAsBytes(pdf.save());
+        // final File file = File("/storage/emulated/0/Download/$name.pdf");
+        // await file.writeAsBytes(pdf.save());
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("PDF Saved"),
@@ -191,7 +182,7 @@ class _PersonCardState extends State<PersonCard> {
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.blue),
           ),
-          hintText: widget.person.title,
+          hintText: widget.resume['name'],
         ),
       ),
       actions: [okButton, cancelButton],
@@ -208,17 +199,16 @@ class _PersonCardState extends State<PersonCard> {
 
   showTitleUpdateDialog(BuildContext context) {
     // set up the button
-    Widget okButton = ElevatedButton(
+    Widget okButton = TextButton(
       child: Text("Update"),
       onPressed: () async {
-        await dbHelper.updateTitle(widget.person.id, titleController.text);
         Navigator.pop(context);
       },
     );
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Profile title"),
+      title: Text("Update Resume title"),
       content: TextFormField(
         autofocus: true,
         controller: titleController..text = title,
