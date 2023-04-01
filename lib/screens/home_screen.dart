@@ -1,4 +1,5 @@
 import 'package:cv_builder/apis/resume.dart';
+import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
 import 'package:cv_builder/screens/main_screens/ResumeDetailsScreen.dart';
 import 'package:cv_builder/screens/utility_screens/SettingsScreen.dart';
 import 'package:cv_builder/utils/helper.dart';
@@ -45,19 +46,50 @@ class _HomeScreenState extends State<HomeScreen> {
       if (data['status'] == 200) {
         setState(() {
           resumes = data['data'];
-          //     .map<Supplier>((item) => Supplier.fromJson(item))
-          //     .toList();
           isLoading = false;
           isError = false;
           errorText = '';
         });
       } else {
+        if (data['status'] == 401) {
+          Helper().showSnackBar(context, 'Session expired', Colors.red);
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        }
         setState(() {
           isLoading = false;
           isError = true;
           errorText = data['error'];
         });
         Helper().showSnackBar(context, 'Failed to fetch resumes', Colors.red);
+      }
+    });
+  }
+
+  createResume(String accessToken, String userId, String name) {
+    ResumeService().createResume(accessToken, userId, name).then((data) async {
+      print(data);
+      if (data['status'] == 201) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+        Navigator.pop(context);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ResumeDetailsScreen(
+        //       resume: data['data'],
+        //     ),
+        //   ),
+        // );
+      } else {
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = data['error'];
+        });
+        Helper().showSnackBar(context, 'Failed to create resume', Colors.red);
       }
     });
   }
@@ -91,31 +123,43 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : isError
-              ? Center(
-                  child: Text(
-                    errorText,
-                    style: TextStyle(
-                      color: Colors.red,
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchResumes(tokens['access'], user['uuid']);
+              },
+              child: isError
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            errorText,
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                          SizedBox(height: 10.0),
+                          ElevatedButton(
+                            onPressed: () {
+                              fetchResumes(tokens['access'], user['uuid']);
+                            },
+                            child: Text("Retry"),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: resumes.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () => showBottomSheet(context, resumes[index]),
+                          child: ResumeCard(
+                            resume: resumes[index],
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: () async {
-                    fetchResumes(tokens['access'], user['uuid']);
-                  },
-                  child: ListView.builder(
-                    itemCount: resumes.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () => showBottomSheet(context, resumes[index]),
-                        child: ResumeCard(
-                          resume: resumes[index],
-                        ),
-                      );
-                    },
-                  ),
-                ),
+            ),
     );
   }
 
@@ -151,8 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: ProfileTile(
                       title: resume['name'],
-                      // subtitle: "abcd",
-                      // textColor: Colors.white,
                     ),
                   )
                 ],
@@ -167,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
+                      print('resume');
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -230,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
         String title = titleController.text;
         titleController.clear();
         Navigator.pop(context);
+        createResume(tokens['access'], user['uuid'], title);
         // Person newPerson = Person(
         //   title: title,
         //   creationDateTime: DateFormat.yMd().add_jm().format(DateTime.now()),

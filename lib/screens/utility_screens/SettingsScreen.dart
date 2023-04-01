@@ -1,3 +1,6 @@
+import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
+import 'package:cv_builder/utils/helper.dart';
+import 'package:cv_builder/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class Settingsscreen extends StatefulWidget {
@@ -9,59 +12,68 @@ class Settingsscreen extends StatefulWidget {
 }
 
 class _SettingsscreenState extends State<Settingsscreen> {
-  List items = [
-    {
-      'icon': Icon(Icons.contact_page, size: 30),
-      'title': 'Contact Us',
-      // 'function': () => showAbout(),
-    },
-    {
-      'icon': Icon(Icons.privacy_tip, size: 30),
-      'title': 'About',
-      // 'function': () => showAbout(),
-    },
-    {
-      'icon': Icon(Icons.privacy_tip, size: 30),
-      'title': 'Licenses',
-      'function': (context) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => LicensePage(),
-        ));
-      }
-    },
-    {
-      'icon': RotationTransition(
-        turns: AlwaysStoppedAnimation(180 / 360),
-        child: Icon(
-          Icons.exit_to_app,
-          color: Colors.red,
-          size: 30,
-        ),
-      ),
-      'title': 'Logout',
-    }
-  ];
+  final LocalStorage localStorage = LocalStorage();
+
+  handleLogout() {
+    localStorage.clearData();
+    Helper().navigateAndClearStack(context, LoginScreen.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings'),
-      ),
-      body: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            onTap: () => items[index]['function'](context),
-            leading: items[index]['icon'],
-            title: Text(items[index]['title'], style: TextStyle(fontSize: 18)),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return Divider();
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text('Settings'),
+        ),
+        body: ListView(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                leading: Icon(Icons.contact_page, size: 30),
+                title: Text('Contact Us'),
+                onTap: () {},
+              ),
+            ),
+            const Divider(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                leading: Icon(Icons.privacy_tip, size: 30),
+                title: Text('About'),
+                onTap: () {},
+              ),
+            ),
+            const Divider(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                leading: Icon(Icons.privacy_tip, size: 30),
+                title: Text('Licenses'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => LicensePage(),
+                  ));
+                },
+              ),
+            ),
+            const Divider(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                leading: RotationTransition(
+                  turns: AlwaysStoppedAnimation(180 / 360),
+                  child: Icon(
+                    Icons.exit_to_app,
+                    color: Colors.red,
+                    size: 30,
+                  ),
+                ),
+                title: Text('Logout'),
+                onTap: () => handleLogout(),
+              ),
+            ),
+          ],
+        ));
   }
 }

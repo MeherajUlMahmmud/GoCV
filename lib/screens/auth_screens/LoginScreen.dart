@@ -4,9 +4,6 @@ import 'package:cv_builder/utils/helper.dart';
 import 'package:cv_builder/utils/local_storage.dart';
 import 'package:cv_builder/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = "/login";
@@ -59,22 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: Text("Login"),
       ),
-      body: Center(
+      body: SafeArea(
         child: Container(
-          width: 350,
-          height: 450,
           padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
           child: Form(
             key: _formKey,
             child: Center(
@@ -90,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelText: "Email",
                       hintText: "Email Address",
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email),
                     ),
                     onChanged: (value) {
                       email = value;
@@ -108,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelText: "Password",
                       hintText: "Password",
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
                           !isObscure ? Icons.visibility : Icons.visibility_off,
