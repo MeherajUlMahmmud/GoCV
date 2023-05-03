@@ -6,9 +6,15 @@ class URLS {
 
   // Auth
   static const String kAuthUrl = kBaseUrl + "auth/";
-  static const String kLoginUrl = kAuthUrl + "login";
+  static const String kLoginUrl = kAuthUrl + "login/";
   static const String kRefreshTokenUrl = kAuthUrl + "refresh/";
 
   // Resume
   static const String kResumeUrl = kBaseUrl + "resume/";
+
+  // Personal
+  static const String kPersonalUrl = kBaseUrl + "personal/";
+
+  // Contact
+  static const String kContactUrl = kBaseUrl + "contact/";
 }

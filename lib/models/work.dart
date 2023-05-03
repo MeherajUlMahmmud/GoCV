@@ -8,13 +8,13 @@ class Work {
   final String notes;
 
   Work({
-    this.personId,
-    this.id,
-    this.jobTitle,
-    this.company,
-    this.department,
-    this.years,
-    this.notes,
+    required this.personId,
+    required this.id,
+    required this.jobTitle,
+    required this.company,
+    required this.department,
+    required this.years,
+    required this.notes,
   });
 
   Map<String, dynamic> toMap() {

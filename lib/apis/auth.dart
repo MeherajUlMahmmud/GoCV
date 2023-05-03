@@ -21,6 +21,7 @@ class AuthService {
           'status': response.statusCode,
         };
       } else {
+        print(response.body);
         final data = jsonDecode(response.body);
         return {
           'error': data['detail'],

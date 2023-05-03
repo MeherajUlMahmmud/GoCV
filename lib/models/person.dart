@@ -17,22 +17,22 @@ class Person {
   final String github;
 
   Person({
-    this.id,
-    this.title,
-    this.firstName,
-    this.surname,
-    this.aboutMe,
-    this.dob,
-    this.nationality,
-    this.country,
-    this.city,
-    this.creationDateTime,
-    this.phone,
-    this.email,
-    this.address,
-    this.linkedin,
-    this.facebook,
-    this.github,
+    required this.id,
+    required this.title,
+    required this.firstName,
+    required this.surname,
+    required this.aboutMe,
+    required this.dob,
+    required this.nationality,
+    required this.country,
+    required this.city,
+    required this.creationDateTime,
+    required this.phone,
+    required this.email,
+    required this.address,
+    required this.linkedin,
+    required this.facebook,
+    required this.github,
   });
 
   Map<String, dynamic> toMap() {

@@ -6,11 +6,11 @@ class Certificate {
   final String date;
 
   Certificate({
-    this.personId,
-    this.id,
-    this.name,
-    this.issuedBy,
-    this.date,
+    required this.personId,
+    required this.id,
+    required this.name,
+    required this.issuedBy,
+    required this.date,
   });
 
   Map<String, dynamic> toMap() {

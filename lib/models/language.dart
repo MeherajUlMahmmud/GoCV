@@ -5,10 +5,10 @@ class Language {
   final int proficiency;
 
   Language({
-    this.personId,
-    this.id,
-    this.name,
-    this.proficiency,
+    required this.personId,
+    required this.id,
+    required this.name,
+    required this.proficiency,
   });
 
   Map<String, dynamic> toMap() {

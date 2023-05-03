@@ -41,8 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   fetchResumes(String accessToken, String userId) {
-    ResumeService().getResumeList(accessToken, userId).then((data) async {
-      print(data);
+    ResumeService()
+        .getResumeList(
+      accessToken,
+      userId,
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           resumes = data['data'];
@@ -75,14 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
           errorText = '';
         });
         Navigator.pop(context);
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ResumeDetailsScreen(
-        //       resume: data['data'],
-        //     ),
-        //   ),
-        // );
       } else {
         setState(() {
           isLoading = false;
@@ -98,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Resume Builder"),
+        title: Text("GoCV"),
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -209,7 +205,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      print('resume');
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -272,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> {
       onPressed: () async {
         String title = titleController.text;
         titleController.clear();
-        Navigator.pop(context);
         createResume(tokens['access'], user['uuid'], title);
         // Person newPerson = Person(
         //   title: title,

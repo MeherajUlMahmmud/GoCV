@@ -75,7 +75,9 @@ class ResumeService {
   }
 
   Future<Map<String, dynamic>> getResumeDetails(
-      String accessToken, String resumeId) async {
+    String accessToken,
+    String resumeId,
+  ) async {
     try {
       String url = "${URLS.kResumeUrl}$resumeId/";
       final response = await http.get(
@@ -87,8 +89,9 @@ class ResumeService {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data);
         return {
-          'data': data['data'],
+          'data': data,
           'status': response.statusCode,
         };
       } else {

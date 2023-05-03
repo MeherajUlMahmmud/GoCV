@@ -8,13 +8,13 @@ class Reference {
   final String phone;
 
   Reference({
-    this.personId,
-    this.id,
-    this.fullName,
-    this.workPlace,
-    this.designation,
-    this.email,
-    this.phone,
+    required this.personId,
+    required this.id,
+    required this.fullName,
+    required this.workPlace,
+    required this.designation,
+    required this.email,
+    required this.phone,
   });
 
   Map<String, dynamic> toMap() {

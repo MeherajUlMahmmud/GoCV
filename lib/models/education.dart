@@ -9,14 +9,14 @@ class Education {
   final String notes;
 
   Education({
-    this.id,
-    this.personId,
-    this.years,
-    this.school,
-    this.faculty,
-    this.department,
-    this.grade,
-    this.notes,
+    required this.id,
+    required this.personId,
+    required this.years,
+    required this.school,
+    required this.faculty,
+    required this.department,
+    required this.grade,
+    required this.notes,
   });
 
   Map<String, dynamic> toMap() {

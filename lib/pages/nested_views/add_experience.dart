@@ -1,5 +1,3 @@
-import 'package:cv_builder/widgets/button.dart';
-import 'package:cv_builder/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class AddExperience extends StatelessWidget {
@@ -34,40 +32,40 @@ class AddExperience extends StatelessWidget {
         child: Column(
           children: <Widget>[
             SizedBox(height: 10.0),
-            CustomTextField(
-              labelText: "Years",
-              hintText: "2016-2012",
-              iconText: Icon(Icons.person_outline),
-              ratio: 1.0,
-            ),
-            SizedBox(height: 10.0),
-            CustomTextField(
-              labelText: "Company",
-              hintText: "",
-              iconText: Icon(Icons.person_outline),
-              ratio: 1.0,
-            ),
-            SizedBox(height: 10.0),
-            CustomTextField(
-              labelText: "Job Title",
-              hintText: "",
-              iconText: Icon(Icons.person_outline),
-              ratio: 1.0,
-            ),
-            SizedBox(height: 10.0),
-            CustomTextField(
-              labelText: "Department",
-              hintText: "",
-              iconText: Icon(Icons.person_outline),
-              ratio: 1.0,
-            ),
-            SizedBox(height: 10.0),
-            CustomTextField(
-              labelText: "Additional Notes",
-              hintText: "",
-              iconText: Icon(Icons.person_outline),
-              ratio: 1.0,
-            ),
+            // CustomTextField(
+            //   labelText: "Years",
+            //   hintText: "2016-2012",
+            //   iconText: Icon(Icons.person_outline),
+            //   ratio: 1.0,
+            // ),
+            // SizedBox(height: 10.0),
+            // CustomTextField(
+            //   labelText: "Company",
+            //   hintText: "",
+            //   iconText: Icon(Icons.person_outline),
+            //   ratio: 1.0,
+            // ),
+            // SizedBox(height: 10.0),
+            // CustomTextField(
+            //   labelText: "Job Title",
+            //   hintText: "",
+            //   iconText: Icon(Icons.person_outline),
+            //   ratio: 1.0,
+            // ),
+            // SizedBox(height: 10.0),
+            // CustomTextField(
+            //   labelText: "Department",
+            //   hintText: "",
+            //   iconText: Icon(Icons.person_outline),
+            //   ratio: 1.0,
+            // ),
+            // SizedBox(height: 10.0),
+            // CustomTextField(
+            //   labelText: "Additional Notes",
+            //   hintText: "",
+            //   iconText: Icon(Icons.person_outline),
+            //   ratio: 1.0,
+            // ),
             SizedBox(height: 10.0),
           ],
         ),

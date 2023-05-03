@@ -5,10 +5,10 @@ class Skill {
   final int proficiency;
 
   Skill({
-    this.personId,
-    this.id,
-    this.name,
-    this.proficiency,
+    required this.personId,
+    required this.id,
+    required this.name,
+    required this.proficiency,
   });
 
   Map<String, dynamic> toMap() {
