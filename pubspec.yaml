@@ -25,14 +25,13 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^0.1.3
-  http:
+  http: ^0.13.6
   shared_preferences:
   permission_handler:
   image_picker:
   image_cropper:
-  url_launcher:
-  intl:
-  pdf:
+  url_launcher: ^6.1.5
+  printing: ^5.10.1
 
 dev_dependencies:
   flutter_test:

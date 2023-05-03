@@ -1,9 +1,12 @@
+import 'package:cv_builder/pages/work_experience/AddWorkExperiencePage.dart';
 import 'package:flutter/material.dart';
 
 class WorkExperiencePage extends StatefulWidget {
   final String resumeId;
-  const WorkExperiencePage({Key? key, required this.resumeId})
-      : super(key: key);
+  const WorkExperiencePage({
+    Key? key,
+    required this.resumeId,
+  }) : super(key: key);
 
   @override
   State<WorkExperiencePage> createState() => _WorkExperiencePageState();
@@ -15,8 +18,14 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: () {},
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return AddWorkExperiencePage(
+              resumeId: widget.resumeId,
+            );
+          }));
+        },
       ),
     );
   }

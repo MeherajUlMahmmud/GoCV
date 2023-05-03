@@ -2,6 +2,7 @@ import 'package:cv_builder/apis/contact.dart';
 import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
 import 'package:cv_builder/utils/helper.dart';
 import 'package:cv_builder/utils/local_storage.dart';
+import 'package:cv_builder/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class ContactPage extends StatefulWidget {
@@ -47,7 +48,6 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
 
-    print(widget.contactId);
     readTokensAndUser();
   }
 
@@ -104,110 +104,103 @@ class _ContactPageState extends State<ContactPage> {
         child: Icon(Icons.save),
         onPressed: () {},
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+      body: Container(
+        // padding: EdgeInsets.symmetric(horizontal: 10),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              CustomTextFormField(
+                width: width,
                 controller: phoneNumberController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  labelText: "Phone Number",
-                  hintText: "Phone Number",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                ),
+                labelText: "Phone Number",
+                hintText: "Phone Number",
+                prefixIcon: Icons.phone,
+                textCapitalization: TextCapitalization.none,
+                borderRadius: 20,
                 keyboardType: TextInputType.phone,
+                onChanged: (value) {
+                  setState(() {
+                    phoneNumber = value;
+                  });
+                },
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+              CustomTextFormField(
+                width: width,
                 controller: emailController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.mail),
-                  labelText: "Email",
-                  hintText: "Email Address",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                    borderSide: BorderSide(color: Colors.blueAccent),
-                  ),
-                ),
+                labelText: "Email",
+                hintText: "Email Address",
+                prefixIcon: Icons.mail,
+                textCapitalization: TextCapitalization.none,
+                borderRadius: 20,
                 keyboardType: TextInputType.emailAddress,
+                onChanged: (value) {
+                  setState(() {
+                    email = value;
+                  });
+                },
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+              CustomTextFormField(
+                width: width,
                 controller: addressController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.navigation),
-                  labelText: "Address",
-                  hintText: "Address",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                ),
+                labelText: "Address",
+                hintText: "Address",
+                prefixIcon: Icons.navigation,
+                textCapitalization: TextCapitalization.sentences,
+                borderRadius: 20,
                 keyboardType: TextInputType.text,
+                onChanged: (value) {
+                  setState(() {
+                    address = value;
+                  });
+                },
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+              CustomTextFormField(
+                width: width,
                 controller: linkedinController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.link),
-                  labelText: "LinkedIn",
-                  hintText: "LinkedIn",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                ),
+                labelText: "LinkedIn",
+                hintText: "LinkedIn",
+                prefixIcon: Icons.link,
+                textCapitalization: TextCapitalization.none,
+                borderRadius: 20,
                 keyboardType: TextInputType.text,
+                onChanged: (value) {
+                  setState(() {
+                    linkedin = value;
+                  });
+                },
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+              CustomTextFormField(
+                width: width,
                 controller: facebookController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.facebook),
-                  labelText: "Facebook",
-                  hintText: "Facebook",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                ),
+                labelText: "Facebook",
+                hintText: "Facebook",
+                prefixIcon: Icons.facebook,
+                textCapitalization: TextCapitalization.none,
+                borderRadius: 20,
                 keyboardType: TextInputType.text,
+                onChanged: (value) {
+                  setState(() {
+                    facebook = value;
+                  });
+                },
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-              child: TextFormField(
-                maxLines: null,
+              CustomTextFormField(
+                width: width,
                 controller: githubController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.code),
-                  labelText: "Github",
-                  hintText: "Github",
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                  ),
-                ),
+                labelText: "Github",
+                hintText: "Github",
+                prefixIcon: Icons.code,
+                textCapitalization: TextCapitalization.none,
+                borderRadius: 20,
                 keyboardType: TextInputType.text,
+                onChanged: (value) {
+                  setState(() {
+                    github = value;
+                  });
+                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

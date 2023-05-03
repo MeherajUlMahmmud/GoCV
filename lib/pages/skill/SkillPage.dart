@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 class SkillPage extends StatefulWidget {
   final String resumeId;
-  const SkillPage({Key? key, required this.resumeId}) : super(key: key);
+  const SkillPage({
+    Key? key,
+    required this.resumeId,
+  }) : super(key: key);
 
   @override
   State<SkillPage> createState() => _SkillPageState();
@@ -14,7 +17,7 @@ class _SkillPageState extends State<SkillPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
+        child: Icon(Icons.add),
         onPressed: () {},
       ),
     );

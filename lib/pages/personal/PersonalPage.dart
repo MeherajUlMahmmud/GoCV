@@ -1,8 +1,8 @@
 import 'package:cv_builder/apis/personal.dart';
-import 'package:cv_builder/apis/resume.dart';
 import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
 import 'package:cv_builder/utils/helper.dart';
 import 'package:cv_builder/utils/local_storage.dart';
+import 'package:cv_builder/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class PersonalPage extends StatefulWidget {
@@ -128,99 +128,62 @@ class _PersonalPageState extends State<PersonalPage> {
                         Container(
                           margin: EdgeInsets.all(5.0),
                           child: Column(
-                            children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                  vertical: 8.0,
-                                ),
+                            children: [
+                              CustomTextFormField(
                                 width: (width - 10) / 1.6,
-                                child: TextFormField(
-                                  maxLines: null,
-                                  textCapitalization: TextCapitalization.words,
-                                  controller: firstNameController,
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.person_outline),
-                                    labelText: "First Name",
-                                    hintText: "First Name",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
-                                    ),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      firstName = value;
-                                    });
-                                  },
-                                ),
+                                controller: firstNameController,
+                                labelText: "First Name",
+                                hintText: "First Name",
+                                prefixIcon: Icons.person_outline,
+                                textCapitalization: TextCapitalization.words,
+                                borderRadius: 20,
+                                keyboardType: TextInputType.name,
+                                onChanged: (value) {
+                                  setState(() {
+                                    firstName = value;
+                                  });
+                                },
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                  vertical: 8.0,
-                                ),
+                              CustomTextFormField(
                                 width: (width - 10) / 1.6,
-                                child: TextFormField(
-                                  maxLines: null,
-                                  textCapitalization:
-                                      TextCapitalization.sentences,
-                                  keyboardType: TextInputType.name,
-                                  controller: lastNameController,
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.person_outline),
-                                    labelText: "Surname",
-                                    hintText: "Surname",
-                                    border: new OutlineInputBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(25.0),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(25.0),
-                                      borderSide:
-                                          BorderSide(color: Colors.blueAccent),
-                                    ),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      lastName = value;
-                                    });
-                                  },
-                                ),
+                                controller: lastNameController,
+                                labelText: "Surname",
+                                hintText: "Surname",
+                                prefixIcon: Icons.person_outline,
+                                textCapitalization: TextCapitalization.words,
+                                borderRadius: 20,
+                                keyboardType: TextInputType.name,
+                                onChanged: (value) {
+                                  setState(() {
+                                    lastName = value;
+                                  });
+                                },
                               ),
                             ],
                           ),
                         )
                       ],
                     ),
-                    // about me
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      width: (width - 10) / 1,
-                      child: TextFormField(
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: aboutMeController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person_outline),
-                          labelText: "About Me",
-                          hintText: "About Me",
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            aboutMe = value;
-                          });
-                        },
-                        keyboardType: TextInputType.multiline,
-                      ),
+                    CustomTextFormField(
+                      width: width,
+                      controller: aboutMeController,
+                      labelText: "About Me",
+                      hintText: "About Me",
+                      prefixIcon: Icons.person_outline,
+                      textCapitalization: TextCapitalization.sentences,
+                      borderRadius: 20,
+                      keyboardType: TextInputType.multiline,
+                      onChanged: (value) {
+                        setState(() {
+                          aboutMe = value;
+                        });
+                      },
                     ),
                     Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                        vertical: 8.0,
+                      ),
                       width: (width - 10) / 1,
                       child: GestureDetector(
                         onTap: () async {
@@ -252,100 +215,65 @@ class _PersonalPageState extends State<PersonalPage> {
                         ),
                       ),
                     ),
-                    // city
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      width: (width - 10) / 1,
-                      child: TextFormField(
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: cityController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.location_city),
-                          labelText: "City",
-                          hintText: "City",
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        onChanged: (value) {
-                          setState(() {
-                            city = value;
-                          });
-                        },
-                      ),
+                    CustomTextFormField(
+                      width: width,
+                      controller: cityController,
+                      labelText: "City",
+                      hintText: "City",
+                      prefixIcon: Icons.location_city,
+                      textCapitalization: TextCapitalization.sentences,
+                      borderRadius: 20,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          city = value;
+                        });
+                      },
                     ),
-                    // state
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      width: (width - 10) / 1,
-                      child: TextFormField(
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: cityController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.location_city),
-                          labelText: "State",
-                          hintText: "State",
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        onChanged: (value) {
-                          setState(() {
-                            state = value;
-                          });
-                        },
-                      ),
+                    CustomTextFormField(
+                      width: width,
+                      controller: stateController,
+                      labelText: "State",
+                      hintText: "State",
+                      prefixIcon: Icons.person_outline,
+                      textCapitalization: TextCapitalization.sentences,
+                      borderRadius: 20,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          state = value;
+                        });
+                      },
                     ),
-                    // country
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      width: (width - 10) / 1,
-                      child: TextFormField(
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: countryController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person_outline),
-                          labelText: "Country",
-                          hintText: "Country",
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        onChanged: (value) {
-                          setState(() {
-                            country = value;
-                          });
-                        },
-                      ),
+                    CustomTextFormField(
+                      width: width,
+                      controller: countryController,
+                      labelText: "Country",
+                      hintText: "Country",
+                      prefixIcon: Icons.person_outline,
+                      textCapitalization: TextCapitalization.words,
+                      borderRadius: 20,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          country = value;
+                        });
+                      },
                     ),
-                    // nationality
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                      width: (width - 10) / 1,
-                      child: TextFormField(
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        // controller: nationalityController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person_outline),
-                          labelText: "Nationality",
-                          hintText: "Nationality",
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                      ),
+                    CustomTextFormField(
+                      width: width,
+                      controller: nationalityController,
+                      labelText: "Nationality",
+                      hintText: "Nationality",
+                      prefixIcon: Icons.person_outline,
+                      textCapitalization: TextCapitalization.sentences,
+                      borderRadius: 20,
+                      keyboardType: TextInputType.text,
+                      onChanged: (value) {
+                        setState(() {
+                          nationality = value;
+                        });
+                      },
                     ),
                   ],
                 ),

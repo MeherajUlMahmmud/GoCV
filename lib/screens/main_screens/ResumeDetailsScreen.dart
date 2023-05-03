@@ -6,6 +6,7 @@ import 'package:cv_builder/pages/reference/Referencepage.dart';
 import 'package:cv_builder/pages/skill/SkillPage.dart';
 import 'package:cv_builder/pages/work_experience/WorkExperiencePage.dart';
 import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
+import 'package:cv_builder/screens/main_screens/ResumePreviewScreen.dart';
 import 'package:cv_builder/utils/helper.dart';
 import 'package:cv_builder/utils/local_storage.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,16 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
           title: Text(widget.resume['name']),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResumePreviewScreen(
+                        // resume: resumeDetails,
+                        ),
+                  ),
+                );
+              },
               icon: Icon(Icons.visibility),
               tooltip: "Preview",
             ),
