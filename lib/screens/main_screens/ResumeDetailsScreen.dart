@@ -1,6 +1,7 @@
 import 'package:gocv/apis/resume.dart';
 import 'package:gocv/pages/contact/ContactPage.dart';
 import 'package:gocv/pages/education/EducationPage.dart';
+import 'package:gocv/pages/language/LanguagePage.dart';
 import 'package:gocv/pages/personal/PersonalPage.dart';
 import 'package:gocv/pages/reference/Referencepage.dart';
 import 'package:gocv/pages/skill/SkillPage.dart';
@@ -42,7 +43,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 6, vsync: this);
+    tabController = TabController(length: 7, vsync: this);
 
     readTokensAndUser();
   }
@@ -56,7 +57,6 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
 
   fetchResumeDetails(String accessToken, String resumeId) {
     ResumeService().getResumeDetails(accessToken, resumeId).then((data) async {
-      print(data);
       if (data['status'] == 200) {
         setState(() {
           resumeDetails = data['data'];
@@ -93,19 +93,19 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) => ResumePreviewScreen(
-                        // resume: resumeDetails,
-                        ),
+                      resumeId: resumeDetails['uuid'],
+                    ),
                   ),
                 );
               },
-              icon: Icon(Icons.visibility),
+              icon: const Icon(Icons.visibility),
               tooltip: "Preview",
             ),
           ],
         ),
         body: Container(
           child: isLoading
-              ? Center(
+              ? const Center(
                   child: CircularProgressIndicator(),
                 )
               : isError
@@ -121,7 +121,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                           labelColor: Theme.of(context).primaryColor,
                           unselectedLabelColor: Colors.grey,
                           isScrollable: true,
-                          tabs: [
+                          tabs: const [
                             Tab(
                               child: Text(
                                 "Personal",
@@ -152,18 +152,12 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
-                            // Tab(
-                            //   child: Text(
-                            //     "Projects",
-                            //     style: TextStyle(fontSize: 16.0),
-                            //   ),
-                            // ),
-                            // Tab(
-                            //   child: Text(
-                            //     "Cover Letter",
-                            //     style: TextStyle(fontSize: 16.0),
-                            //   ),
-                            // ),
+                            Tab(
+                              child: Text(
+                                "Languages",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
                             Tab(
                               child: Text(
                                 "References",
@@ -188,6 +182,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                                   resumeId: widget.resume['uuid']),
                               EducationPage(resumeId: widget.resume['uuid']),
                               SkillPage(resumeId: widget.resume['uuid']),
+                              LanguagePage(resumeId: widget.resume['uuid']),
                               ReferencePage(resumeId: widget.resume['uuid']),
                             ],
                           ),

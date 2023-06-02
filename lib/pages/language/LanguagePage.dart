@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/education.dart';
-import 'package:gocv/pages/education/AddEditEducation.dart';
+import 'package:gocv/apis/language.dart';
+import 'package:gocv/pages/language/AddEditLanguagePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 
-class EducationPage extends StatefulWidget {
+class LanguagePage extends StatefulWidget {
   final String resumeId;
-  const EducationPage({
+
+  const LanguagePage({
     Key? key,
     required this.resumeId,
   }) : super(key: key);
 
   @override
-  State<EducationPage> createState() => _EducationPageState();
+  State<LanguagePage> createState() => _LanguagePageState();
 }
 
-class _EducationPageState extends State<EducationPage> {
+class _LanguagePageState extends State<LanguagePage> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
-  List<dynamic> educationList = [];
+  List<dynamic> languageList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -38,17 +39,14 @@ class _EducationPageState extends State<EducationPage> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    fetchEducations(tokens['access'], widget.resumeId);
+    fetchLanguages(tokens['access'], widget.resumeId);
   }
 
-  fetchEducations(String accessToken, String resumeId) {
-    EducationService()
-        .getEducationList(accessToken, resumeId)
-        .then((data) async {
-      print(data);
+  fetchLanguages(String accessToken, String resumeId) {
+    LanguageService().getLanguageList(accessToken, resumeId).then((data) async {
       if (data['status'] == 200) {
         setState(() {
-          educationList = data['data'];
+          languageList = data['data'];
           isLoading = false;
           isError = false;
           errorText = '';
@@ -87,14 +85,13 @@ class _EducationPageState extends State<EducationPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              return AddEditEducationPage(
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return AddEditLanguagePage(
                 resumeId: widget.resumeId,
               );
-            }),
-          );
+            },
+          ));
         },
       ),
       body: isLoading
@@ -109,10 +106,10 @@ class _EducationPageState extends State<EducationPage> {
                     ),
                   ),
                 )
-              : educationList.isEmpty
+              : languageList.isEmpty
                   ? const Center(
                       child: Text(
-                        'No work experiences added',
+                        'No languages added',
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 20,
@@ -121,19 +118,19 @@ class _EducationPageState extends State<EducationPage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchEducations(
+                        fetchLanguages(
                           tokens['access'],
                           widget.resumeId,
                         );
                       },
                       child: ListView.builder(
-                        itemCount: educationList.length,
+                        itemCount: languageList.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                educationList[index]['uuid'],
+                                languageList[index]['uuid'],
                               );
                             },
                             child: Container(
@@ -162,14 +159,17 @@ class _EducationPageState extends State<EducationPage> {
                                   Row(
                                     children: [
                                       const Icon(
-                                        Icons.business,
+                                        Icons.language,
                                         color: Colors.grey,
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
                                         width: width * 0.7,
                                         child: Text(
-                                          educationList[index]['school_name'],
+                                          languageList[index]['language'] +
+                                              ' - ' +
+                                              languageList[index]
+                                                  ['proficiency'],
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -178,95 +178,9 @@ class _EducationPageState extends State<EducationPage> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.business,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          educationList[index]['degree'] +
-                                              ' in ' +
-                                              educationList[index]
-                                                  ['department'],
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                   const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.money,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          '${educationList[index]['grade']} out of ${educationList[index]['grade_scale']}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.date_range,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: educationList[index]
-                                                        ['start_date'] !=
-                                                    null &&
-                                                educationList[index]
-                                                        ['end_date'] ==
-                                                    null
-                                            ? Text(
-                                                '${Helper().formatMonthYear(educationList[index]['start_date'])} - Present',
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                ),
-                                              )
-                                            : educationList[index]
-                                                            ['start_date'] ==
-                                                        null &&
-                                                    educationList[index]
-                                                            ['end_date'] !=
-                                                        null
-                                                ? Text(
-                                                    Helper().formatMonthYear(
-                                                        educationList[index]
-                                                            ['end_date']),
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                    ),
-                                                  )
-                                                : const SizedBox(),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  educationList[index]['description'] == null ||
-                                          educationList[index]['description'] ==
+                                  languageList[index]['description'] == null ||
+                                          languageList[index]['description'] ==
                                               ''
                                       ? const SizedBox()
                                       : Row(
@@ -279,11 +193,12 @@ class _EducationPageState extends State<EducationPage> {
                                             SizedBox(
                                               width: width * 0.7,
                                               child: Text(
-                                                educationList[index]
+                                                languageList[index]
                                                     ['description'],
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
+                                                textAlign: TextAlign.justify,
                                               ),
                                             ),
                                           ],
@@ -298,7 +213,7 @@ class _EducationPageState extends State<EducationPage> {
     );
   }
 
-  void _showBottomSheet(BuildContext context, String educationId) {
+  void _showBottomSheet(BuildContext context, String languageId) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -320,9 +235,9 @@ class _EducationPageState extends State<EducationPage> {
                   Navigator.of(context).pop(false);
 
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return AddEditEducationPage(
+                    return AddEditLanguagePage(
                       resumeId: widget.resumeId,
-                      educationId: educationId,
+                      languageId: languageId,
                     );
                   }));
                 },

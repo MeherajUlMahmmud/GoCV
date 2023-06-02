@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
-class ExpreienceService {
-  Future<Map<String, dynamic>> getExperienceList(
+class EducationService {
+  Future<Map<String, dynamic>> getEducationList(
     String accessToken,
     String resumeId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}?resume=$resumeId";
+      String url = "${URLS.kEducationUrl}?resume=$resumeId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -38,12 +38,12 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> getExperience(
+  Future<Map<String, dynamic>> getEducation(
     String accessToken,
-    String experienceId,
+    String educationId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId";
+      String url = "${URLS.kEducationUrl}$educationId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -73,21 +73,21 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> createExperience(
+  Future<Map<String, dynamic>> createEducation(
     String accessToken,
     String resumeId,
-    String companyName,
-    String position,
-    String type,
-    String startDate,
+    String schoolName,
+    String degree,
+    String department,
+    String gradeScale,
+    String grade,
+    String? startDate,
     String? endDate,
     String description,
-    // String salary,
-    String companyWebsite,
     bool isCurrentlyWorking,
   ) async {
     try {
-      String url = URLS.kExperienceUrl;
+      String url = URLS.kEducationUrl;
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -96,14 +96,14 @@ class ExpreienceService {
         },
         body: jsonEncode({
           'resume': resumeId,
-          'company_name': companyName,
-          'position': position,
-          'type': type,
+          'school_name': schoolName,
+          'degree': degree,
+          'department': department,
+          'grade_scale': gradeScale,
+          'grade': grade,
           'start_date': startDate,
           'end_date': endDate,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
           'is_current': isCurrentlyWorking,
         }),
       );
@@ -130,21 +130,21 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> updateExperience(
+  Future<Map<String, dynamic>> updateEducation(
     String accessToken,
-    String experienceId,
-    String companyName,
-    String position,
-    String type,
-    String startDate,
+    String educationId,
+    String schoolName,
+    String degree,
+    String department,
+    String gradeScale,
+    String grade,
+    String? startDate,
     String? endDate,
     String description,
-    // String salary,
-    String companyWebsite,
     bool isCurrentlyWorking,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kEducationUrl}$educationId/";
       final response = await http.put(
         Uri.parse(url),
         headers: {
@@ -152,14 +152,14 @@ class ExpreienceService {
           'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode({
-          'company_name': companyName,
-          'position': position,
-          'type': type,
+          'company_name': schoolName,
+          'degree': degree,
+          'department': department,
+          'grade_scale': gradeScale,
+          'grade': grade,
           'start_date': startDate,
           'end_date': endDate,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
           'is_current': isCurrentlyWorking,
         }),
       );
@@ -188,11 +188,11 @@ class ExpreienceService {
 
   Future<Map<String, dynamic>> deleteExperience(
     String accessToken,
-    String experienceId,
+    String educationId,
   ) async {
-    print(experienceId);
+    print(educationId);
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kEducationUrl}$educationId/";
       print(url);
       final response = await http.delete(
         Uri.parse(url),

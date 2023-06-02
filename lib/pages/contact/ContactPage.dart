@@ -150,108 +150,118 @@ class _ContactPageState extends State<ContactPage> {
           }
         },
       ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              CustomTextFormField(
-                width: width,
-                controller: phoneNumberController,
-                labelText: "Phone Number",
-                hintText: "Phone Number",
-                prefixIcon: Icons.phone,
-                textCapitalization: TextCapitalization.none,
-                borderRadius: 20,
-                keyboardType: TextInputType.phone,
-                onChanged: (value) {
-                  setState(() {
-                    phoneNumber = value;
-                  });
-                },
-              ),
-              CustomTextFormField(
-                width: width,
-                controller: emailController,
-                labelText: "Email",
-                hintText: "Email Address",
-                prefixIcon: Icons.mail,
-                textCapitalization: TextCapitalization.none,
-                borderRadius: 20,
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  setState(() {
-                    email = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter email address';
-                  }
-                  return null;
-                },
-              ),
-              CustomTextFormField(
-                width: width,
-                controller: addressController,
-                labelText: "Address",
-                hintText: "Address",
-                prefixIcon: Icons.navigation,
-                textCapitalization: TextCapitalization.sentences,
-                borderRadius: 20,
-                keyboardType: TextInputType.text,
-                onChanged: (value) {
-                  setState(() {
-                    address = value;
-                  });
-                },
-              ),
-              CustomTextFormField(
-                width: width,
-                controller: linkedinController,
-                labelText: "LinkedIn",
-                hintText: "LinkedIn",
-                prefixIcon: Icons.link,
-                textCapitalization: TextCapitalization.none,
-                borderRadius: 20,
-                keyboardType: TextInputType.text,
-                onChanged: (value) {
-                  setState(() {
-                    linkedin = value;
-                  });
-                },
-              ),
-              CustomTextFormField(
-                width: width,
-                controller: facebookController,
-                labelText: "Facebook",
-                hintText: "Facebook",
-                prefixIcon: Icons.facebook,
-                textCapitalization: TextCapitalization.none,
-                borderRadius: 20,
-                keyboardType: TextInputType.text,
-                onChanged: (value) {
-                  setState(() {
-                    facebook = value;
-                  });
-                },
-              ),
-              CustomTextFormField(
-                width: width,
-                controller: githubController,
-                labelText: "Github",
-                hintText: "Github",
-                prefixIcon: Icons.code,
-                textCapitalization: TextCapitalization.none,
-                borderRadius: 20,
-                keyboardType: TextInputType.text,
-                onChanged: (value) {
-                  setState(() {
-                    github = value;
-                  });
-                },
-              ),
-            ],
+      body: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: phoneNumberController,
+                  labelText: "Phone Number",
+                  hintText: "Phone Number",
+                  prefixIcon: Icons.phone,
+                  textCapitalization: TextCapitalization.none,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.phone,
+                  onChanged: (value) {
+                    setState(() {
+                      phoneNumber = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: emailController,
+                  labelText: "Email",
+                  hintText: "Email Address",
+                  prefixIcon: Icons.mail,
+                  textCapitalization: TextCapitalization.none,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    setState(() {
+                      email = value;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter email address';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: addressController,
+                  labelText: "Address",
+                  hintText: "Address",
+                  prefixIcon: Icons.navigation,
+                  textCapitalization: TextCapitalization.sentences,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) {
+                    setState(() {
+                      address = value;
+                    });
+                  },
+                ),
+                // const SizedBox(height: 10),
+                // CustomTextFormField(
+                //   width: width,
+                //   controller: linkedinController,
+                //   labelText: "LinkedIn",
+                //   hintText: "LinkedIn",
+                //   prefixIcon: Icons.link,
+                //   textCapitalization: TextCapitalization.none,
+                //   borderRadius: 10,
+                //   keyboardType: TextInputType.text,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       linkedin = value;
+                //     });
+                //   },
+                // ),
+                // const SizedBox(height: 10),
+                // CustomTextFormField(
+                //   width: width,
+                //   controller: facebookController,
+                //   labelText: "Facebook",
+                //   hintText: "Facebook",
+                //   prefixIcon: Icons.facebook,
+                //   textCapitalization: TextCapitalization.none,
+                //   borderRadius: 10,
+                //   keyboardType: TextInputType.text,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       facebook = value;
+                //     });
+                //   },
+                // ),
+                // const SizedBox(height: 10),
+                // CustomTextFormField(
+                //   width: width,
+                //   controller: githubController,
+                //   labelText: "Github",
+                //   hintText: "Github",
+                //   prefixIcon: Icons.code,
+                //   textCapitalization: TextCapitalization.none,
+                //   borderRadius: 10,
+                //   keyboardType: TextInputType.text,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       github = value;
+                //     });
+                //   },
+                // ),
+                const SizedBox(height: 50),
+              ],
+            ),
           ),
         ),
       ),

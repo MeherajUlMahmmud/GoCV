@@ -44,6 +44,7 @@ class PersonalService {
     String firstName,
     String lastName,
     String aboutMe,
+    String dateOfBirth,
     String city,
     String state,
     String country,
@@ -61,6 +62,7 @@ class PersonalService {
           'first_name': firstName,
           'last_name': lastName,
           'about_me': aboutMe,
+          'date_of_birth': dateOfBirth, // 'YYYY-MM-DD
           'city': city,
           'state': state,
           'country': country,

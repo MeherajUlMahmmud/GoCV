@@ -21,4 +21,10 @@ class URLS {
 
   // Experience
   static const String kExperienceUrl = "${kBaseUrl}experience/";
+
+  // Education
+  static const String kEducationUrl = "${kBaseUrl}education/";
+
+  // Language
+  static const String kLanguageUrl = "${kBaseUrl}language/";
 }

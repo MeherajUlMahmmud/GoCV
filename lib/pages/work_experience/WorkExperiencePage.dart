@@ -86,19 +86,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return AddWorkExperiencePage(
-              resumeId: widget.resumeId,
-            );
-          })).then((value) => {
-                if (value == true)
-                  {
-                    fetchWorkExperiences(
-                      tokens['access'],
-                      widget.resumeId,
-                    ),
-                  }
-              });
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return AddWorkExperiencePage(
+                resumeId: widget.resumeId,
+              );
+            },
+          ));
         },
       ),
       body: isLoading
@@ -177,7 +171,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                               ' - ' +
                                               experienceList[index]['type'],
                                           style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -196,41 +190,66 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                       const SizedBox(width: 10),
                                       SizedBox(
                                         width: width * 0.7,
-                                        child: Text(
-                                          experienceList[index]['company_name'],
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              experienceList[index]
+                                                  ['company_name'],
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            experienceList[index][
+                                                            'company_website'] ==
+                                                        null ||
+                                                    experienceList[index][
+                                                            'company_website'] ==
+                                                        ''
+                                                ? const SizedBox()
+                                                : Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                      left: 10,
+                                                    ),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Helper().launchInBrowser(
+                                                            experienceList[
+                                                                    index][
+                                                                'company_website']);
+                                                      },
+                                                      child: const Icon(
+                                                        Icons.open_in_new,
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.money,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          '${experienceList[index]['salary']} BDT',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
+                                  // Row(
+                                  //   children: [
+                                  //     const Icon(
+                                  //       Icons.money,
+                                  //       color: Colors.grey,
+                                  //     ),
+                                  //     const SizedBox(width: 10),
+                                  //     SizedBox(
+                                  //       width: width * 0.7,
+                                  //       child: Text(
+                                  //         '${experienceList[index]['salary']} BDT',
+                                  //         style: const TextStyle(
+                                  //           fontSize: 18,
+                                  //           color: Colors.green,
+                                  //           fontWeight: FontWeight.bold,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  // const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       const Icon(
@@ -246,21 +265,19 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                             ? Text(
                                                 '${Helper().formatDate(experienceList[index]['start_date'])} - Present',
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
                                               )
                                             : Text(
                                                 '${Helper().formatDate(experienceList[index]['start_date'])} - ${Helper().formatDate(experienceList[index]['end_date'])}',
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
                                               ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
                                   experienceList[index]['description'] ==
                                               null ||
                                           experienceList[index]
@@ -280,8 +297,9 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                                 experienceList[index]
                                                     ['description'],
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
+                                                textAlign: TextAlign.justify,
                                               ),
                                             ),
                                           ],

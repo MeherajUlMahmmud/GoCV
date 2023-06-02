@@ -48,6 +48,10 @@ class Helper {
     return DateFormat('MMM d, y').format(DateTime.parse(date));
   }
 
+  String formatMonthYear(String date) {
+    return DateFormat('MMM y').format(DateTime.parse(date));
+  }
+
   void showSnackBar(BuildContext context, String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

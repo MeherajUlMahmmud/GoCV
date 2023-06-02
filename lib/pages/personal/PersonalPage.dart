@@ -93,6 +93,7 @@ class _PersonalPageState extends State<PersonalPage> {
           firstName = personalDetails['first_name'];
           lastName = personalDetails['last_name'];
           aboutMe = personalDetails['about_me'] ?? '';
+          dateOfBirth = personalDetails['date_of_birth'] ?? '';
           city = personalDetails['city'] ?? '';
           state = personalDetails['state'] ?? '';
           country = personalDetails['country'] ?? '';
@@ -100,6 +101,7 @@ class _PersonalPageState extends State<PersonalPage> {
           firstNameController.text = firstName;
           lastNameController.text = lastName;
           aboutMeController.text = aboutMe;
+          dobController.text = dateOfBirth;
           cityController.text = city;
           stateController.text = state;
           countryController.text = country;
@@ -135,6 +137,7 @@ class _PersonalPageState extends State<PersonalPage> {
       firstName,
       lastName,
       aboutMe,
+      dateOfBirth,
       city,
       state,
       country,
@@ -175,184 +178,204 @@ class _PersonalPageState extends State<PersonalPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    // image and name
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.all(8.0),
-                          height: 120,
-                          width: 120,
-                          child: Image.asset("assets/avatars/rdj.png"),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(5.0),
-                          child: Column(
-                            children: [
-                              CustomTextFormField(
-                                width: (width - 10) / 1.6,
-                                controller: firstNameController,
-                                labelText: "First Name",
-                                hintText: "First Name",
-                                prefixIcon: Icons.person_outline,
-                                textCapitalization: TextCapitalization.words,
-                                borderRadius: 20,
-                                keyboardType: TextInputType.name,
-                                onChanged: (value) {
-                                  setState(() {
-                                    firstName = value;
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter first name';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              CustomTextFormField(
-                                width: (width - 10) / 1.6,
-                                controller: lastNameController,
-                                labelText: "Surname",
-                                hintText: "Surname",
-                                prefixIcon: Icons.person_outline,
-                                textCapitalization: TextCapitalization.words,
-                                borderRadius: 20,
-                                keyboardType: TextInputType.name,
-                                onChanged: (value) {
-                                  setState(() {
-                                    lastName = value;
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter surname';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    CustomTextFormField(
-                      width: width,
-                      controller: aboutMeController,
-                      labelText: "About Me",
-                      hintText: "About Me",
-                      prefixIcon: Icons.person_outline,
-                      textCapitalization: TextCapitalization.sentences,
-                      borderRadius: 20,
-                      keyboardType: TextInputType.multiline,
-                      onChanged: (value) {
-                        setState(() {
-                          aboutMe = value;
-                        });
-                      },
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 8.0,
-                      ),
-                      width: (width - 10) / 1,
-                      child: GestureDetector(
-                        onTap: () async {
-                          DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(1985, 1),
-                            lastDate: DateTime(2101),
-                          );
-                          if (picked != null && picked != DateTime.now()) {
-                            setState(() {
-                              dateOfBirth = picked.toString().substring(0, 10);
-                              dobController.text = dateOfBirth;
-                            });
-                          }
-                        },
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: dobController,
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.calendar_today),
-                              labelText: "Date of Birth",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(25.0),
+          : Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            margin: const EdgeInsets.only(left: 5),
+                            height: 140,
+                            width: width * 0.28,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.blueGrey,
+                                width: 1,
                               ),
                             ),
-                            keyboardType: TextInputType.text,
+                            child: Image.asset("assets/avatars/rdj.png"),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.all(5.0),
+                            child: Column(
+                              children: [
+                                CustomTextFormField(
+                                  width: width * 0.6,
+                                  controller: firstNameController,
+                                  labelText: "First Name",
+                                  hintText: "First Name",
+                                  prefixIcon: Icons.person_outline,
+                                  textCapitalization: TextCapitalization.words,
+                                  borderRadius: 10,
+                                  keyboardType: TextInputType.name,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      firstName = value;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter first name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 5),
+                                CustomTextFormField(
+                                  width: width * 0.6,
+                                  controller: lastNameController,
+                                  labelText: "Surname",
+                                  hintText: "Surname",
+                                  prefixIcon: Icons.person_outline,
+                                  textCapitalization: TextCapitalization.words,
+                                  borderRadius: 10,
+                                  keyboardType: TextInputType.name,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      lastName = value;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter surname';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        width: width,
+                        controller: aboutMeController,
+                        labelText: "About Me",
+                        hintText: "About Me",
+                        prefixIcon: Icons.person_outline,
+                        textCapitalization: TextCapitalization.sentences,
+                        borderRadius: 10,
+                        keyboardType: TextInputType.multiline,
+                        onChanged: (value) {
+                          setState(() {
+                            aboutMe = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 5.0,
+                          vertical: 5.0,
+                        ),
+                        width: (width - 10) / 1,
+                        child: GestureDetector(
+                          onTap: () async {
+                            DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1985, 1),
+                              lastDate: DateTime(2101),
+                            );
+                            if (picked != null && picked != DateTime.now()) {
+                              setState(() {
+                                dateOfBirth =
+                                    picked.toString().substring(0, 10);
+                                dobController.text = dateOfBirth;
+                              });
+                            }
+                          },
+                          child: AbsorbPointer(
+                            child: TextFormField(
+                              controller: dobController,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.calendar_today),
+                                labelText: "Date of Birth",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              keyboardType: TextInputType.text,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    CustomTextFormField(
-                      width: width,
-                      controller: cityController,
-                      labelText: "City",
-                      hintText: "City",
-                      prefixIcon: Icons.location_city,
-                      textCapitalization: TextCapitalization.sentences,
-                      borderRadius: 20,
-                      keyboardType: TextInputType.text,
-                      onChanged: (value) {
-                        setState(() {
-                          city = value;
-                        });
-                      },
-                    ),
-                    CustomTextFormField(
-                      width: width,
-                      controller: stateController,
-                      labelText: "State",
-                      hintText: "State",
-                      prefixIcon: Icons.person_outline,
-                      textCapitalization: TextCapitalization.sentences,
-                      borderRadius: 20,
-                      keyboardType: TextInputType.text,
-                      onChanged: (value) {
-                        setState(() {
-                          state = value;
-                        });
-                      },
-                    ),
-                    CustomTextFormField(
-                      width: width,
-                      controller: countryController,
-                      labelText: "Country",
-                      hintText: "Country",
-                      prefixIcon: Icons.person_outline,
-                      textCapitalization: TextCapitalization.words,
-                      borderRadius: 20,
-                      keyboardType: TextInputType.text,
-                      onChanged: (value) {
-                        setState(() {
-                          country = value;
-                        });
-                      },
-                    ),
-                    CustomTextFormField(
-                      width: width,
-                      controller: nationalityController,
-                      labelText: "Nationality",
-                      hintText: "Nationality",
-                      prefixIcon: Icons.person_outline,
-                      textCapitalization: TextCapitalization.sentences,
-                      borderRadius: 20,
-                      keyboardType: TextInputType.text,
-                      onChanged: (value) {
-                        setState(() {
-                          nationality = value;
-                        });
-                      },
-                    ),
-                  ],
+                      // const SizedBox(height: 10),
+                      // CustomTextFormField(
+                      //   width: width,
+                      //   controller: cityController,
+                      //   labelText: "City",
+                      //   hintText: "City",
+                      //   prefixIcon: Icons.location_city,
+                      //   textCapitalization: TextCapitalization.sentences,
+                      //   borderRadius: 10,
+                      //   keyboardType: TextInputType.text,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       city = value;
+                      //     });
+                      //   },
+                      // ),
+                      // const SizedBox(height: 10),
+                      // CustomTextFormField(
+                      //   width: width,
+                      //   controller: stateController,
+                      //   labelText: "State",
+                      //   hintText: "State",
+                      //   prefixIcon: Icons.person_outline,
+                      //   textCapitalization: TextCapitalization.sentences,
+                      //   borderRadius: 10,
+                      //   keyboardType: TextInputType.text,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       state = value;
+                      //     });
+                      //   },
+                      // ),
+                      // const SizedBox(height: 10),
+                      // CustomTextFormField(
+                      //   width: width,
+                      //   controller: countryController,
+                      //   labelText: "Country",
+                      //   hintText: "Country",
+                      //   prefixIcon: Icons.person_outline,
+                      //   textCapitalization: TextCapitalization.words,
+                      //   borderRadius: 10,
+                      //   keyboardType: TextInputType.text,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       country = value;
+                      //     });
+                      //   },
+                      // ),
+                      // const SizedBox(height: 10),
+                      // CustomTextFormField(
+                      //   width: width,
+                      //   controller: nationalityController,
+                      //   labelText: "Nationality",
+                      //   hintText: "Nationality",
+                      //   prefixIcon: Icons.person_outline,
+                      //   textCapitalization: TextCapitalization.sentences,
+                      //   borderRadius: 10,
+                      //   keyboardType: TextInputType.text,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       nationality = value;
+                      //     });
+                      //   },
+                      // ),
+                      const SizedBox(height: 50),
+                    ],
+                  ),
                 ),
               ),
             ),
