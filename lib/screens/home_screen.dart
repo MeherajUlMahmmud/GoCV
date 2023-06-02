@@ -129,9 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      drawer: Drawer(
-        width: MediaQuery.of(context).size.width * 0.8,
-      ),
+      // drawer: Drawer(
+      //   width: MediaQuery.of(context).size.width * 0.8,
+      // ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
