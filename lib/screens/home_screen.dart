@@ -1,11 +1,11 @@
-import 'package:cv_builder/apis/resume.dart';
-import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
-import 'package:cv_builder/screens/main_screens/ResumeDetailsScreen.dart';
-import 'package:cv_builder/screens/utility_screens/SettingsScreen.dart';
-import 'package:cv_builder/utils/helper.dart';
-import 'package:cv_builder/utils/local_storage.dart';
-import 'package:cv_builder/widgets/profile_tile.dart';
-import 'package:cv_builder/widgets/resume_card.dart';
+import 'package:gocv/apis/resume.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
+import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
+import 'package:gocv/utils/helper.dart';
+import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/profile_tile.dart';
+import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -55,16 +55,24 @@ class _HomeScreenState extends State<HomeScreen> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401) {
+        if (data['status'] == 401 || data['status'] == 403) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Navigator.pushReplacementNamed(
+            context,
+            LoginScreen.routeName,
+          );
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch resumes',
+            Colors.red,
+          );
         }
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-        Helper().showSnackBar(context, 'Failed to fetch resumes', Colors.red);
       }
     });
   }
@@ -85,7 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
           isError = true;
           errorText = data['error'];
         });
-        Helper().showSnackBar(context, 'Failed to create resume', Colors.red);
+        Helper().showSnackBar(
+          context,
+          'Failed to create resume',
+          Colors.red,
+        );
       }
     });
   }
@@ -94,10 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("GoCV"),
+        title: const Text("GoCV"),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.settings,
             ),
             onPressed: () {
@@ -110,15 +122,18 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           showAddDialog(context);
         },
-        child: Icon(
+        child: const Icon(
           Icons.add,
           size: 35.0,
           color: Colors.white,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      drawer: Drawer(
+        width: MediaQuery.of(context).size.width * 0.8,
+      ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: () async {
                 fetchResumes(tokens['access'], user['uuid']);
@@ -130,16 +145,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(
                             errorText,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.red,
                             ),
                           ),
-                          SizedBox(height: 10.0),
+                          const SizedBox(height: 10.0),
                           ElevatedButton(
                             onPressed: () {
                               fetchResumes(tokens['access'], user['uuid']);
                             },
-                            child: Text("Retry"),
+                            child: const Text("Retry"),
                           ),
                         ],
                       ),
@@ -164,10 +179,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Map<String, dynamic> resume,
   ) {
     showModalBottomSheet(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(20.0),
-          topRight: const Radius.circular(20.0),
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
         ),
       ),
       backgroundColor: Colors.white,
@@ -178,12 +193,12 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Row(
                 children: <Widget>[
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 30.0,
                     backgroundImage: AssetImage("assets/avatars/rdj.png"),
                   ),
@@ -216,9 +231,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Row(
                       children: [
-                        Icon(Icons.edit, size: 25),
-                        SizedBox(width: 10.0),
-                        Text(
+                        const Icon(Icons.edit, size: 25),
+                        const SizedBox(width: 10.0),
+                        const Text(
                           "Update Resume",
                           style: TextStyle(fontSize: 16.0),
                         ),
@@ -234,9 +249,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Row(
                       children: [
-                        Icon(Icons.delete, size: 25),
-                        SizedBox(width: 10.0),
-                        Text(
+                        const Icon(Icons.delete, size: 25),
+                        const SizedBox(width: 10.0),
+                        const Text(
                           "Delete Resume",
                           style: TextStyle(fontSize: 16.0),
                         ),
@@ -256,14 +271,14 @@ class _HomeScreenState extends State<HomeScreen> {
   showAddDialog(BuildContext context) {
     // set up the button
     Widget cancelButton = TextButton(
-      child: Text("Cancel"),
+      child: const Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: Text("Save"),
+      child: const Text("Save"),
       onPressed: () async {
         String title = titleController.text;
         titleController.clear();
@@ -287,11 +302,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Resume title"),
+      title: const Text("Resume title"),
       content: TextFormField(
         autofocus: true,
         controller: titleController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.blue),
           ),
@@ -323,14 +338,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void showDeleteDialog(BuildContext context, Map<String, dynamic> resume) {
     // set up the button
     Widget cancelButton = TextButton(
-      child: Text("Cancel"),
+      child: const Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: Text("Delete"),
+      child: const Text("Delete"),
       onPressed: () async {
         Navigator.pop(context);
       },
@@ -339,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Deleting " + resume['name']),
-      content: Text("Are you sure about deleting this resume?"),
+      content: const Text("Are you sure about deleting this resume?"),
       actions: [
         cancelButton,
         okButton,

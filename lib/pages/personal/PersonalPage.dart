@@ -1,8 +1,8 @@
-import 'package:cv_builder/apis/personal.dart';
-import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
-import 'package:cv_builder/utils/helper.dart';
-import 'package:cv_builder/utils/local_storage.dart';
-import 'package:cv_builder/widgets/custom_text_form_field.dart';
+import 'package:gocv/apis/personal.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/helper.dart';
+import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class PersonalPage extends StatefulWidget {
@@ -23,6 +23,8 @@ class _PersonalPageState extends State<PersonalPage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
+  final _formKey = GlobalKey<FormState>();
+
   late Map<String, dynamic> personalDetails = {};
 
   bool isLoading = true;
@@ -33,25 +35,40 @@ class _PersonalPageState extends State<PersonalPage> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController aboutMeController = TextEditingController();
   TextEditingController dobController = TextEditingController();
-  TextEditingController nationalityController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController stateController = TextEditingController();
   TextEditingController countryController = TextEditingController();
+  TextEditingController nationalityController = TextEditingController();
 
+  String uuid = "";
   String firstName = "";
   String lastName = "";
   String aboutMe = "";
   String dateOfBirth = "";
-  String nationality = "";
   String city = "";
   String state = "";
   String country = "";
+  String nationality = "";
 
   @override
   void initState() {
     super.initState();
 
     readTokensAndUser();
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    aboutMeController.dispose();
+    dobController.dispose();
+    cityController.dispose();
+    stateController.dispose();
+    countryController.dispose();
+    nationalityController.dispose();
+
+    super.dispose();
   }
 
   readTokensAndUser() async {
@@ -63,18 +80,31 @@ class _PersonalPageState extends State<PersonalPage> {
 
   fetchPersonalDetails(String accessToken, String personalId) {
     PersonalService()
-        .getPersonalDetails(accessToken, personalId)
+        .getPersonalDetails(
+      accessToken,
+      personalId,
+    )
         .then((data) async {
       print(data);
       if (data['status'] == 200) {
         setState(() {
           personalDetails = data['data'];
-          firstNameController.text = personalDetails['first_name'];
-          lastNameController.text = personalDetails['last_name'];
-          aboutMeController.text = personalDetails['about_me'];
-          cityController.text = personalDetails['city'];
-          stateController.text = personalDetails['state'];
-          countryController.text = personalDetails['country'];
+          uuid = personalDetails['uuid'];
+          firstName = personalDetails['first_name'];
+          lastName = personalDetails['last_name'];
+          aboutMe = personalDetails['about_me'] ?? '';
+          city = personalDetails['city'] ?? '';
+          state = personalDetails['state'] ?? '';
+          country = personalDetails['country'] ?? '';
+          nationality = personalDetails['nationality'] ?? '';
+          firstNameController.text = firstName;
+          lastNameController.text = lastName;
+          aboutMeController.text = aboutMe;
+          cityController.text = city;
+          stateController.text = state;
+          countryController.text = country;
+          nationalityController.text = nationality;
+
           isLoading = false;
           isError = false;
           errorText = '';
@@ -97,6 +127,36 @@ class _PersonalPageState extends State<PersonalPage> {
     });
   }
 
+  handleUpdatePersonalDetails() {
+    PersonalService()
+        .updatePersonalDetails(
+      tokens['access'],
+      uuid,
+      firstName,
+      lastName,
+      aboutMe,
+      city,
+      state,
+      country,
+      nationality,
+    )
+        .then((data) async {
+      if (data['status'] == 200) {
+        Helper().showSnackBar(
+          context,
+          'Personal details updated successfully',
+          Colors.green,
+        );
+      } else {
+        Helper().showSnackBar(
+          context,
+          'Failed to update personal details',
+          Colors.red,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -104,15 +164,20 @@ class _PersonalPageState extends State<PersonalPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: () {},
+        child: const Icon(Icons.save),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            handleUpdatePersonalDetails();
+          }
+        },
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              child: SingleChildScrollView(
+          : SingleChildScrollView(
+              child: Form(
+                key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -120,13 +185,13 @@ class _PersonalPageState extends State<PersonalPage> {
                     Row(
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.all(8.0),
                           height: 120,
                           width: 120,
                           child: Image.asset("assets/avatars/rdj.png"),
                         ),
                         Container(
-                          margin: EdgeInsets.all(5.0),
+                          margin: const EdgeInsets.all(5.0),
                           child: Column(
                             children: [
                               CustomTextFormField(
@@ -143,6 +208,12 @@ class _PersonalPageState extends State<PersonalPage> {
                                     firstName = value;
                                   });
                                 },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter first name';
+                                  }
+                                  return null;
+                                },
                               ),
                               CustomTextFormField(
                                 width: (width - 10) / 1.6,
@@ -157,6 +228,12 @@ class _PersonalPageState extends State<PersonalPage> {
                                   setState(() {
                                     lastName = value;
                                   });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter surname';
+                                  }
+                                  return null;
                                 },
                               ),
                             ],
@@ -180,7 +257,7 @@ class _PersonalPageState extends State<PersonalPage> {
                       },
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(
+                      margin: const EdgeInsets.symmetric(
                         horizontal: 10.0,
                         vertical: 8.0,
                       ),
@@ -204,10 +281,10 @@ class _PersonalPageState extends State<PersonalPage> {
                           child: TextFormField(
                             controller: dobController,
                             decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.calendar_today),
+                              prefixIcon: const Icon(Icons.calendar_today),
                               labelText: "Date of Birth",
-                              border: new OutlineInputBorder(
-                                borderRadius: new BorderRadius.circular(25.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
                               ),
                             ),
                             keyboardType: TextInputType.text,

@@ -1,10 +1,11 @@
-import 'package:cv_builder/apis/auth.dart';
-import 'package:cv_builder/screens/home_screen.dart';
-import 'package:cv_builder/utils/helper.dart';
-import 'package:cv_builder/utils/local_storage.dart';
-import 'package:cv_builder/widgets/custom_button.dart';
+import 'package:gocv/apis/auth.dart';
+import 'package:gocv/screens/auth_screens/SignUpScreen.dart';
+import 'package:gocv/screens/home_screen.dart';
+import 'package:gocv/utils/helper.dart';
+import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = "/login";
@@ -16,6 +17,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final LocalStorage localStorage = LocalStorage();
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   String email = "";
   String password = "";
@@ -53,117 +57,131 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login"),
+        title: const Text("Login"),
       ),
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           child: Form(
             key: _formKey,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "GoCV",
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     "Welcome back",
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text(
+                  const SizedBox(height: 10),
+                  const Text(
                     "Login to continue",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      hintText: "Email Address",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
-                    ),
+                  CustomTextFormField(
+                    width: width,
+                    autofocus: true,
+                    controller: emailController,
+                    labelText: 'Email',
+                    hintText: 'Email Address',
+                    prefixIcon: Icons.email,
+                    textCapitalization: TextCapitalization.none,
+                    borderRadius: 10,
+                    keyboardType: TextInputType.emailAddress,
                     onChanged: (value) {
-                      email = value;
+                      setState(() {
+                        email = value;
+                      });
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your email";
+                        return 'Please enter your email';
                       }
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    obscureText: isObscure,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hintText: "Password",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          !isObscure ? Icons.visibility : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isObscure = !isObscure;
-                          });
-                        },
-                      ),
-                    ),
+                  const SizedBox(height: 5),
+                  CustomTextFormField(
+                    width: width,
+                    controller: passwordController,
+                    labelText: 'Password',
+                    hintText: 'Password',
+                    prefixIcon: Icons.lock,
+                    suffixIcon:
+                        !isObscure ? Icons.visibility : Icons.visibility_off,
+                    textCapitalization: TextCapitalization.none,
+                    borderRadius: 10,
+                    keyboardType: TextInputType.visiblePassword,
+                    isObscure: isObscure,
+                    suffixIconOnPressed: () {
+                      setState(() {
+                        isObscure = !isObscure;
+                      });
+                    },
                     onChanged: (value) {
-                      password = value;
+                      setState(() {
+                        password = value;
+                      });
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password";
+                        return 'Please enter your password';
                       }
                       return null;
+                    },
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text("Forgot Password?"),
+                    ),
+                  ),
+                  CustomButton(
+                    text: "Login",
+                    isLoading: isLoading,
+                    isDisabled: isLoading,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        handleLogin();
+                      }
                     },
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Text("Don't have an account?"),
                       TextButton(
-                        onPressed: () {},
-                        child: Text("Forgot Password?"),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            SignUpScreen.routeName,
+                          );
+                        },
+                        child: const Text("Sign Up"),
                       ),
                     ],
                   ),
-                  isLoading
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 10),
-                            Text("Logging in..."),
-                          ],
-                        )
-                      : CustomButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              handleLogin();
-                            }
-                          },
-                          text: "Login",
-                        ),
                 ],
               ),
             ),

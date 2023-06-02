@@ -1,6 +1,6 @@
-import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
-import 'package:cv_builder/screens/home_screen.dart';
-import 'package:cv_builder/utils/local_storage.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/screens/home_screen.dart';
+import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -1,14 +1,14 @@
-import 'package:cv_builder/apis/resume.dart';
-import 'package:cv_builder/pages/contact/ContactPage.dart';
-import 'package:cv_builder/pages/education/EducationPage.dart';
-import 'package:cv_builder/pages/personal/PersonalPage.dart';
-import 'package:cv_builder/pages/reference/Referencepage.dart';
-import 'package:cv_builder/pages/skill/SkillPage.dart';
-import 'package:cv_builder/pages/work_experience/WorkExperiencePage.dart';
-import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
-import 'package:cv_builder/screens/main_screens/ResumePreviewScreen.dart';
-import 'package:cv_builder/utils/helper.dart';
-import 'package:cv_builder/utils/local_storage.dart';
+import 'package:gocv/apis/resume.dart';
+import 'package:gocv/pages/contact/ContactPage.dart';
+import 'package:gocv/pages/education/EducationPage.dart';
+import 'package:gocv/pages/personal/PersonalPage.dart';
+import 'package:gocv/pages/reference/Referencepage.dart';
+import 'package:gocv/pages/skill/SkillPage.dart';
+import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
+import 'package:gocv/utils/helper.dart';
+import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class ResumeDetailsScreen extends StatefulWidget {
@@ -56,6 +56,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
 
   fetchResumeDetails(String accessToken, String resumeId) {
     ResumeService().getResumeDetails(accessToken, resumeId).then((data) async {
+      print(data);
       if (data['status'] == 200) {
         setState(() {
           resumeDetails = data['data'];

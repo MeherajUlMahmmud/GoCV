@@ -1,7 +1,8 @@
-import 'package:cv_builder/apis/auth.dart';
-import 'package:cv_builder/utils/local_storage.dart';
+import 'package:gocv/apis/auth.dart';
+import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Helper {
@@ -37,6 +38,14 @@ class Helper {
               errorMsg,
               Colors.red,
             ));
+  }
+
+  String formatDateTime(String dateTime) {
+    return DateFormat('MMM d, y h:mm a').format(DateTime.parse(dateTime));
+  }
+
+  String formatDate(String date) {
+    return DateFormat('MMM d, y').format(DateTime.parse(date));
   }
 
   void showSnackBar(BuildContext context, String message, Color color) {

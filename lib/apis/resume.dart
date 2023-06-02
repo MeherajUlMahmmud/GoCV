@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:cv_builder/utils/urls.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
 class ResumeService {
@@ -26,6 +26,7 @@ class ResumeService {
         };
       } else {
         final data = jsonDecode(response.body);
+        print(data);
         return {
           'error': data['detail'],
           'status': response.statusCode,

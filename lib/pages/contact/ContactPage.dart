@@ -1,8 +1,8 @@
-import 'package:cv_builder/apis/contact.dart';
-import 'package:cv_builder/screens/auth_screens/LoginScreen.dart';
-import 'package:cv_builder/utils/helper.dart';
-import 'package:cv_builder/utils/local_storage.dart';
-import 'package:cv_builder/widgets/custom_text_form_field.dart';
+import 'package:gocv/apis/contact.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/helper.dart';
+import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class ContactPage extends StatefulWidget {
@@ -22,6 +22,8 @@ class _ContactPageState extends State<ContactPage> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
+
+  final _formKey = GlobalKey<FormState>();
 
   late Map<String, dynamic> contactDetails = {};
 
@@ -49,6 +51,18 @@ class _ContactPageState extends State<ContactPage> {
     super.initState();
 
     readTokensAndUser();
+  }
+
+  @override
+  void dispose() {
+    phoneNumberController.dispose();
+    emailController.dispose();
+    addressController.dispose();
+    linkedinController.dispose();
+    facebookController.dispose();
+    githubController.dispose();
+
+    super.dispose();
   }
 
   readTokensAndUser() async {
@@ -94,6 +108,34 @@ class _ContactPageState extends State<ContactPage> {
     });
   }
 
+  handleUpdateContactDetails() {
+    ContactService()
+        .updateContactDetails(
+      tokens['access'],
+      widget.contactId,
+      phoneNumberController.text,
+      emailController.text,
+      addressController.text,
+      linkedinController.text,
+      facebookController.text,
+      githubController.text,
+    )
+        .then((data) async {
+      print(data);
+      if (data['status'] == 200) {
+        Helper().showSnackBar(context, 'Contact details updated', Colors.green);
+      } else {
+        if (data['status'] == 401 || data['status'] == 403) {
+          Helper().showSnackBar(context, 'Session expired', Colors.red);
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        } else {
+          Helper().showSnackBar(
+              context, 'Failed to update contact details', Colors.red);
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -101,12 +143,16 @@ class _ContactPageState extends State<ContactPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: () {},
+        child: const Icon(Icons.save),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            handleUpdateContactDetails();
+          }
+        },
       ),
-      body: Container(
-        // padding: EdgeInsets.symmetric(horizontal: 10),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
           child: Column(
             children: <Widget>[
               CustomTextFormField(
@@ -137,6 +183,12 @@ class _ContactPageState extends State<ContactPage> {
                   setState(() {
                     email = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter email address';
+                  }
+                  return null;
                 },
               ),
               CustomTextFormField(

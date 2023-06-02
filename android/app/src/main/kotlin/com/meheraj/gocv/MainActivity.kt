@@ -1,4 +1,4 @@
-package com.prolifictech.gocv
+package com.meheraj.gocv
 
 import io.flutter.embedding.android.FlutterActivity
 
