@@ -307,15 +307,6 @@ class _HomeScreenState extends State<HomeScreen> {
         autofocus: true,
         controller: titleController,
         decoration: const InputDecoration(
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          ),
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          ),
           hintText: "Give a title",
         ),
         keyboardType: TextInputType.text,

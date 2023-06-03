@@ -1,9 +1,13 @@
 import 'package:gocv/apis/resume.dart';
+import 'package:gocv/pages/award/AwardPage.dart';
+import 'package:gocv/pages/certification/CertificationPage.dart';
 import 'package:gocv/pages/contact/ContactPage.dart';
 import 'package:gocv/pages/education/EducationPage.dart';
+import 'package:gocv/pages/interest/InterestPage.dart';
 import 'package:gocv/pages/language/LanguagePage.dart';
 import 'package:gocv/pages/personal/PersonalPage.dart';
 import 'package:gocv/pages/reference/Referencepage.dart';
+import 'package:gocv/pages/settings/ResumeSettingsPage.dart';
 import 'package:gocv/pages/skill/SkillPage.dart';
 import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
@@ -43,7 +47,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 7, vsync: this);
+    tabController = TabController(length: 11, vsync: this);
 
     readTokensAndUser();
   }
@@ -154,6 +158,24 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                             ),
                             Tab(
                               child: Text(
+                                "Awards",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                "Certifications",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                "Interests",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
                                 "Languages",
                                 style: TextStyle(fontSize: 16.0),
                               ),
@@ -161,6 +183,12 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                             Tab(
                               child: Text(
                                 "References",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                "Settings",
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
@@ -182,8 +210,13 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                                   resumeId: widget.resume['uuid']),
                               EducationPage(resumeId: widget.resume['uuid']),
                               SkillPage(resumeId: widget.resume['uuid']),
+                              AwardPage(resumeId: widget.resume['uuid']),
+                              CertificationPage(
+                                  resumeId: widget.resume['uuid']),
+                              InterestPage(resumeId: widget.resume['uuid']),
                               LanguagePage(resumeId: widget.resume['uuid']),
                               ReferencePage(resumeId: widget.resume['uuid']),
+                              const ResumeSettingsPage(),
                             ],
                           ),
                         ),

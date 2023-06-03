@@ -137,13 +137,13 @@ class _EducationPageState extends State<EducationPage> {
                               );
                             },
                             child: Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: width * 0.05,
-                                vertical: 10,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
-                                vertical: 10,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -241,7 +241,7 @@ class _EducationPageState extends State<EducationPage> {
                                             ? Text(
                                                 '${Helper().formatMonthYear(educationList[index]['start_date'])} - Present',
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
                                               )
                                             : educationList[index]
@@ -282,7 +282,7 @@ class _EducationPageState extends State<EducationPage> {
                                                 educationList[index]
                                                     ['description'],
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                 ),
                                               ),
                                             ),
@@ -317,8 +317,7 @@ class _EducationPageState extends State<EducationPage> {
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(false);
-
+                  Navigator.of(context).pop();
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return AddEditEducationPage(
                       resumeId: widget.resumeId,
@@ -337,7 +336,7 @@ class _EducationPageState extends State<EducationPage> {
               const Divider(),
               TextButton(
                 onPressed: () {
-                  // _showDeleteConfirmationDialog(context, experienceId);
+                  _showDeleteConfirmationDialog(context, educationId);
                 },
                 child: Row(
                   children: const [
@@ -349,6 +348,66 @@ class _EducationPageState extends State<EducationPage> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    String educationId,
+  ) {
+    deleteEducation() {
+      EducationService()
+          .deleteEducation(tokens['access'], educationId)
+          .then((data) async {
+        if (data['status'] == 200) {
+          Navigator.of(context).pop();
+          Helper().showSnackBar(
+            context,
+            'Education deleted successfully',
+            Colors.green,
+          );
+          fetchEducations(tokens['access'], widget.resumeId);
+        } else {
+          if (data['status'] == 401 || data['status'] == 403) {
+            Helper().showSnackBar(
+              context,
+              'Session expired',
+              Colors.red,
+            );
+            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          } else {
+            Helper().showSnackBar(
+              context,
+              'Failed to delete education',
+              Colors.red,
+            );
+          }
+        }
+      });
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this item?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteEducation();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
         );
       },
     );

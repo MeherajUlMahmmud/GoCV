@@ -145,7 +145,7 @@ class EducationService {
   ) async {
     try {
       String url = "${URLS.kEducationUrl}$educationId/";
-      final response = await http.put(
+      final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ class EducationService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteExperience(
+  Future<Map<String, dynamic>> deleteEducation(
     String accessToken,
     String educationId,
   ) async {
@@ -201,7 +201,7 @@ class EducationService {
           'Authorization': 'Bearer $accessToken',
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 204) {
         return {
           'status': response.statusCode,
         };

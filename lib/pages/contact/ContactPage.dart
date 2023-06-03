@@ -145,9 +145,7 @@ class _ContactPageState extends State<ContactPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
         onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            handleUpdateContactDetails();
-          }
+          if (_formKey.currentState!.validate()) handleUpdateContactDetails();
         },
       ),
       body: Container(

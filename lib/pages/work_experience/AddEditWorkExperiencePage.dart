@@ -5,21 +5,22 @@ import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-class AddWorkExperiencePage extends StatefulWidget {
+class AddEditWorkExperiencePage extends StatefulWidget {
   final String resumeId;
   String? experienceId;
 
-  AddWorkExperiencePage({
+  AddEditWorkExperiencePage({
     Key? key,
     required this.resumeId,
     this.experienceId,
   }) : super(key: key);
 
   @override
-  State<AddWorkExperiencePage> createState() => _AddWorkExperiencePageState();
+  State<AddEditWorkExperiencePage> createState() =>
+      _AddEditWorkExperiencePageState();
 }
 
-class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
+class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
@@ -352,7 +353,9 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
                     onTap: () async {
                       DateTime? picked = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: startDate != ''
+                            ? DateTime.parse(startDate)
+                            : DateTime.now(),
                         firstDate: DateTime(1990, 1),
                         lastDate: DateTime(2101),
                       );
@@ -409,7 +412,9 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate: endDate != null && endDate != ''
+                                  ? DateTime.parse(endDate!)
+                                  : DateTime.now(),
                               firstDate: DateTime(1990, 1),
                               lastDate: DateTime(2101),
                             );

@@ -47,34 +47,34 @@ class _ResumeCardState extends State<ResumeCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Last Updated: ${widget.resume['updated_at']}",
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black54,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      title = widget.resume['name'];
-                    });
-                    showTitleUpdateDialog(context);
-                  },
-                  child: Row(
-                    children: const [
-                      Icon(Icons.edit, size: 16.0),
-                      SizedBox(width: 10.0),
-                      Text("Edit Title"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            // const SizedBox(height: 10.0),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text(
+            //       "Last Updated: ${widget.resume['updated_at']}",
+            //       style: const TextStyle(
+            //         fontSize: 14.0,
+            //         color: Colors.black54,
+            //       ),
+            //     ),
+            //     ElevatedButton(
+            //       onPressed: () {
+            //         setState(() {
+            //           title = widget.resume['name'];
+            //         });
+            //         showTitleUpdateDialog(context);
+            //       },
+            //       child: Row(
+            //         children: const [
+            //           Icon(Icons.edit, size: 16.0),
+            //           SizedBox(width: 10.0),
+            //           Text("Edit Title"),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

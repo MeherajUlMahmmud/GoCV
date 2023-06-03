@@ -345,7 +345,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                     onTap: () async {
                       DateTime? picked = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: startDate != null
+                            ? DateTime.parse(startDate!)
+                            : DateTime.now(),
                         firstDate: DateTime(1990, 1),
                         lastDate: DateTime(2101),
                       );
@@ -396,7 +398,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate: endDate != null
+                                  ? DateTime.parse(endDate!)
+                                  : DateTime.now(),
                               firstDate: DateTime(1990, 1),
                               lastDate: DateTime(2101),
                             );

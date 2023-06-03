@@ -25,6 +25,12 @@ class URLS {
   // Education
   static const String kEducationUrl = "${kBaseUrl}education/";
 
+  // Skill
+  static const String kSkillUrl = "${kBaseUrl}skill/";
+
   // Language
   static const String kLanguageUrl = "${kBaseUrl}language/";
+
+  // Reference
+  static const String kReferenceUrl = "${kBaseUrl}reference/";
 }

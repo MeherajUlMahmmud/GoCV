@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:gocv/apis/personal.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
@@ -50,6 +56,9 @@ class _PersonalPageState extends State<PersonalPage> {
   String country = "";
   String nationality = "";
 
+  // image
+  File? imageFile;
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +83,9 @@ class _PersonalPageState extends State<PersonalPage> {
   readTokensAndUser() async {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
+
+    // get from "assets/avatars/rdj.png"
+    imageFile = File("assets/avatars/rdj.png");
 
     fetchPersonalDetails(tokens['access'], widget.personalId);
   }
@@ -129,6 +141,30 @@ class _PersonalPageState extends State<PersonalPage> {
     });
   }
 
+  Future<File> getFromGallery() async {
+    final XFile? image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    File file = File(image!.path);
+    return file;
+  }
+
+  Future<File> cropImage({required File imageFile}) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+    );
+    return File(croppedFile!.path);
+  }
+
   handleUpdatePersonalDetails() {
     PersonalService()
         .updatePersonalDetails(
@@ -169,9 +205,7 @@ class _PersonalPageState extends State<PersonalPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
         onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            handleUpdatePersonalDetails();
-          }
+          if (_formKey.currentState!.validate()) handleUpdatePersonalDetails();
         },
       ),
       body: isLoading
@@ -190,18 +224,53 @@ class _PersonalPageState extends State<PersonalPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Container(
-                            margin: const EdgeInsets.only(left: 5),
-                            height: 140,
-                            width: width * 0.28,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.blueGrey,
-                                width: 1,
+                          Stack(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(left: 5),
+                                height: 140,
+                                width: width * 0.28,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    color: Colors.blueGrey,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: ImageFullScreenWrapperWidget(
+                                  dark: true,
+                                  // child: Image.asset("assets/avatars/rdj.png"),
+                                  child: Image.asset(imageFile!.path),
+                                ),
                               ),
-                            ),
-                            child: Image.asset("assets/avatars/rdj.png"),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    getFromGallery().then((value) {
+                                      cropImage(imageFile: value).then((value) {
+                                        setState(() {
+                                          imageFile = value;
+                                        });
+                                      });
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 35,
+                                    width: 35,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: const Icon(
+                                      Icons.edit,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
                             margin: const EdgeInsets.all(5.0),

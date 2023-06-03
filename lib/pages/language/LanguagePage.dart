@@ -95,7 +95,7 @@ class _LanguagePageState extends State<LanguagePage> {
         },
       ),
       body: isLoading
-          ? const CircularProgressIndicator()
+          ? const Center(child: CircularProgressIndicator())
           : isError
               ? Center(
                   child: Text(
@@ -134,9 +134,9 @@ class _LanguagePageState extends State<LanguagePage> {
                               );
                             },
                             child: Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: width * 0.05,
-                                vertical: 10,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -178,30 +178,33 @@ class _LanguagePageState extends State<LanguagePage> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
                                   languageList[index]['description'] == null ||
                                           languageList[index]['description'] ==
                                               ''
                                       ? const SizedBox()
-                                      : Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.description,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            SizedBox(
-                                              width: width * 0.7,
-                                              child: Text(
-                                                languageList[index]
-                                                    ['description'],
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                                textAlign: TextAlign.justify,
+                                      : Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.description,
+                                                color: Colors.grey,
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 10),
+                                              SizedBox(
+                                                width: width * 0.7,
+                                                child: Text(
+                                                  languageList[index]
+                                                      ['description'],
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                  textAlign: TextAlign.justify,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                 ],
                               ),
@@ -232,7 +235,7 @@ class _LanguagePageState extends State<LanguagePage> {
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(false);
+                  Navigator.of(context).pop();
 
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return AddEditLanguagePage(
@@ -252,7 +255,8 @@ class _LanguagePageState extends State<LanguagePage> {
               const Divider(),
               TextButton(
                 onPressed: () {
-                  // _showDeleteConfirmationDialog(context, experienceId);
+                  Navigator.of(context).pop();
+                  _showDeleteConfirmationDialog(context, languageId);
                 },
                 child: Row(
                   children: const [
@@ -264,6 +268,68 @@ class _LanguagePageState extends State<LanguagePage> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    String languageId,
+  ) {
+    deleteLanguage() {
+      LanguageService()
+          .deleteLanguage(tokens['access'], languageId)
+          .then((data) async {
+        print(data);
+        if (data['status'] == 204) {
+          Navigator.of(context).pop();
+          Helper().showSnackBar(
+            context,
+            'Language deleted successfully',
+            Colors.green,
+          );
+          // fetchLanguages(tokens['access'], widget.resumeId);
+        } else {
+          if (data['status'] == 401 || data['status'] == 403) {
+            Helper().showSnackBar(
+              context,
+              'Session expired',
+              Colors.red,
+            );
+            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          } else {
+            print(data['error']);
+            Helper().showSnackBar(
+              context,
+              'Failed to delete language',
+              Colors.red,
+            );
+          }
+        }
+      });
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this item?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteLanguage();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
         );
       },
     );

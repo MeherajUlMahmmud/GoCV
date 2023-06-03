@@ -127,7 +127,7 @@ class LanguageService {
   ) async {
     try {
       String url = "${URLS.kLanguageUrl}$languageId/";
-      final response = await http.put(
+      final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -162,13 +162,12 @@ class LanguageService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteExperience(
+  Future<Map<String, dynamic>> deleteLanguage(
     String accessToken,
     String languageId,
   ) async {
     try {
       String url = "${URLS.kLanguageUrl}$languageId/";
-      print(url);
       final response = await http.delete(
         Uri.parse(url),
         headers: {
@@ -176,7 +175,7 @@ class LanguageService {
           'Authorization': 'Bearer $accessToken',
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 204) {
         return {
           'status': response.statusCode,
         };

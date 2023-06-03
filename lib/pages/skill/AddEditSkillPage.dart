@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/language.dart';
+import 'package:gocv/apis/skill.dart';
+import 'package:gocv/models/skill.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
-class AddEditLanguagePage extends StatefulWidget {
+class AddEditSkillPage extends StatefulWidget {
   final String resumeId;
-  String? languageId;
+  String? skillId;
 
-  AddEditLanguagePage({
+  AddEditSkillPage({
     Key? key,
     required this.resumeId,
-    this.languageId,
+    this.skillId,
   }) : super(key: key);
 
   @override
-  State<AddEditLanguagePage> createState() => _AddEditLanguagePageState();
+  State<AddEditSkillPage> createState() => _AddEditSkillPageState();
 }
 
-class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
+class _AddEditSkillPageState extends State<AddEditSkillPage> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
@@ -36,13 +37,13 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   bool isError = false;
   String errorText = '';
 
-  TextEditingController languageController = TextEditingController();
+  TextEditingController skillController = TextEditingController();
   TextEditingController proficiencyController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
   String uuid = "";
-  String language = "";
+  String skill = "";
   String proficiency = "";
   String description = "";
 
@@ -57,42 +58,8 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    if (widget.languageId != null) {
-      LanguageService()
-          .getLanguage(tokens['access'], widget.languageId!)
-          .then((data) {
-        print(data);
-        if (data['status'] == 200) {
-          setState(() {
-            isLoading = false;
-            isError = false;
-            uuid = data['data']['uuid'];
-            language = data['data']['language'];
-            proficiency = data['data']['proficiency'];
-            description = data['data']['description'];
-            languageController.text = language;
-            proficiencyController.text = proficiency;
-            descriptionController.text = description;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }).catchError((error) {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = error.toString();
-        });
-        Helper().showSnackBar(
-          context,
-          error.toString(),
-          Colors.red,
-        );
-      });
+    if (widget.skillId != null) {
+      getSkill(tokens['access'], widget.skillId!);
     } else {
       setState(() {
         isLoading = false;
@@ -101,12 +68,48 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     }
   }
 
-  createLanguage() {
-    LanguageService()
-        .createLanguage(
+  getSkill(String accessToken, String skillId) {
+    SkillService().getSkill(accessToken, skillId).then((data) {
+      print(data);
+      if (data['status'] == 200) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          uuid = data['data']['uuid'];
+          skill = data['data']['skill'];
+          proficiency = data['data']['proficiency'];
+          description = data['data']['description'];
+          skillController.text = skill;
+          proficiencyController.text = proficiency;
+          descriptionController.text = description;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = data['error'];
+        });
+      }
+    }).catchError((error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = error.toString();
+      });
+      Helper().showSnackBar(
+        context,
+        error.toString(),
+        Colors.red,
+      );
+    });
+  }
+
+  createSkill() {
+    SkillService()
+        .createSkill(
       tokens['access'],
       widget.resumeId,
-      language,
+      skill,
       proficiency,
       description,
     )
@@ -134,12 +137,12 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     });
   }
 
-  updateLanguage() {
-    LanguageService()
-        .updateLanguage(
+  updateSkill() {
+    SkillService()
+        .updateSkill(
       tokens['access'],
       uuid,
-      language,
+      skill,
       proficiency,
       description,
     )
@@ -160,10 +163,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     setState(() {
       isLoading = true;
     });
-    if (widget.languageId != null) {
-      updateLanguage();
+    if (widget.skillId != null) {
+      updateSkill();
     } else {
-      createLanguage();
+      createSkill();
     }
   }
 
@@ -173,11 +176,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: widget.languageId == null
-            ? const Text('Add Language')
-            : const Text('Update Language'),
+        title: widget.skillId == null
+            ? const Text('Add Skill')
+            : const Text('Update Skill'),
       ),
-      resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
         onPressed: () {
@@ -194,21 +196,21 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                 const SizedBox(height: 10),
                 CustomTextFormField(
                   width: width,
-                  controller: languageController,
-                  labelText: "Language",
-                  hintText: "Language",
+                  controller: skillController,
+                  labelText: "Skill",
+                  hintText: "Skill",
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
                   keyboardType: TextInputType.name,
                   onChanged: (value) {
                     setState(() {
-                      language = value!;
+                      skill = value!;
                     });
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter language';
+                      return 'Please enter skill';
                     }
                     return null;
                   },

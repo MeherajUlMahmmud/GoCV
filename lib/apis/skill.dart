@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
-class ExpreienceService {
-  Future<Map<String, dynamic>> getExperienceList(
+class SkillService {
+  Future<Map<String, dynamic>> getSkillList(
     String accessToken,
     String resumeId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}?resume=$resumeId";
+      String url = "${URLS.kSkillUrl}?resume=$resumeId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -38,12 +38,12 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> getExperience(
+  Future<Map<String, dynamic>> getSkill(
     String accessToken,
-    String experienceId,
+    String skillId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId";
+      String url = "${URLS.kSkillUrl}$skillId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -73,21 +73,15 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> createExperience(
+  Future<Map<String, dynamic>> createSkill(
     String accessToken,
     String resumeId,
-    String companyName,
-    String position,
-    String type,
-    String startDate,
-    String? endDate,
+    String skill,
+    String proficiency,
     String description,
-    // String salary,
-    String companyWebsite,
-    bool isCurrentlyWorking,
   ) async {
     try {
-      String url = URLS.kExperienceUrl;
+      String url = URLS.kSkillUrl;
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -96,15 +90,9 @@ class ExpreienceService {
         },
         body: jsonEncode({
           'resume': resumeId,
-          'company_name': companyName,
-          'position': position,
-          'type': type,
-          'start_date': startDate,
-          'end_date': endDate,
+          'skill': skill,
+          'proficiency': proficiency,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
-          'is_current': isCurrentlyWorking,
         }),
       );
       if (response.statusCode == 200) {
@@ -115,7 +103,6 @@ class ExpreienceService {
         };
       } else {
         final data = jsonDecode(response.body);
-        print(data);
         return {
           'error': data['detail'],
           'status': response.statusCode,
@@ -130,21 +117,15 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> updateExperience(
+  Future<Map<String, dynamic>> updateSkill(
     String accessToken,
-    String experienceId,
-    String companyName,
-    String position,
-    String type,
-    String startDate,
-    String? endDate,
+    String skillId,
+    String skill,
+    String proficiency,
     String description,
-    // String salary,
-    String companyWebsite,
-    bool isCurrentlyWorking,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kSkillUrl}$skillId/";
       final response = await http.patch(
         Uri.parse(url),
         headers: {
@@ -152,15 +133,9 @@ class ExpreienceService {
           'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode({
-          'company_name': companyName,
-          'position': position,
-          'type': type,
-          'start_date': startDate,
-          'end_date': endDate,
+          'skill': skill,
+          'proficiency': proficiency,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
-          'is_current': isCurrentlyWorking,
         }),
       );
       if (response.statusCode == 200) {
@@ -186,12 +161,12 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteExperience(
+  Future<Map<String, dynamic>> deleteSkill(
     String accessToken,
-    String experienceId,
+    String skillId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kSkillUrl}$skillId/";
       final response = await http.delete(
         Uri.parse(url),
         headers: {
@@ -205,7 +180,6 @@ class ExpreienceService {
         };
       } else {
         final data = jsonDecode(response.body);
-        print(data);
         return {
           'error': data['detail'],
           'status': response.statusCode,

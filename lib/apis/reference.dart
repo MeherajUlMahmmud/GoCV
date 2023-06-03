@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
-class ExpreienceService {
-  Future<Map<String, dynamic>> getExperienceList(
+class ReferenceService {
+  Future<Map<String, dynamic>> getReferenceList(
     String accessToken,
     String resumeId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}?resume=$resumeId";
+      String url = "${URLS.kReferenceUrl}?resume=$resumeId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -38,12 +38,12 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> getExperience(
+  Future<Map<String, dynamic>> getReference(
     String accessToken,
-    String experienceId,
+    String referenceId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId";
+      String url = "${URLS.kReferenceUrl}$referenceId";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -73,21 +73,19 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> createExperience(
+  Future<Map<String, dynamic>> createReference(
     String accessToken,
     String resumeId,
+    String name,
+    String email,
+    String phone,
     String companyName,
     String position,
-    String type,
-    String startDate,
-    String? endDate,
     String description,
-    // String salary,
-    String companyWebsite,
-    bool isCurrentlyWorking,
   ) async {
+    print(resumeId);
     try {
-      String url = URLS.kExperienceUrl;
+      String url = URLS.kReferenceUrl;
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -96,19 +94,18 @@ class ExpreienceService {
         },
         body: jsonEncode({
           'resume': resumeId,
+          'name': name,
+          'email': email,
+          'phone': phone,
           'company_name': companyName,
           'position': position,
-          'type': type,
-          'start_date': startDate,
-          'end_date': endDate,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
-          'is_current': isCurrentlyWorking,
         }),
       );
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data);
         return {
           'data': data,
           'status': response.statusCode,
@@ -130,21 +127,18 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> updateExperience(
+  Future<Map<String, dynamic>> updateReference(
     String accessToken,
-    String experienceId,
+    String referenceId,
+    String name,
+    String email,
+    String phone,
     String companyName,
     String position,
-    String type,
-    String startDate,
-    String? endDate,
     String description,
-    // String salary,
-    String companyWebsite,
-    bool isCurrentlyWorking,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kReferenceUrl}$referenceId/";
       final response = await http.patch(
         Uri.parse(url),
         headers: {
@@ -152,15 +146,12 @@ class ExpreienceService {
           'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode({
+          'name': name,
+          'email': email,
+          'phone': phone,
           'company_name': companyName,
           'position': position,
-          'type': type,
-          'start_date': startDate,
-          'end_date': endDate,
           'description': description,
-          // 'salary': salary,
-          'company_website': companyWebsite,
-          'is_current': isCurrentlyWorking,
         }),
       );
       if (response.statusCode == 200) {
@@ -186,12 +177,12 @@ class ExpreienceService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteExperience(
+  Future<Map<String, dynamic>> deleteReference(
     String accessToken,
-    String experienceId,
+    String referenceId,
   ) async {
     try {
-      String url = "${URLS.kExperienceUrl}$experienceId/";
+      String url = "${URLS.kReferenceUrl}$referenceId/";
       final response = await http.delete(
         Uri.parse(url),
         headers: {

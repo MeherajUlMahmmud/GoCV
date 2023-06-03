@@ -1,5 +1,5 @@
 import 'package:gocv/apis/experience.dart';
-import 'package:gocv/pages/work_experience/AddWorkExperiencePage.dart';
+import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
@@ -88,7 +88,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(
             builder: (context) {
-              return AddWorkExperiencePage(
+              return AddEditWorkExperiencePage(
                 resumeId: widget.resumeId,
               );
             },
@@ -135,13 +135,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                               );
                             },
                             child: Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: width * 0.05,
-                                vertical: 10,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
-                                vertical: 10,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -314,10 +314,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
     );
   }
 
-  void _showBottomSheet(
-    BuildContext context,
-    String experienceId,
-  ) {
+  void _showBottomSheet(BuildContext context, String experienceId) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -339,7 +336,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                   Navigator.of(context).pop(false);
 
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return AddWorkExperiencePage(
+                    return AddEditWorkExperiencePage(
                       resumeId: widget.resumeId,
                       experienceId: experienceId,
                     );
@@ -356,6 +353,8 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
               const Divider(),
               TextButton(
                 onPressed: () {
+                  Navigator.of(context).pop(false);
+
                   _showDeleteConfirmationDialog(context, experienceId);
                 },
                 child: Row(
@@ -383,16 +382,12 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
           .then((data) async {
         if (data['status'] == 200) {
           Navigator.of(context).pop(true);
-          Navigator.of(context).pop(true);
           Helper().showSnackBar(
             context,
             'Experience deleted successfully',
             Colors.green,
           );
-          fetchWorkExperiences(
-            tokens['access'],
-            widget.resumeId,
-          );
+          fetchWorkExperiences(tokens['access'], widget.resumeId);
         } else {
           if (data['status'] == 401 || data['status'] == 403) {
             Helper().showSnackBar(
