@@ -7,7 +7,6 @@ import 'package:gocv/pages/interest/InterestPage.dart';
 import 'package:gocv/pages/language/LanguagePage.dart';
 import 'package:gocv/pages/personal/PersonalPage.dart';
 import 'package:gocv/pages/reference/Referencepage.dart';
-import 'package:gocv/pages/settings/ResumeSettingsPage.dart';
 import 'package:gocv/pages/skill/SkillPage.dart';
 import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
@@ -47,7 +46,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 11, vsync: this);
+    tabController = TabController(length: 10, vsync: this);
 
     readTokensAndUser();
   }
@@ -216,7 +215,6 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                               InterestPage(resumeId: widget.resume['uuid']),
                               LanguagePage(resumeId: widget.resume['uuid']),
                               ReferencePage(resumeId: widget.resume['uuid']),
-                              const ResumeSettingsPage(),
                             ],
                           ),
                         ),
