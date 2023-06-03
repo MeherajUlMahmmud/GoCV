@@ -145,7 +145,7 @@ class ExpreienceService {
   ) async {
     try {
       String url = "${URLS.kExperienceUrl}$experienceId/";
-      final response = await http.put(
+      final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
