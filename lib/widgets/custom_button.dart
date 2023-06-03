@@ -3,13 +3,20 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   IconData? icon;
+  double? height;
+  double? width;
+  double? textFontSize;
   bool? isLoading = false;
   bool? isDisabled = false;
   final Function() onPressed;
+
   CustomButton({
     Key? key,
     required this.text,
     this.icon,
+    this.height,
+    this.width,
+    this.textFontSize,
     this.isLoading,
     this.isDisabled,
     required this.onPressed,
@@ -18,8 +25,8 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
-      height: 50,
+      width: width ?? double.infinity,
+      height: height ?? 55,
       child: ElevatedButton(
         onPressed: () => isDisabled != null && isDisabled == true
             ? null
@@ -27,9 +34,9 @@ class CustomButton extends StatelessWidget {
                 ? null
                 : onPressed(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: isDisabled != null && isDisabled == true
-              ? Colors.grey
-              : Theme.of(context).primaryColor,
+          // backgroundColor: isDisabled == true || isLoading == true
+          //     ? Colors.grey
+          //     : Theme.of(context).elevatedButtonTheme.style.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -44,12 +51,17 @@ class CustomButton extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (icon != null) Icon(icon, color: Colors.white),
+                    if (icon != null)
+                      Icon(
+                        icon,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     SizedBox(width: icon != null ? 10 : 0),
                     Text(
                       text,
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: textFontSize ?? 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),

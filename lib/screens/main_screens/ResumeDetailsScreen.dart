@@ -185,12 +185,6 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
-                            Tab(
-                              child: Text(
-                                "Settings",
-                                style: TextStyle(fontSize: 16.0),
-                              ),
-                            ),
                           ],
                         ),
                         Expanded(

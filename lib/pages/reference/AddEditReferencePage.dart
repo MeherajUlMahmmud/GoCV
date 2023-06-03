@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/reference.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class AddEditReferencePage extends StatefulWidget {
@@ -191,11 +192,40 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
             : const Text("Update Work Experience"),
       ),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.save),
-        onPressed: () {
-          if (_formKey.currentState!.validate()) handleSubmit();
-        },
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.save),
+      //   onPressed: () {
+      //     if (_formKey.currentState!.validate()) handleSubmit();
+      //   },
+      // ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 30.0,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: CustomButton(
+          text:
+              widget.referenceId == null ? "Add Reference" : "Update Reference",
+          isLoading: isLoading,
+          isDisabled: isLoading,
+          onPressed: () {
+            if (_formKey.currentState!.validate()) handleSubmit();
+          },
+        ),
       ),
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10.0),

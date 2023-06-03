@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/experience.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -218,20 +219,59 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
             : const Text("Update Work Experience"),
       ),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.save),
-        onPressed: () {
-          if (typeController.text.isEmpty) {
-            setState(() {
-              typeError = "Please enter job type";
-            });
-          } else {
-            setState(() {
-              typeError = "";
-            });
-          }
-          if (_formKey.currentState!.validate()) handleSubmit();
-        },
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.save),
+      //   onPressed: () {
+      //     if (typeController.text.isEmpty) {
+      //       setState(() {
+      //         typeError = "Please enter job type";
+      //       });
+      //     } else {
+      //       setState(() {
+      //         typeError = "";
+      //       });
+      //     }
+      //     if (_formKey.currentState!.validate()) handleSubmit();
+      //   },
+      // ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 30.0,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: CustomButton(
+          text: widget.experienceId == null
+              ? "Add Work Experience"
+              : "Update Work Experience",
+          isLoading: isLoading,
+          isDisabled: isLoading,
+          onPressed: () {
+            if (typeController.text.isEmpty) {
+              setState(() {
+                typeError = "Please enter job type";
+              });
+            } else {
+              setState(() {
+                typeError = "";
+              });
+            }
+            if (_formKey.currentState!.validate()) handleSubmit();
+          },
+        ),
       ),
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10.0),

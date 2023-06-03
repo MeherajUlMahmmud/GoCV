@@ -3,6 +3,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/language.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class AddEditLanguagePage extends StatefulWidget {
@@ -178,11 +179,39 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
             : const Text('Update Language'),
       ),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.save),
-        onPressed: () {
-          if (_formKey.currentState!.validate()) handleSubmit();
-        },
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.save),
+      //   onPressed: () {
+      //     if (_formKey.currentState!.validate()) handleSubmit();
+      //   },
+      // ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 30.0,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: CustomButton(
+          text: widget.languageId == null ? 'Add Language' : 'Update Language',
+          isLoading: isLoading,
+          isDisabled: isLoading,
+          onPressed: () {
+            if (_formKey.currentState!.validate()) handleSubmit();
+          },
+        ),
       ),
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10.0),

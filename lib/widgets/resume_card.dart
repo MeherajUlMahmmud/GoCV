@@ -16,67 +16,35 @@ class _ResumeCardState extends State<ResumeCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 5.0,
-      margin: const EdgeInsets.all(10.0),
-      child: Container(
-        margin: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 30.0,
-                      backgroundImage: AssetImage("assets/avatars/rdj.png"),
-                    ),
-                    const SizedBox(width: 10.0),
-                    Text(
-                      widget.resume['name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+    return Container(
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5.0,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          const CircleAvatar(
+            radius: 50.0,
+            backgroundImage: AssetImage("assets/avatars/rdj.png"),
+          ),
+          const SizedBox(height: 10.0),
+          Text(
+            widget.resume['name'],
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20.0,
             ),
-            // const SizedBox(height: 10.0),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     Text(
-            //       "Last Updated: ${widget.resume['updated_at']}",
-            //       style: const TextStyle(
-            //         fontSize: 14.0,
-            //         color: Colors.black54,
-            //       ),
-            //     ),
-            //     ElevatedButton(
-            //       onPressed: () {
-            //         setState(() {
-            //           title = widget.resume['name'];
-            //         });
-            //         showTitleUpdateDialog(context);
-            //       },
-            //       child: Row(
-            //         children: const [
-            //           Icon(Icons.edit, size: 16.0),
-            //           SizedBox(width: 10.0),
-            //           Text("Edit Title"),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

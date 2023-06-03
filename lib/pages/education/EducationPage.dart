@@ -112,7 +112,7 @@ class _EducationPageState extends State<EducationPage> {
               : educationList.isEmpty
                   ? const Center(
                       child: Text(
-                        'No work experiences added',
+                        'No education added',
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 20,

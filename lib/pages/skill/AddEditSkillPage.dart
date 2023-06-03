@@ -4,6 +4,7 @@ import 'package:gocv/apis/skill.dart';
 import 'package:gocv/models/skill.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class AddEditSkillPage extends StatefulWidget {
@@ -180,11 +181,40 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
             ? const Text('Add Skill')
             : const Text('Update Skill'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.save),
-        onPressed: () {
-          if (_formKey.currentState!.validate()) handleSubmit();
-        },
+      resizeToAvoidBottomInset: false,
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.save),
+      //   onPressed: () {
+      //     if (_formKey.currentState!.validate()) handleSubmit();
+      //   },
+      // ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 30.0,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: CustomButton(
+          text: widget.skillId == null ? "Add Skill" : "Update Skill",
+          isLoading: isLoading,
+          isDisabled: isLoading,
+          onPressed: () {
+            if (_formKey.currentState!.validate()) handleSubmit();
+          },
+        ),
       ),
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10.0),
