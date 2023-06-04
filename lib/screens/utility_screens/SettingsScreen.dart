@@ -34,9 +34,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.account_box_outlined, size: 30),
                 title: const Text('Account'),
                 onTap: () {
-                  Navigator.of(context).pushNamed(
-                    AccountSettingsScreen.routeName,
-                  );
+                  // Navigator.of(context).pushNamed(
+                  //   AccountSettingsScreen.routeName,
+                  // );
                 },
               ),
             ),
