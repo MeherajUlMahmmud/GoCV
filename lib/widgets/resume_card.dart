@@ -34,7 +34,7 @@ class _ResumeCardState extends State<ResumeCard> {
         children: <Widget>[
           const CircleAvatar(
             radius: 50.0,
-            backgroundImage: AssetImage("assets/avatars/rdj.png"),
+            backgroundImage: AssetImage('assets/avatars/rdj.png'),
           ),
           const SizedBox(height: 10.0),
           Text(
@@ -51,14 +51,14 @@ class _ResumeCardState extends State<ResumeCard> {
 
   showTitleUpdateDialog(BuildContext context) {
     Widget okButton = TextButton(
-      child: const Text("Update"),
+      child: const Text('Update'),
       onPressed: () async {
         Navigator.pop(context);
       },
     );
 
     AlertDialog alert = AlertDialog(
-      title: const Text("Update Resume title"),
+      title: const Text('Update Resume title'),
       content: TextFormField(
         autofocus: true,
         controller: titleController..text = title,
@@ -66,7 +66,7 @@ class _ResumeCardState extends State<ResumeCard> {
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.blue),
           ),
-          hintText: "New title",
+          hintText: 'New title',
         ),
         keyboardType: TextInputType.text,
       ),

@@ -39,12 +39,12 @@ class _ContactPageState extends State<ContactPage> {
   TextEditingController githubController = TextEditingController();
 
   int id = 0;
-  String phoneNumber = "";
-  String email = "";
-  String address = "";
-  String linkedin = "";
-  String facebook = "";
-  String github = "";
+  String phoneNumber = '';
+  String email = '';
+  String address = '';
+  String linkedin = '';
+  String facebook = '';
+  String github = '';
 
   @override
   void initState() {
@@ -159,8 +159,8 @@ class _ContactPageState extends State<ContactPage> {
                 CustomTextFormField(
                   width: width,
                   controller: phoneNumberController,
-                  labelText: "Phone Number",
-                  hintText: "Phone Number",
+                  labelText: 'Phone Number',
+                  hintText: 'Phone Number',
                   prefixIcon: Icons.phone,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -175,8 +175,8 @@ class _ContactPageState extends State<ContactPage> {
                 CustomTextFormField(
                   width: width,
                   controller: emailController,
-                  labelText: "Email",
-                  hintText: "Email Address",
+                  labelText: 'Email',
+                  hintText: 'Email Address',
                   prefixIcon: Icons.mail,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -197,8 +197,8 @@ class _ContactPageState extends State<ContactPage> {
                 CustomTextFormField(
                   width: width,
                   controller: addressController,
-                  labelText: "Address",
-                  hintText: "Address",
+                  labelText: 'Address',
+                  hintText: 'Address',
                   prefixIcon: Icons.navigation,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

@@ -4,7 +4,7 @@ import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
-  static const routeName = "/account-settings";
+  static const routeName = '/account-settings';
 
   const AccountSettingsScreen({super.key});
 
@@ -28,9 +28,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController otpController = TextEditingController();
 
-  String uuid = "";
-  String email = "";
-  String otp = "";
+  String uuid = '';
+  String email = '';
+  String otp = '';
 
   @override
   void initState() {
@@ -112,8 +112,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: emailController,
-                        labelText: "Email Address",
-                        hintText: "Email address",
+                        labelText: 'Email Address',
+                        hintText: 'Email address',
                         prefixIcon: Icons.email_outlined,
                         textCapitalization: TextCapitalization.words,
                         borderRadius: 10,
@@ -127,7 +127,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter email address';
                           } else if (!RegExp(
-                                  r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")
+                                  r'^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$')
                               .hasMatch(value)) {
                             return 'Please enter valid email address';
                           } else if (value == email) {
@@ -149,8 +149,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                           ? CustomTextFormField(
                               width: width,
                               controller: otpController,
-                              labelText: "OTP",
-                              hintText: "OTP",
+                              labelText: 'OTP',
+                              hintText: 'OTP',
                               prefixIcon: Icons.pin,
                               textCapitalization: TextCapitalization.none,
                               borderRadius: 10,

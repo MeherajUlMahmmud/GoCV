@@ -34,9 +34,9 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String interest = "";
-  String description = "";
+  String uuid = '';
+  String interest = '';
+  String description = '';
 
   @override
   void initState() {
@@ -194,7 +194,7 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
           ],
         ),
         child: CustomButton(
-          text: widget.interestId == null ? "Add Interest" : "Update Interest",
+          text: widget.interestId == null ? 'Add Interest' : 'Update Interest',
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
@@ -213,8 +213,8 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
                 CustomTextFormField(
                   width: width,
                   controller: interestController,
-                  labelText: "Interest",
-                  hintText: "Interest",
+                  labelText: 'Interest',
+                  hintText: 'Interest',
                   prefixIcon: Icons.interests_outlined,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -235,8 +235,8 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

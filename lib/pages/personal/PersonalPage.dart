@@ -46,15 +46,15 @@ class _PersonalPageState extends State<PersonalPage> {
   TextEditingController countryController = TextEditingController();
   TextEditingController nationalityController = TextEditingController();
 
-  String uuid = "";
-  String firstName = "";
-  String lastName = "";
-  String aboutMe = "";
-  String dateOfBirth = "";
-  String city = "";
-  String state = "";
-  String country = "";
-  String nationality = "";
+  String uuid = '';
+  String firstName = '';
+  String lastName = '';
+  String aboutMe = '';
+  String dateOfBirth = '';
+  String city = '';
+  String state = '';
+  String country = '';
+  String nationality = '';
 
   // image
   File? imageFile;
@@ -85,7 +85,7 @@ class _PersonalPageState extends State<PersonalPage> {
     user = await localStorage.readData('user');
 
     // get from "assets/avatars/rdj.png"
-    imageFile = File("assets/avatars/rdj.png");
+    imageFile = File('assets/avatars/rdj.png');
 
     fetchPersonalDetails(tokens['access'], widget.personalId);
   }
@@ -279,8 +279,8 @@ class _PersonalPageState extends State<PersonalPage> {
                                 CustomTextFormField(
                                   width: width * 0.6,
                                   controller: firstNameController,
-                                  labelText: "First Name",
-                                  hintText: "First Name",
+                                  labelText: 'First Name',
+                                  hintText: 'First Name',
                                   prefixIcon: Icons.person_outline,
                                   textCapitalization: TextCapitalization.words,
                                   borderRadius: 10,
@@ -301,8 +301,8 @@ class _PersonalPageState extends State<PersonalPage> {
                                 CustomTextFormField(
                                   width: width * 0.6,
                                   controller: lastNameController,
-                                  labelText: "Surname",
-                                  hintText: "Surname",
+                                  labelText: 'Surname',
+                                  hintText: 'Surname',
                                   prefixIcon: Icons.person_outline,
                                   textCapitalization: TextCapitalization.words,
                                   borderRadius: 10,
@@ -328,8 +328,8 @@ class _PersonalPageState extends State<PersonalPage> {
                       CustomTextFormField(
                         width: width,
                         controller: aboutMeController,
-                        labelText: "About Me",
-                        hintText: "About Me",
+                        labelText: 'About Me',
+                        hintText: 'About Me',
                         prefixIcon: Icons.person_outline,
                         textCapitalization: TextCapitalization.sentences,
                         borderRadius: 10,
@@ -368,7 +368,7 @@ class _PersonalPageState extends State<PersonalPage> {
                               controller: dobController,
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(Icons.calendar_today),
-                                labelText: "Date of Birth",
+                                labelText: 'Date of Birth',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),

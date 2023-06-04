@@ -229,27 +229,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  // Row(
-                                  //   children: [
-                                  //     const Icon(
-                                  //       Icons.money,
-                                  //       color: Colors.grey,
-                                  //     ),
-                                  //     const SizedBox(width: 10),
-                                  //     SizedBox(
-                                  //       width: width * 0.7,
-                                  //       child: Text(
-                                  //         '${experienceList[index]['salary']} BDT',
-                                  //         style: const TextStyle(
-                                  //           fontSize: 18,
-                                  //           color: Colors.green,
-                                  //           fontWeight: FontWeight.bold,
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  // const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       const Icon(

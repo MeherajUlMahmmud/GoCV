@@ -308,7 +308,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Resume Preview"),
+        title: const Text('Resume Preview'),
       ),
       body: isLoading
           ? const Center(

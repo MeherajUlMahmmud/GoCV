@@ -26,14 +26,14 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
   List<String> types = [
-    "Full Time",
-    "Part Time",
-    "Internship",
-    "Contract",
-    "Freelance",
-    "Volunteer",
-    "Apprenticeship",
-    "Traineeship",
+    'Full Time',
+    'Part Time',
+    'Internship',
+    'Contract',
+    'Freelance',
+    'Volunteer',
+    'Apprenticeship',
+    'Traineeship',
   ];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -50,17 +50,17 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   TextEditingController companyWebsiteController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String companyName = "";
-  String position = "";
-  String type = "";
-  String startDate = "";
+  String uuid = '';
+  String companyName = '';
+  String position = '';
+  String type = '';
+  String startDate = '';
   String? endDate;
-  String description = "";
-  String companyWebsite = "";
+  String description = '';
+  String companyWebsite = '';
   bool isCurrentlyWorking = false;
 
-  String typeError = "";
+  String typeError = '';
 
   @override
   void initState() {
@@ -102,13 +102,13 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
             startDate = data['data']['start_date'];
             endDate = data['data']['end_date'];
             description = data['data']['description'];
-            companyWebsite = data['data']['company_website'] ?? "";
+            companyWebsite = data['data']['company_website'] ?? '';
             isCurrentlyWorking = data['data']['is_current'];
             companyNameController.text = companyName;
             positionController.text = position;
             typeController.text = type;
             startDateController.text = startDate;
-            endDateController.text = endDate ?? "";
+            endDateController.text = endDate ?? '';
             descriptionController.text = description;
             companyWebsiteController.text = companyWebsite;
           });
@@ -223,8 +223,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     return Scaffold(
       appBar: AppBar(
         title: widget.experienceId == null
-            ? const Text("Add Work Experience")
-            : const Text("Update Work Experience"),
+            ? const Text('Add Work Experience')
+            : const Text('Update Work Experience'),
       ),
       resizeToAvoidBottomInset: false,
       // floatingActionButton: FloatingActionButton(
@@ -263,18 +263,18 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         ),
         child: CustomButton(
           text: widget.experienceId == null
-              ? "Add Work Experience"
-              : "Update Work Experience",
+              ? 'Add Work Experience'
+              : 'Update Work Experience',
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
             if (typeController.text.isEmpty) {
               setState(() {
-                typeError = "Please enter job type";
+                typeError = 'Please enter job type';
               });
             } else {
               setState(() {
-                typeError = "";
+                typeError = '';
               });
             }
             if (_formKey.currentState!.validate()) handleSubmit();
@@ -292,8 +292,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: companyNameController,
-                  labelText: "Company Name",
-                  hintText: "Company Name",
+                  labelText: 'Company Name',
+                  hintText: 'Company Name',
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -314,8 +314,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: positionController,
-                  labelText: "Position",
-                  hintText: "Position",
+                  labelText: 'Position',
+                  hintText: 'Position',
                   prefixIcon: Icons.work_outline_rounded,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,
@@ -345,7 +345,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                         border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        errorText: typeError == "" ? null : typeError,
+                        errorText: typeError == '' ? null : typeError,
                         labelText: 'Job Type',
                         hintText: 'Job Type',
                         prefixIcon: const Icon(Icons.work_outline_rounded),
@@ -419,7 +419,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                         controller: startDateController,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.calendar_today),
-                          labelText: "Start Date",
+                          labelText: 'Start Date',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -445,7 +445,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                         });
                       },
                     ),
-                    const Text("Currently Working"),
+                    const Text('Currently Working'),
                   ],
                 ),
                 isCurrentlyWorking
@@ -469,7 +469,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                             if (picked != null && picked != DateTime.now()) {
                               setState(() {
                                 endDate = picked.toString().substring(0, 10);
-                                endDateController.text = endDate ?? "";
+                                endDateController.text = endDate ?? '';
                               });
                             }
                           },
@@ -478,7 +478,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                               controller: endDateController,
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(Icons.calendar_today),
-                                labelText: "End Date",
+                                labelText: 'End Date',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -498,8 +498,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,
@@ -514,8 +514,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: companyWebsiteController,
-                  labelText: "Company Website",
-                  hintText: "Company Website",
+                  labelText: 'Company Website',
+                  hintText: 'Company Website',
                   prefixIcon: Icons.link,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

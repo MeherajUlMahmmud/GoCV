@@ -103,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 150,
                       child: ImageFullScreenWrapperWidget(
                         dark: true,
-                        child: Image.asset("assets/avatars/rdj.png"),
+                        child: Image.asset('assets/avatars/rdj.png'),
                         // child: Image.asset(imageFile!.path),
                       ),
                     ),

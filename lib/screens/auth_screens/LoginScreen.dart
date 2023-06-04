@@ -10,7 +10,7 @@ import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const routeName = "/login";
+  static const routeName = '/login';
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
@@ -23,8 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  String email = "";
-  String password = "";
+  String email = '';
+  String password = '';
 
   bool isObscure = true;
   bool isLoading = false;
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "GoCV",
+                      'GoCV',
                       style: TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      "Welcome back",
+                      'Welcome back',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      "Login to continue",
+                      'Login to continue',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -173,11 +173,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
-                        child: const Text("Forgot Password?"),
+                        child: const Text('Forgot Password?'),
                       ),
                     ),
                     CustomButton(
-                      text: "Login",
+                      text: 'Login',
                       isLoading: isLoading,
                       isDisabled: isLoading,
                       onPressed: () {
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               SignUpScreen.routeName,
                             );
                           },
-                          child: const Text("Sign Up"),
+                          child: const Text('Sign Up'),
                         ),
                       ],
                     ),

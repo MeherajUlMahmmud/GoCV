@@ -8,7 +8,7 @@ import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static const routeName = "/signup";
+  static const routeName = '/signup';
   const SignUpScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,11 +22,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
-  String firstName = "";
-  String lastName = "";
-  String email = "";
-  String password = "";
-  String confirmPassword = "";
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  String password = '';
+  String confirmPassword = '';
 
   bool isObscure = true;
   bool isLoading = false;
@@ -117,7 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "GoCV",
+                      'GoCV',
                       style: TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      "Welcome",
+                      'Welcome',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -133,7 +133,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      "Create an account to continue!",
+                      'Create an account to continue!',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -266,7 +266,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 15),
                     CustomButton(
-                      text: "Sign Up",
+                      text: 'Sign Up',
                       isLoading: isLoading,
                       isDisabled: isLoading,
                       onPressed: () {
@@ -278,7 +278,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Already have an account?"),
+                        const Text('Already have an account?'),
                         TextButton(
                           onPressed: () {
                             Navigator.pushReplacementNamed(
@@ -286,7 +286,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               LoginScreen.routeName,
                             );
                           },
-                          child: const Text("Login"),
+                          child: const Text('Login'),
                         ),
                       ],
                     ),

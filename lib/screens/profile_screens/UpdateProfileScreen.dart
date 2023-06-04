@@ -34,10 +34,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  String uuid = "";
-  String firstName = "";
-  String lastName = "";
-  String phone = "";
+  String uuid = '';
+  String firstName = '';
+  String lastName = '';
+  String phone = '';
 
   // image
   File? imageFile;
@@ -62,7 +62,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    imageFile = File("assets/avatars/rdj.png");
+    imageFile = File('assets/avatars/rdj.png');
 
     firstName = user['applicant']['first_name'];
     lastName = user['applicant']['last_name'];
@@ -234,8 +234,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: firstNameController,
-                        labelText: "First Name",
-                        hintText: "First Name",
+                        labelText: 'First Name',
+                        hintText: 'First Name',
                         prefixIcon: Icons.person_outline,
                         textCapitalization: TextCapitalization.words,
                         borderRadius: 10,
@@ -256,8 +256,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: lastNameController,
-                        labelText: "Surname",
-                        hintText: "Surname",
+                        labelText: 'Surname',
+                        hintText: 'Surname',
                         prefixIcon: Icons.person_outline,
                         textCapitalization: TextCapitalization.words,
                         borderRadius: 10,
@@ -278,8 +278,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: phoneController,
-                        labelText: "Phone Number",
-                        hintText: "Phone Number",
+                        labelText: 'Phone Number',
+                        hintText: 'Phone Number',
                         prefixIcon: Icons.phone,
                         textCapitalization: TextCapitalization.none,
                         borderRadius: 10,

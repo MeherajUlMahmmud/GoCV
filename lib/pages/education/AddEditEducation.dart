@@ -40,15 +40,15 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String schoolName = "";
-  String degree = "";
-  String department = "";
-  String gradeScale = "";
-  String grade = "";
+  String uuid = '';
+  String schoolName = '';
+  String degree = '';
+  String department = '';
+  String gradeScale = '';
+  String grade = '';
   String? startDate;
   String? endDate;
-  String description = "";
+  String description = '';
   bool isCurrentlyEnrolled = false;
 
   @override
@@ -101,7 +101,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
             gradeScaleController.text = gradeScale;
             gradeController.text = grade;
             startDateController.text = startDate ?? '';
-            endDateController.text = endDate ?? "";
+            endDateController.text = endDate ?? '';
             descriptionController.text = description;
           });
         } else {
@@ -216,8 +216,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     return Scaffold(
       appBar: AppBar(
         title: widget.educationId != null
-            ? const Text("Update Education")
-            : const Text("Add Education"),
+            ? const Text('Update Education')
+            : const Text('Add Education'),
       ),
       resizeToAvoidBottomInset: false,
       // floatingActionButton: FloatingActionButton(
@@ -247,7 +247,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
         ),
         child: CustomButton(
           text:
-              widget.educationId == null ? "Add Education" : "Update Education",
+              widget.educationId == null ? 'Add Education' : 'Update Education',
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
@@ -266,8 +266,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: schoolNameController,
-                  labelText: "School Name",
-                  hintText: "School Name",
+                  labelText: 'School Name',
+                  hintText: 'School Name',
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -288,8 +288,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: degreeController,
-                  labelText: "Degree",
-                  hintText: "Degree",
+                  labelText: 'Degree',
+                  hintText: 'Degree',
                   prefixIcon: Icons.grade,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -310,8 +310,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: departmentController,
-                  labelText: "Department",
-                  hintText: "Department",
+                  labelText: 'Department',
+                  hintText: 'Department',
                   prefixIcon: Icons.grade,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -332,8 +332,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: gradeScaleController,
-                  labelText: "CGPA Scale",
-                  hintText: "CGPA Scale",
+                  labelText: 'CGPA Scale',
+                  hintText: 'CGPA Scale',
                   prefixIcon: Icons.grade,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -357,8 +357,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: gradeController,
-                  labelText: "CGPA",
-                  hintText: "CGPA",
+                  labelText: 'CGPA',
+                  hintText: 'CGPA',
                   prefixIcon: Icons.grade,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -407,7 +407,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                         controller: startDateController,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.calendar_today),
-                          labelText: "Start Date",
+                          labelText: 'Start Date',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -427,7 +427,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                         });
                       },
                     ),
-                    const Text("Currently Enrolled"),
+                    const Text('Currently Enrolled'),
                   ],
                 ),
                 isCurrentlyEnrolled
@@ -451,7 +451,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                             if (picked != null && picked != DateTime.now()) {
                               setState(() {
                                 endDate = picked.toString().substring(0, 10);
-                                endDateController.text = endDate ?? "";
+                                endDateController.text = endDate ?? '';
                               });
                             }
                           },
@@ -460,7 +460,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                               controller: endDateController,
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(Icons.calendar_today),
-                                labelText: "End Date",
+                                labelText: 'End Date',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -474,8 +474,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

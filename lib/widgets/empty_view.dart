@@ -12,7 +12,7 @@ class EmptyView extends StatelessWidget {
             height: 300.0,
             width: 300.0,
           ),
-          Text(
+          const Text(
             'Nothing is here yet',
             style: TextStyle(
               fontSize: 24.0,

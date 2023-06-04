@@ -11,7 +11,7 @@ import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = "/home";
+  static const routeName = '/home';
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("GoCV"),
+        title: const Text('GoCV'),
         // actions: <Widget>[
         //   IconButton(
         //     icon: const Icon(
@@ -286,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () {
                               fetchResumes(tokens['access'], user['uuid']);
                             },
-                            child: const Text("Retry"),
+                            child: const Text('Retry'),
                           ),
                         ],
                       ),
@@ -342,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: <Widget>[
                   const CircleAvatar(
                     radius: 30.0,
-                    backgroundImage: AssetImage("assets/avatars/rdj.png"),
+                    backgroundImage: AssetImage('assets/avatars/rdj.png'),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -398,14 +398,14 @@ class _HomeScreenState extends State<HomeScreen> {
   showAddDialog(BuildContext context) {
     // set up the button
     Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
+      child: const Text('Cancel'),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: const Text("Save"),
+      child: const Text('Save'),
       onPressed: () async {
         String title = titleController.text;
         titleController.clear();
@@ -414,12 +414,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     AlertDialog alert = AlertDialog(
-      title: const Text("Resume title"),
+      title: const Text('Resume title'),
       content: TextFormField(
         autofocus: true,
         controller: titleController,
         decoration: const InputDecoration(
-          hintText: "Give a title",
+          hintText: 'Give a title',
         ),
         keyboardType: TextInputType.text,
       ),
@@ -441,14 +441,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void showDeleteDialog(BuildContext context, Map<String, dynamic> resume) {
     // set up the button
     Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
+      child: const Text('Cancel'),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: const Text("Delete"),
+      child: const Text('Delete'),
       onPressed: () async {
         Navigator.pop(context);
       },
@@ -456,8 +456,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Deleting " + resume['name']),
-      content: const Text("Are you sure about deleting this resume?"),
+      title: Text('Deleting ${resume['name']}'),
+      content: const Text('Are you sure about deleting this resume?'),
       actions: [
         cancelButton,
         okButton,

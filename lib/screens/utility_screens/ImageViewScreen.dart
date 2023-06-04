@@ -22,8 +22,8 @@ class ImageFullScreenWrapperWidget extends StatelessWidget {
             barrierColor: dark ? Colors.black : Colors.white,
             pageBuilder: (BuildContext context, _, __) {
               return FullScreenPage(
-                child: child,
                 dark: dark,
+                child: child,
               );
             },
           ),
@@ -53,7 +53,8 @@ class _FullScreenPageState extends State<FullScreenPage> {
     var brightness = widget.dark ? Brightness.light : Brightness.dark;
     var color = widget.dark ? Colors.black12 : Colors.white70;
 
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top]);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       systemNavigationBarColor: color,
       statusBarColor: color,
@@ -67,7 +68,8 @@ class _FullScreenPageState extends State<FullScreenPage> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         // Restore your settings here...
         ));
@@ -104,11 +106,6 @@ class _FullScreenPageState extends State<FullScreenPage> {
               child: MaterialButton(
                 padding: const EdgeInsets.all(15),
                 elevation: 0,
-                child: Icon(
-                  Icons.arrow_back,
-                  color: widget.dark ? Colors.white : Colors.black,
-                  size: 25,
-                ),
                 color: widget.dark ? Colors.black12 : Colors.white70,
                 highlightElevation: 0,
                 minWidth: double.minPositive,
@@ -117,6 +114,11 @@ class _FullScreenPageState extends State<FullScreenPage> {
                   borderRadius: BorderRadius.circular(100),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: widget.dark ? Colors.white : Colors.black,
+                  size: 25,
+                ),
               ),
             ),
           ),

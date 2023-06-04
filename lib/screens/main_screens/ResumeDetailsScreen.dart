@@ -16,7 +16,7 @@ import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class ResumeDetailsScreen extends StatefulWidget {
-  static const String routeName = "/resume-details";
+  static const String routeName = '/resume-details';
 
   final Map<String, dynamic> resume;
   const ResumeDetailsScreen({
@@ -102,7 +102,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                 );
               },
               icon: const Icon(Icons.visibility),
-              tooltip: "Preview",
+              tooltip: 'Preview',
             ),
           ],
         ),
@@ -127,61 +127,61 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                           tabs: const [
                             Tab(
                               child: Text(
-                                "Personal",
+                                'Personal',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Contact",
+                                'Contact',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Work Experience",
+                                'Work Experience',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Education",
+                                'Education',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Skills",
+                                'Skills',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Awards",
+                                'Awards',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Certifications",
+                                'Certifications',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Interests",
+                                'Interests',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "Languages",
+                                'Languages',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
                             Tab(
                               child: Text(
-                                "References",
+                                'References',
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),

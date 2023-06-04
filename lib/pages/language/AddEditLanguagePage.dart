@@ -25,10 +25,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
   List<String> proficiencyTypes = [
-    "Beginner",
-    "Intermediate",
-    "Advanced",
-    "Professional",
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+    'Professional',
   ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -42,10 +42,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String language = "";
-  String proficiency = "";
-  String description = "";
+  String uuid = '';
+  String language = '';
+  String proficiency = '';
+  String description = '';
 
   @override
   void initState() {
@@ -233,8 +233,8 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                 CustomTextFormField(
                   width: width,
                   controller: languageController,
-                  labelText: "Language",
-                  hintText: "Language",
+                  labelText: 'Language',
+                  hintText: 'Language',
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -313,8 +313,8 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

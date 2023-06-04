@@ -26,10 +26,10 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
   List<String> proficiencyTypes = [
-    "Beginner",
-    "Intermediate",
-    "Advanced",
-    "Professional",
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+    'Professional',
   ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -44,10 +44,10 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String skill = "";
-  String proficiency = "";
-  String description = "";
+  String uuid = '';
+  String skill = '';
+  String proficiency = '';
+  String description = '';
 
   @override
   void initState() {
@@ -218,7 +218,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
           ],
         ),
         child: CustomButton(
-          text: widget.skillId == null ? "Add Skill" : "Update Skill",
+          text: widget.skillId == null ? 'Add Skill' : 'Update Skill',
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
@@ -237,8 +237,8 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                 CustomTextFormField(
                   width: width,
                   controller: skillController,
-                  labelText: "Skill",
-                  hintText: "Skill",
+                  labelText: 'Skill',
+                  hintText: 'Skill',
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -268,7 +268,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                         border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        errorText: typeError == "" ? null : typeError,
+                        errorText: typeError == '' ? null : typeError,
                         labelText: 'Proficiency Type',
                         hintText: 'Proficiency Type',
                         prefixIcon: const Icon(Icons.work_outline_rounded),
@@ -317,8 +317,8 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,

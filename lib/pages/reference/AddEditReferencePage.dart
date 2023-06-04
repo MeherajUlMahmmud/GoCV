@@ -38,15 +38,15 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
-  String uuid = "";
-  String name = "";
-  String email = "";
-  String phone = "";
-  String companyName = "";
-  String position = "";
-  String description = "";
+  String uuid = '';
+  String name = '';
+  String email = '';
+  String phone = '';
+  String companyName = '';
+  String position = '';
+  String description = '';
 
-  String typeError = "";
+  String typeError = '';
 
   @override
   void initState() {
@@ -200,8 +200,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     return Scaffold(
       appBar: AppBar(
         title: widget.referenceId == null
-            ? const Text("Add Work Experience")
-            : const Text("Update Work Experience"),
+            ? const Text('Add Work Experience')
+            : const Text('Update Work Experience'),
       ),
       resizeToAvoidBottomInset: false,
       // floatingActionButton: FloatingActionButton(
@@ -231,7 +231,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
         ),
         child: CustomButton(
           text:
-              widget.referenceId == null ? "Add Reference" : "Update Reference",
+              widget.referenceId == null ? 'Add Reference' : 'Update Reference',
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
@@ -250,8 +250,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: nameController,
-                  labelText: "Name",
-                  hintText: "Name",
+                  labelText: 'Name',
+                  hintText: 'Name',
                   prefixIcon: Icons.business,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -272,8 +272,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: emailController,
-                  labelText: "Email Address",
-                  hintText: "Email Address",
+                  labelText: 'Email Address',
+                  hintText: 'Email Address',
                   prefixIcon: Icons.email,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -294,8 +294,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: phoneController,
-                  labelText: "Phone Number",
-                  hintText: "Phone Number",
+                  labelText: 'Phone Number',
+                  hintText: 'Phone Number',
                   prefixIcon: Icons.phone,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
@@ -318,8 +318,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: companyNameController,
-                  labelText: "Organization Name",
-                  hintText: "Organization Name",
+                  labelText: 'Organization Name',
+                  hintText: 'Organization Name',
                   prefixIcon: Icons.work_outline_rounded,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
@@ -340,8 +340,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: positionController,
-                  labelText: "Position",
-                  hintText: "Position",
+                  labelText: 'Position',
+                  hintText: 'Position',
                   prefixIcon: Icons.work_outline_rounded,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,
@@ -362,8 +362,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                 CustomTextFormField(
                   width: width,
                   controller: descriptionController,
-                  labelText: "Description",
-                  hintText: "Description",
+                  labelText: 'Description',
+                  hintText: 'Description',
                   prefixIcon: Icons.description,
                   textCapitalization: TextCapitalization.sentences,
                   borderRadius: 10,
