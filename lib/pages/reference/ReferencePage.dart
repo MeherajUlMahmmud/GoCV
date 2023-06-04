@@ -70,7 +70,7 @@ class _ReferencePageState extends State<ReferencePage> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch work experiences',
+            'Failed to fetch references',
             Colors.red,
           );
         }

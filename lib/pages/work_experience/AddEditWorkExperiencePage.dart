@@ -47,7 +47,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  // TextEditingController salaryController = TextEditingController();
   TextEditingController companyWebsiteController = TextEditingController();
 
   int id = 0;
@@ -58,7 +57,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   String startDate = "";
   String? endDate;
   String description = "";
-  // String salary = "";
   String companyWebsite = "";
   bool isCurrentlyWorking = false;
 
@@ -69,6 +67,19 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     super.initState();
 
     readTokensAndUser();
+  }
+
+  @override
+  void dispose() {
+    companyNameController.dispose();
+    positionController.dispose();
+    typeController.dispose();
+    startDateController.dispose();
+    endDateController.dispose();
+    descriptionController.dispose();
+    companyWebsiteController.dispose();
+
+    super.dispose();
   }
 
   readTokensAndUser() async {
@@ -91,7 +102,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
             startDate = data['data']['start_date'];
             endDate = data['data']['end_date'];
             description = data['data']['description'];
-            // salary = data['data']['salary'].toString();
             companyWebsite = data['data']['company_website'] ?? "";
             isCurrentlyWorking = data['data']['is_current'];
             companyNameController.text = companyName;
@@ -100,7 +110,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
             startDateController.text = startDate;
             endDateController.text = endDate ?? "";
             descriptionController.text = description;
-            // salaryController.text = salary;
             companyWebsiteController.text = companyWebsite;
           });
         } else {
@@ -180,7 +189,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
       startDate,
       endDate,
       description,
-      // salary,
       companyWebsite,
       isCurrentlyWorking,
     )
@@ -503,28 +511,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                   },
                 ),
                 const SizedBox(height: 10),
-                // CustomTextFormField(
-                //   width: width,
-                //   controller: salaryController,
-                //   labelText: "Salary",
-                //   hintText: "Salary",
-                //   prefixIcon: Icons.money,
-                //   textCapitalization: TextCapitalization.none,
-                //   borderRadius: 10,
-                //   keyboardType: TextInputType.number,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       salary = value!;
-                //     });
-                //   },
-                //   validator: (value) {
-                //     if (value == null || value.isEmpty) {
-                //       return 'Please enter salary';
-                //     }
-                //     return null;
-                //   },
-                // ),
-                // const SizedBox(height: 10),
                 CustomTextFormField(
                   width: width,
                   controller: companyWebsiteController,

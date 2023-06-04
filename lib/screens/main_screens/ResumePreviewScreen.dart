@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gocv/apis/education.dart';
 import 'package:gocv/apis/experience.dart';
+import 'package:gocv/apis/interest.dart';
 import 'package:gocv/apis/language.dart';
 import 'package:gocv/apis/reference.dart';
 import 'package:gocv/apis/resume.dart';
@@ -172,7 +173,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           skillList = data['data'];
         });
 
-        fetchLanguages(tokens['access'], resumeDetails['uuid']);
+        fetchInterests(tokens['access'], resumeDetails['uuid']);
       } else {
         if (data['status'] == 401 || data['status'] == 403) {
           Helper().showSnackBar(
@@ -191,6 +192,39 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           Helper().showSnackBar(
             context,
             'Failed to fetch skills',
+            Colors.red,
+          );
+        }
+      }
+    });
+  }
+
+  fetchInterests(String accessToken, String resumeId) {
+    InterestService().getInterestList(accessToken, resumeId).then((data) async {
+      if (data['status'] == 200) {
+        setState(() {
+          interestList = data['data'];
+        });
+
+        fetchLanguages(tokens['access'], resumeDetails['uuid']);
+      } else {
+        if (data['status'] == 401 || data['status'] == 403) {
+          Helper().showSnackBar(
+            context,
+            'Session expired',
+            Colors.red,
+          );
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        } else {
+          print(data['error']);
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch interests',
             Colors.red,
           );
         }
@@ -260,7 +294,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch work experiences',
+            'Failed to fetch references',
             Colors.red,
           );
         }
@@ -411,7 +445,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                 interestList.isNotEmpty
                     ? sectionHeader('INTERESTS')
                     : pw.SizedBox(),
-                for (var item in interestList) skillItem(item),
+                for (var item in interestList) interestItem(item),
                 languageList.isNotEmpty
                     ? sectionHeader('LANGUAGES')
                     : pw.SizedBox(),
@@ -482,7 +516,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           pw.Text(
               'CGPA: ${education['grade']} out of ${education['grade_scale']}'),
           pw.Text(
-            education['description'] ?? '',
+            education['description'] == null || education['description'] == ''
+                ? ''
+                : education['description'],
             textAlign: pw.TextAlign.justify,
           ),
         ],
@@ -518,7 +554,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           pw.Container(
             margin: const pw.EdgeInsets.only(left: 20),
             child: pw.Text(
-              experience['description'] ?? '',
+              experience['description'] == null ||
+                      experience['description'] == ''
+                  ? ''
+                  : experience['description'],
               textAlign: pw.TextAlign.justify,
             ),
           ),
@@ -542,7 +581,32 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
             ),
           ),
           pw.Text(
-            skill['description'] ?? '',
+            skill['description'] == null || skill['description'] == ''
+                ? ''
+                : skill['description'],
+            textAlign: pw.TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Container interestItem(Map<String, dynamic> interest) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            interest['interest'],
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            interest['description'] == null || interest['description'] == ''
+                ? ''
+                : interest['description'],
             textAlign: pw.TextAlign.justify,
           ),
         ],
@@ -557,10 +621,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(language['language'] + ' (${language['proficiency']})'),
-          // pw.Text(
-          //   language['description'] ?? '',
-          //   textAlign: pw.TextAlign.justify,
-          // ),
         ],
       ),
     );
@@ -592,8 +652,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                       style: const pw.TextStyle(color: PdfColors.blue),
                       annotation: pw.AnnotationUrl(
                         'mailto:${reference['email']}',
-                        // width: 50,
-                        // height: 50,
                       ),
                     ),
                   ],
@@ -614,8 +672,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                       style: const pw.TextStyle(color: PdfColors.blue),
                       annotation: pw.AnnotationUrl(
                         'tel:${reference['phone']}',
-                        // width: 50,
-                        // height: 50,
                       ),
                     ),
                   ],
@@ -627,7 +683,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           // pw.Text('Email: mailto:${reference['email']}'),
           // pw.Text('Phone: tel:${reference['phone']}'),
           pw.Text(
-            reference['description'] ?? '',
+            reference['description'] == null || reference['description'] == ''
+                ? ''
+                : reference['description'],
             textAlign: pw.TextAlign.justify,
           ),
         ],

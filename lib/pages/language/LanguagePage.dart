@@ -68,7 +68,7 @@ class _LanguagePageState extends State<LanguagePage> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch work experiences',
+            'Failed to fetch languages',
             Colors.red,
           );
         }

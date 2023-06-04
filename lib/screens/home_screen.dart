@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //       Icons.settings,
         //     ),
         //     onPressed: () {
-        //       Navigator.pushNamed(context, Settingsscreen.routeName);
+        //       Navigator.pushNamed(context, SettingsScreen.routeName);
         //     },
         //   ),
         // ],
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onTap: () {
                 // Navigator.pop(context);
-                Navigator.pushNamed(context, Settingsscreen.routeName);
+                Navigator.pushNamed(context, SettingsScreen.routeName);
               },
             ),
             ListTile(

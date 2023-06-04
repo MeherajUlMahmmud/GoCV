@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/user.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/local_storage.dart';
@@ -34,7 +35,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoading = false;
     });
-    print(user);
+  }
+
+  fetchUserDetails() {
+    setState(() {
+      isLoading = true;
+    });
+    UserService()
+        .getUserDetails(tokens['access'], user['uuid'])
+        .then((data) async {
+      print(data);
+      if (data['status'] == 200) {
+        await localStorage.writeData('user', data['data']);
+        setState(() {
+          user = data['data'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isError = true;
+          errorText = data['error'];
+        });
+      }
+    }).catchError((error) {
+      setState(() {
+        isError = true;
+        errorText = error.toString();
+      });
+    });
   }
 
   @override
@@ -46,10 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, UpdateProfileScreen.routeName)
-              .then((value) => {
-                    // update data
-                    print('')
-                  });
+              .then((value) => {if (value == true) fetchUserDetails()});
         },
         child: const Icon(Icons.edit),
       ),
@@ -57,14 +82,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  // mainAxisAlignment: MainAxisAlignment.center,
+          : RefreshIndicator(
+              onRefresh: () {
+                return Future.delayed(
+                  const Duration(seconds: 1),
+                  () {
+                    fetchUserDetails();
+                  },
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                child: ListView(
                   children: [
                     const SizedBox(height: 10.0),
                     SizedBox(
@@ -76,10 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // child: Image.asset(imageFile!.path),
                       ),
                     ),
-                    // const CircleAvatar(
-                    //   radius: 50.0,
-                    //   backgroundImage: AssetImage("assets/avatars/rdj.png"),
-                    // ),
                     const SizedBox(height: 10.0),
                     Text(
                       '${user['applicant']['first_name']} ${user['applicant']['last_name']}',
@@ -87,60 +114,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const Divider(),
-                    Container(
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: const Icon(
-                              Icons.email,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(50),
                           ),
-                          const SizedBox(width: 15),
-                          SizedBox(
-                            width: width * 0.8,
-                            child: Text(
-                              user['email'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          )
-                        ],
-                      ),
+                          child: const Icon(
+                            Icons.email,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        SizedBox(
+                          width: width * 0.8,
+                          child: Text(
+                            user['email'],
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        )
+                      ],
                     ),
                     const Divider(),
-                    Container(
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: const Icon(
-                              Icons.phone,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(50),
                           ),
-                          const SizedBox(width: 15),
-                          SizedBox(
-                            width: width * 0.8,
-                            child: Text(
-                              user['phone'] ?? 'N/A',
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          )
-                        ],
-                      ),
+                          child: const Icon(
+                            Icons.phone,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        SizedBox(
+                          width: width * 0.8,
+                          child: Text(
+                            user['applicant']['phone_number'] ?? 'N/A',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        )
+                      ],
                     ),
                     const Divider(),
                   ],

@@ -70,7 +70,7 @@ class _EducationPageState extends State<EducationPage> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch work experiences',
+            'Failed to fetch educations',
             Colors.red,
           );
         }
@@ -98,7 +98,7 @@ class _EducationPageState extends State<EducationPage> {
         },
       ),
       body: isLoading
-          ? const CircularProgressIndicator()
+          ? const Center(child: CircularProgressIndicator())
           : isError
               ? Center(
                   child: Text(

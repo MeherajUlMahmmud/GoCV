@@ -10,6 +10,12 @@ class URLS {
   static const String kRegisterUrl = "${kAuthUrl}register/";
   static const String kRefreshTokenUrl = "${kAuthUrl}refresh/";
 
+  // User
+  static const String kUserUrl = "${kBaseUrl}user/";
+
+  // Applicant
+  static const String kApplicantUrl = "${kBaseUrl}applicant/";
+
   // Resume
   static const String kResumeUrl = "${kBaseUrl}resume/";
 
@@ -27,6 +33,9 @@ class URLS {
 
   // Skill
   static const String kSkillUrl = "${kBaseUrl}skill/";
+
+  // Interest
+  static const String kInterestUrl = "${kBaseUrl}interest/";
 
   // Language
   static const String kLanguageUrl = "${kBaseUrl}language/";

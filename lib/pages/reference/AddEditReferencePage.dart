@@ -55,6 +55,18 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     readTokensAndUser();
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    companyNameController.dispose();
+    positionController.dispose();
+    descriptionController.dispose();
+
+    super.dispose();
+  }
+
   readTokensAndUser() async {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');

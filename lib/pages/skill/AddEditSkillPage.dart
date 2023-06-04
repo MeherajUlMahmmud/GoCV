@@ -37,6 +37,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
+  String typeError = '';
 
   TextEditingController skillController = TextEditingController();
   TextEditingController proficiencyController = TextEditingController();
@@ -53,6 +54,15 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
     super.initState();
 
     readTokensAndUser();
+  }
+
+  @override
+  void dispose() {
+    skillController.dispose();
+    proficiencyController.dispose();
+    descriptionController.dispose();
+
+    super.dispose();
   }
 
   readTokensAndUser() async {
@@ -258,7 +268,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                         border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        // errorText: typeError == "" ? null : typeError,
+                        errorText: typeError == "" ? null : typeError,
                         labelText: 'Proficiency Type',
                         hintText: 'Proficiency Type',
                         prefixIcon: const Icon(Icons.work_outline_rounded),

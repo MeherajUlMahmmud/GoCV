@@ -58,6 +58,20 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     readTokensAndUser();
   }
 
+  @override
+  void dispose() {
+    schoolNameController.dispose();
+    degreeController.dispose();
+    departmentController.dispose();
+    gradeScaleController.dispose();
+    gradeController.dispose();
+    startDateController.dispose();
+    endDateController.dispose();
+    descriptionController.dispose();
+
+    super.dispose();
+  }
+
   readTokensAndUser() async {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');

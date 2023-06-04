@@ -68,7 +68,7 @@ class _SkillPageState extends State<SkillPage> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch work experiences',
+            'Failed to fetch skills',
             Colors.red,
           );
         }
@@ -95,7 +95,7 @@ class _SkillPageState extends State<SkillPage> {
         },
       ),
       body: isLoading
-          ? const CircularProgressIndicator()
+          ? const Center(child: CircularProgressIndicator())
           : isError
               ? Center(
                   child: Text(

@@ -3,6 +3,7 @@ import 'package:gocv/screens/auth_screens/SignUpScreen.dart';
 import 'package:gocv/screens/home_screen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
+import 'package:gocv/screens/utility_screens/AccountSettingsScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
 import 'package:gocv/screens/utility_screens/SplashScreen.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +77,9 @@ class MyApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         ProfileScreen.routeName: (context) => const ProfileScreen(),
         UpdateProfileScreen.routeName: (context) => const UpdateProfileScreen(),
-        Settingsscreen.routeName: (context) => const Settingsscreen(),
+        SettingsScreen.routeName: (context) => const SettingsScreen(),
+        AccountSettingsScreen.routeName: (context) =>
+            const AccountSettingsScreen(),
       },
     );
   }

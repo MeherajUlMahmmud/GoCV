@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/language.dart';
+import 'package:gocv/apis/interest.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
-class AddEditLanguagePage extends StatefulWidget {
+class AddEditInterestPage extends StatefulWidget {
   final String resumeId;
-  String? languageId;
+  String? interestId;
 
-  AddEditLanguagePage({
+  AddEditInterestPage({
     Key? key,
     required this.resumeId,
-    this.languageId,
+    this.interestId,
   }) : super(key: key);
 
   @override
-  State<AddEditLanguagePage> createState() => _AddEditLanguagePageState();
+  State<AddEditInterestPage> createState() => _AddEditInterestPageState();
 }
 
-class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
+class _AddEditInterestPageState extends State<AddEditInterestPage> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
-  List<String> proficiencyTypes = [
-    "Beginner",
-    "Intermediate",
-    "Advanced",
-    "Professional",
-  ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -37,14 +30,12 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   bool isError = false;
   String errorText = '';
 
-  TextEditingController languageController = TextEditingController();
-  TextEditingController proficiencyController = TextEditingController();
+  TextEditingController interestController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   int id = 0;
   String uuid = "";
-  String language = "";
-  String proficiency = "";
+  String interest = "";
   String description = "";
 
   @override
@@ -56,8 +47,7 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
 
   @override
   void dispose() {
-    languageController.dispose();
-    proficiencyController.dispose();
+    interestController.dispose();
     descriptionController.dispose();
 
     super.dispose();
@@ -67,9 +57,9 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    if (widget.languageId != null) {
-      LanguageService()
-          .getLanguage(tokens['access'], widget.languageId!)
+    if (widget.interestId != null) {
+      InterestService()
+          .getInterest(tokens['access'], widget.interestId!)
           .then((data) {
         print(data);
         if (data['status'] == 200) {
@@ -77,11 +67,9 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
             isLoading = false;
             isError = false;
             uuid = data['data']['uuid'];
-            language = data['data']['language'];
-            proficiency = data['data']['proficiency'];
+            interest = data['data']['interest'];
             description = data['data']['description'];
-            languageController.text = language;
-            proficiencyController.text = proficiency;
+            interestController.text = interest;
             descriptionController.text = description;
           });
         } else {
@@ -111,13 +99,12 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     }
   }
 
-  createLanguage() {
-    LanguageService()
-        .createLanguage(
+  createInterest() {
+    InterestService()
+        .createInterest(
       tokens['access'],
       widget.resumeId,
-      language,
-      proficiency,
+      interest,
       description,
     )
         .then((value) {
@@ -144,13 +131,12 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     });
   }
 
-  updateLanguage() {
-    LanguageService()
-        .updateLanguage(
+  updateInterest() {
+    InterestService()
+        .updateInterest(
       tokens['access'],
       uuid,
-      language,
-      proficiency,
+      interest,
       description,
     )
         .then((data) async {
@@ -170,10 +156,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     setState(() {
       isLoading = true;
     });
-    if (widget.languageId != null) {
-      updateLanguage();
+    if (widget.interestId != null) {
+      updateInterest();
     } else {
-      createLanguage();
+      createInterest();
     }
   }
 
@@ -183,17 +169,11 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: widget.languageId == null
-            ? const Text('Add Language')
-            : const Text('Update Language'),
+        title: widget.interestId != null
+            ? const Text('Update Interest')
+            : const Text('Add Interest'),
       ),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -214,7 +194,7 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
           ],
         ),
         child: CustomButton(
-          text: widget.languageId == null ? 'Add Language' : 'Update Language',
+          text: widget.interestId == null ? "Add Interest" : "Update Interest",
           isLoading: isLoading,
           isDisabled: isLoading,
           onPressed: () {
@@ -232,82 +212,24 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                 const SizedBox(height: 10),
                 CustomTextFormField(
                   width: width,
-                  controller: languageController,
-                  labelText: "Language",
-                  hintText: "Language",
-                  prefixIcon: Icons.business,
+                  controller: interestController,
+                  labelText: "Interest",
+                  hintText: "Interest",
+                  prefixIcon: Icons.interests_outlined,
                   textCapitalization: TextCapitalization.words,
                   borderRadius: 10,
                   keyboardType: TextInputType.name,
                   onChanged: (value) {
                     setState(() {
-                      language = value!;
+                      interest = value!;
                     });
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter language';
+                      return 'Please enter interest';
                     }
                     return null;
                   },
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 5.0,
-                    vertical: 5.0,
-                  ),
-                  child: TypeAheadField(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      style: const TextStyle(fontSize: 16),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                        // errorText: typeError == "" ? null : typeError,
-                        labelText: 'Proficiency Type',
-                        hintText: 'Proficiency Type',
-                        prefixIcon: const Icon(Icons.work_outline_rounded),
-                      ),
-                      controller: proficiencyController,
-                    ),
-                    suggestionsCallback: (pattern) {
-                      List<String> matches = <String>[];
-                      matches.addAll(proficiencyTypes);
-                      matches.retainWhere((s) {
-                        return s.toLowerCase().contains(pattern.toLowerCase());
-                      });
-                      return matches;
-                    },
-                    itemBuilder: (context, item) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.toString(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            const Divider(),
-                          ],
-                        ),
-                      );
-                    },
-                    onSuggestionSelected: (suggestion) {
-                      setState(() {
-                        proficiencyController.text = suggestion.toString();
-                        proficiency = suggestion.toString();
-                      });
-                    },
-                  ),
                 ),
                 const SizedBox(height: 10),
                 CustomTextFormField(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/user.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_button.dart';
@@ -25,18 +26,17 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = true;
+  bool isSubmitting = false;
   bool isError = false;
   String errorText = '';
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
   String uuid = "";
   String firstName = "";
   String lastName = "";
-  String email = "";
   String phone = "";
 
   // image
@@ -53,7 +53,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void dispose() {
     firstNameController.dispose();
     lastNameController.dispose();
-    emailController.dispose();
     phoneController.dispose();
 
     super.dispose();
@@ -63,16 +62,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    // get from "assets/avatars/rdj.png"
     imageFile = File("assets/avatars/rdj.png");
 
     firstName = user['applicant']['first_name'];
     lastName = user['applicant']['last_name'];
-    email = user['email'];
-    phone = user['phone'] ?? '';
+    phone = user['applicant']['phone_number'] ?? '';
     firstNameController.text = firstName;
     lastNameController.text = lastName;
-    emailController.text = email;
     phoneController.text = phone;
 
     setState(() {
@@ -104,7 +100,41 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return File(croppedFile!.path);
   }
 
-  handleSubmit() {}
+  handleSubmit() {
+    setState(() {
+      isSubmitting = true;
+    });
+    UserService()
+        .updateApplicantDetails(
+      tokens['access'],
+      user['applicant']['uuid'],
+      firstName,
+      lastName,
+      phone,
+    )
+        .then((data) async {
+      print(data);
+      if (data['status'] == 200) {
+        await localStorage.writeData('user', data['data']);
+        setState(() {
+          isSubmitting = false;
+        });
+        Navigator.of(context).pop(true);
+      } else {
+        setState(() {
+          isSubmitting = false;
+          isError = true;
+          errorText = data['error'];
+        });
+      }
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        isError = true;
+        errorText = e.toString();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +170,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ),
         child: CustomButton(
           text: 'Update Profile',
-          isLoading: isLoading,
+          isLoading: isSubmitting,
           isDisabled: isLoading,
           onPressed: () {
             if (_formKey.currentState!.validate()) handleSubmit();
@@ -242,22 +272,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             return 'Please enter surname';
                           }
                           return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      CustomTextFormField(
-                        width: width,
-                        controller: emailController,
-                        labelText: "Email Address",
-                        hintText: "Email Address",
-                        prefixIcon: Icons.email_outlined,
-                        textCapitalization: TextCapitalization.none,
-                        borderRadius: 10,
-                        keyboardType: TextInputType.emailAddress,
-                        onChanged: (value) {
-                          setState(() {
-                            email = value;
-                          });
                         },
                       ),
                       const SizedBox(height: 10),
