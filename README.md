@@ -33,7 +33,7 @@ To run this project locally, follow these steps:
     ```
 3. Navigate to the project directory:
     ```shell
-    cd your-flutter-project
+    cd GoCV
     ```
 4. Fetch the project dependencies by running the following command:
     ```shell
