@@ -49,8 +49,39 @@ To run this project locally, follow these steps:
 
 ## Usage
 
--   [Explain how to use your app or provide a brief overview]
--   [Include screenshots or gifs to demonstrate your app's functionality]
+Before using the Flutter app, please ensure that the [JobBoard REST API](https://github.com/MeherajUlMahmmud/JobBoardAPI) project is running and accessible. Follow these steps to set up the app correctly:
+
+1. Start the REST API by running the appropriate command or script. Make sure the project is running on a server or local development environment.
+
+2. Once the REST API is up and running, open the Flutter app's source code in your preferred code editor.
+
+3. Locate the file or class responsible for making HTTP requests to the REST API. This is typically where the API client or services or URLs are defined.
+
+4. Look for a variable or constant that represents the base URL of the API endpoints. It is usually defined as a string constant or assigned to a variable.
+
+5. Update the value of the base URL to match the URL of your Django project's API. Ensure that you include the appropriate path and any necessary authentication or authorization headers if required by the REST API.
+
+    Example:
+
+    ```dart
+    class URLS {
+    	// static const String kBaseUrl = "http://192.168.0.108:8000/";
+    	// static const String kBaseUrl = "http://10.0.2.2:8000/";
+    	static const String kBaseUrl =
+    		"http://127.0.0.1:8000/api/"; // for iOS simulator
+
+
+      // Rest of your API client code...
+    }
+    ```
+
+    Replace `"http://127.0.0.1:8000/api/"` with the actual URL of your Django project's API.
+
+6. Save the changes and ensure that the Flutter app's source code is updated with the correct base API URL.
+
+7. Build and run the Flutter app on your device or emulator, and it should now be able to communicate with the REST API endpoints.
+
+By following these steps and updating the base API URL in your Flutter app, you can successfully utilize the functionalities provided by the Django project. This ensures proper communication between the Flutter app and the Django backend.
 
 ## Dependencies
 
@@ -77,6 +108,10 @@ This project depends on the following packages:
 10. `flutter_typeahead: ^4.3.1`: The `flutter_typeahead` package provides an autocomplete or type-ahead feature for text input fields in a Flutter app. It suggests and displays a list of options based on the user's input, making it easier and faster for users to enter data.
 
 For more details, see the pubspec.yaml file.
+
+## Screenshots
+
+-   [Include screenshots or gifs to demonstrate your app's functionality]
 
 ## Contributing
 
