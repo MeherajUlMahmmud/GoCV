@@ -15,7 +15,7 @@ Build Resume on the Go
 
 ## Introduction
 
-This Flutter project aims to [provide a brief description of your project]. It is developed using Flutter framework, which allows for cross-platform mobile app development.
+This Flutter project aims to enable the people to build resumes easily. It is developed using Flutter framework, which allows for cross-platform mobile app development.
 
 ## Features
 
