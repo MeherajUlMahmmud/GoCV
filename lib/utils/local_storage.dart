@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -12,10 +11,10 @@ class LocalStorage {
     try {
       final prefs = await _getPreferences();
       final data = prefs.getString(key);
-      return data != null ? jsonDecode(data) : Map<String, dynamic>();
+      return data != null ? jsonDecode(data) : <String, dynamic>{};
     } catch (e) {
       print(e);
-      return Map<String, dynamic>();
+      return <String, dynamic>{};
     }
   }
 
