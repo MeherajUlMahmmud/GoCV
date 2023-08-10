@@ -242,13 +242,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                                     ['end_date'] ==
                                                 null
                                             ? Text(
-                                                '${Helper().formatDate(experienceList[index]['start_date'])} - Present',
+                                                '${Helper().formatMonthYear(experienceList[index]['start_date'])} - Present',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
                                               )
                                             : Text(
-                                                '${Helper().formatDate(experienceList[index]['start_date'])} - ${Helper().formatDate(experienceList[index]['end_date'])}',
+                                                '${Helper().formatMonthYear(experienceList[index]['start_date'])} - ${Helper().formatDate(experienceList[index]['end_date'])}',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),

@@ -233,32 +233,20 @@ class _EducationPageState extends State<EducationPage> {
                                       SizedBox(
                                         width: width * 0.7,
                                         child: educationList[index]
-                                                        ['start_date'] !=
-                                                    null &&
-                                                educationList[index]
-                                                        ['end_date'] ==
-                                                    null
+                                                    ['end_date'] ==
+                                                null
                                             ? Text(
                                                 '${Helper().formatMonthYear(educationList[index]['start_date'])} - Present',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
                                               )
-                                            : educationList[index]
-                                                            ['start_date'] ==
-                                                        null &&
-                                                    educationList[index]
-                                                            ['end_date'] !=
-                                                        null
-                                                ? Text(
-                                                    Helper().formatMonthYear(
-                                                        educationList[index]
-                                                            ['end_date']),
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                    ),
-                                                  )
-                                                : const SizedBox(),
+                                            : Text(
+                                                '${Helper().formatMonthYear(educationList[index]['start_date'])} - ${Helper().formatMonthYear(educationList[index]['end_date'])}',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
                                       ),
                                     ],
                                   ),

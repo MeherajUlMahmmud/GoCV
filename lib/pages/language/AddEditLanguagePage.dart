@@ -25,10 +25,10 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
   List<String> proficiencyTypes = [
-    'Beginner',
-    'Intermediate',
-    'Advanced',
-    'Professional',
+    'Basic',
+    'Conversational',
+    'Fluent',
+    'Native',
   ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
