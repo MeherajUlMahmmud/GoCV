@@ -1,3 +1,4 @@
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/resume.dart';
 import 'package:gocv/pages/award/AwardPage.dart';
 import 'package:gocv/pages/certification/CertificationPage.dart';
@@ -14,6 +15,7 @@ import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:gocv/utils/urls.dart';
 
 class ResumeDetailsScreen extends StatefulWidget {
   static const String routeName = '/resume-details';
@@ -55,16 +57,19 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    fetchResumeDetails(tokens['access'], widget.resume['uuid']);
+    fetchResumeDetails(tokens['access'], widget.resume['id'].toString());
   }
 
   fetchResumeDetails(String accessToken, String resumeId) {
-    ResumeService().getResumeDetails(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(accessToken, '${URLS.kResumeUrl}$resumeId/details/')
+        .then((data) async {
+      print(data['data']['contact']);
       if (data['status'] == 200) {
         setState(() {
-          resumeDetails = data['data'];
-          personalId = data['data']['personal']['uuid'];
-          contactId = data['data']['contact']['uuid'];
+          resumeDetails = data['data']['resume'];
+          personalId = data['data']['personal']['id'].toString();
+          contactId = data['data']['contact']['id'].toString();
           isLoading = false;
           isError = false;
           errorText = '';
@@ -96,7 +101,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) => ResumePreviewScreen(
-                      resumeId: resumeDetails['uuid'],
+                      resumeId: resumeDetails['id'],
                     ),
                   ),
                 );
@@ -192,23 +197,37 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                             controller: tabController,
                             children: [
                               PersonalPage(
-                                resumeId: widget.resume['uuid'],
+                                resumeId: widget.resume['id'].toString(),
                                 personalId: personalId,
                               ),
                               ContactPage(
-                                resumeId: widget.resume['uuid'],
+                                resumeId: widget.resume['id'].toString(),
                                 contactId: contactId,
                               ),
                               WorkExperiencePage(
-                                  resumeId: widget.resume['uuid']),
-                              EducationPage(resumeId: widget.resume['uuid']),
-                              SkillPage(resumeId: widget.resume['uuid']),
-                              AwardPage(resumeId: widget.resume['uuid']),
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              EducationPage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              SkillPage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              AwardPage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
                               CertificationPage(
-                                  resumeId: widget.resume['uuid']),
-                              InterestPage(resumeId: widget.resume['uuid']),
-                              LanguagePage(resumeId: widget.resume['uuid']),
-                              ReferencePage(resumeId: widget.resume['uuid']),
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              InterestPage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              LanguagePage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
+                              ReferencePage(
+                                resumeId: widget.resume['id'].toString(),
+                              ),
                             ],
                           ),
                         ),

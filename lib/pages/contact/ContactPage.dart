@@ -1,7 +1,9 @@
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/contact.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
@@ -73,8 +75,8 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   fetchContactDetails(String accessToken, String contactId) {
-    ContactService()
-        .getContactDetails(accessToken, contactId)
+    APIService()
+        .sendGetRequest(accessToken, '${URLS.kContactUrl}$contactId/details/')
         .then((data) async {
       print(data);
       if (data['status'] == 200) {

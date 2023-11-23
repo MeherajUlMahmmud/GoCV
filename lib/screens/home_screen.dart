@@ -1,3 +1,4 @@
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/resume.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
@@ -5,6 +6,7 @@ import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/profile_tile.dart';
 import 'package:gocv/widgets/resume_card.dart';
@@ -12,6 +14,8 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -39,16 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    fetchResumes(tokens['access'], user['uuid']);
+    fetchResumes(tokens['access'], user['id'].toString());
   }
 
   fetchResumes(String accessToken, String userId) {
-    ResumeService()
-        .getResumeList(
-      accessToken,
-      userId,
-    )
+    APIService()
+        .sendGetRequest(tokens['access'], '${URLS.kResumeUrl}?user=$userId')
         .then((data) async {
+      print(data);
       if (data['status'] == 200) {
         setState(() {
           resumes = data['data'];
@@ -268,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: () async {
-                fetchResumes(tokens['access'], user['uuid']);
+                fetchResumes(tokens['access'], user['id'].toString());
               },
               child: isError
                   ? Center(

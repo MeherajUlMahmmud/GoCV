@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 
 class EducationPage extends StatefulWidget {
   final String resumeId;
@@ -42,13 +44,13 @@ class _EducationPageState extends State<EducationPage> {
   }
 
   fetchEducations(String accessToken, String resumeId) {
-    EducationService()
-        .getEducationList(accessToken, resumeId)
+    APIService()
+        .sendGetRequest(accessToken, '${URLS.kEducationUrl}$resumeId/')
         .then((data) async {
       print(data);
       if (data['status'] == 200) {
         setState(() {
-          educationList = data['data'];
+          educationList = data['data']['data'];
           isLoading = false;
           isError = false;
           errorText = '';
@@ -133,7 +135,7 @@ class _EducationPageState extends State<EducationPage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                educationList[index]['uuid'],
+                                educationList[index]['id'].toString(),
                               );
                             },
                             child: Container(
@@ -232,21 +234,22 @@ class _EducationPageState extends State<EducationPage> {
                                       const SizedBox(width: 10),
                                       SizedBox(
                                         width: width * 0.7,
-                                        child: educationList[index]
-                                                    ['end_date'] ==
-                                                null
-                                            ? Text(
-                                                '${Helper().formatMonthYear(educationList[index]['start_date'])} - Present',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              )
-                                            : Text(
-                                                '${Helper().formatMonthYear(educationList[index]['start_date'])} - ${Helper().formatMonthYear(educationList[index]['end_date'])}',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
+                                        child: Text(
+                                          educationList[index]['start_date'] ==
+                                                  null
+                                              ? ''
+                                              : '${Helper().formatMonthYear(educationList[index]['start_date'])} - ' +
+                                                          educationList[index]
+                                                              ['end_date'] ==
+                                                      null
+                                                  ? ''
+                                                  : Helper().formatMonthYear(
+                                                      educationList[index]
+                                                          ['end_date']),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -313,8 +316,8 @@ class _EducationPageState extends State<EducationPage> {
                     );
                   }));
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.edit),
                     SizedBox(width: 8.0),
                     Text('Update'),
@@ -326,8 +329,8 @@ class _EducationPageState extends State<EducationPage> {
                 onPressed: () {
                   _showDeleteConfirmationDialog(context, educationId);
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8.0),
                     Text('Delete'),

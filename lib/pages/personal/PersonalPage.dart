@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/personal.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
@@ -46,7 +48,7 @@ class _PersonalPageState extends State<PersonalPage> {
   TextEditingController countryController = TextEditingController();
   TextEditingController nationalityController = TextEditingController();
 
-  String uuid = '';
+  String id = '';
   String firstName = '';
   String lastName = '';
   String aboutMe = '';
@@ -91,17 +93,12 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   fetchPersonalDetails(String accessToken, String personalId) {
-    PersonalService()
-        .getPersonalDetails(
-      accessToken,
-      personalId,
-    )
-        .then((data) async {
-      print(data);
+    String URL = '${URLS.kPersonalUrl}$personalId/details/';
+    APIService().sendGetRequest(accessToken, URL).then((data) async {
       if (data['status'] == 200) {
         setState(() {
           personalDetails = data['data'];
-          uuid = personalDetails['uuid'];
+          id = personalDetails['id'].toString();
           firstName = personalDetails['first_name'];
           lastName = personalDetails['last_name'];
           aboutMe = personalDetails['about_me'] ?? '';
@@ -169,7 +166,7 @@ class _PersonalPageState extends State<PersonalPage> {
     PersonalService()
         .updatePersonalDetails(
       tokens['access'],
-      uuid,
+      id,
       firstName,
       lastName,
       aboutMe,

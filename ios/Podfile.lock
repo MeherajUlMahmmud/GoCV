@@ -7,9 +7,10 @@ PODS:
     - TOCropViewController (~> 2.6.1)
   - image_picker_ios (0.0.1):
     - Flutter
-  - permission_handler_apple (9.0.4):
+  - path_provider_foundation (0.0.1):
     - Flutter
-  - printing (1.0.0):
+    - FlutterMacOS
+  - permission_handler_apple (9.1.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -23,9 +24,9 @@ DEPENDENCIES:
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - printing (from `.symlinks/plugins/printing/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -41,12 +42,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  printing:
-    :path: ".symlinks/plugins/printing/ios"
   shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/ios"
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
@@ -55,12 +56,12 @@ SPEC CHECKSUMS:
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   image_cropper: a3291c624a953049bc6a02e1f8c8ceb162a24b25
   image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
-  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
-  printing: 233e1b73bd1f4a05615548e9b5a324c98588640b
-  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
-  url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
+  url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
 
 PODFILE CHECKSUM: e8eb2a0bcbd97b7946f310ad41c79a4f0017e1fb
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

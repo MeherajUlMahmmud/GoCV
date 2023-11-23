@@ -1,9 +1,11 @@
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/experience.dart';
 import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:gocv/utils/urls.dart';
 
 class WorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -42,12 +44,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   }
 
   fetchWorkExperiences(String accessToken, String resumeId) {
-    ExpreienceService()
-        .getExperienceList(accessToken, resumeId)
+    APIService()
+        .sendGetRequest(accessToken, '${URLS.kExperienceUrl}$resumeId/')
         .then((data) async {
       if (data['status'] == 200) {
+        print(data['data']);
         setState(() {
-          experienceList = data['data'];
+          experienceList = data['data']['data'];
           isLoading = false;
           isError = false;
           errorText = '';

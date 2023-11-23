@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/skill.dart';
 import 'package:gocv/pages/skill/AddEditSkillPage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 
 class SkillPage extends StatefulWidget {
   final String resumeId;
@@ -43,10 +45,13 @@ class _SkillPageState extends State<SkillPage> {
   }
 
   fetchSkills(String accessToken, String resumeId) {
-    SkillService().getSkillList(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(accessToken, '${URLS.kSkillUrl}$resumeId/')
+        .then((data) async {
       if (data['status'] == 200) {
+        print(data['data']['data']);
         setState(() {
-          skillList = data['data'];
+          skillList = data['data']['data'];
           isLoading = false;
           isError = false;
           errorText = '';
