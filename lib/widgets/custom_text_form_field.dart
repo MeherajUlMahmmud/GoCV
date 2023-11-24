@@ -63,6 +63,12 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
         ),
         keyboardType: widget.keyboardType,
         obscureText: widget.isObscure ?? false,

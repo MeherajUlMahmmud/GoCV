@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/reference.dart';
 import 'package:gocv/pages/reference/AddEditReferencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 
 class ReferencePage extends StatefulWidget {
   final String resumeId;
@@ -42,13 +44,12 @@ class _ReferencePageState extends State<ReferencePage> {
   }
 
   fetchReferences(String accessToken, String resumeId) {
-    ReferenceService()
-        .getReferenceList(accessToken, resumeId)
-        .then((data) async {
+    String url = '${URLS.kReferenceUrl}$resumeId/';
+    APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
       if (data['status'] == 200) {
         setState(() {
-          referenceList = data['data'];
+          referenceList = data['data']['data'];
           isLoading = false;
           isError = false;
           errorText = '';
@@ -87,13 +88,16 @@ class _ReferencePageState extends State<ReferencePage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return AddEditReferencePage(
-                resumeId: widget.resumeId,
-              );
-            },
-          ));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return AddEditReferencePage(
+                  resumeId: widget.resumeId,
+                );
+              },
+            ),
+          );
         },
       ),
       body: isLoading
@@ -113,8 +117,7 @@ class _ReferencePageState extends State<ReferencePage> {
                       child: Text(
                         'No references added',
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                     )
@@ -129,7 +132,7 @@ class _ReferencePageState extends State<ReferencePage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                referenceList[index]['uuid'],
+                                referenceList[index]['id'].toString(),
                               );
                             },
                             child: Container(

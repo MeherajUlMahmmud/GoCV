@@ -41,33 +41,17 @@ class PersonalService {
   Future<Map<String, dynamic>> updatePersonalDetails(
     String accessToken,
     String personalId,
-    String firstName,
-    String lastName,
-    String aboutMe,
-    String dateOfBirth,
-    String city,
-    String state,
-    String country,
-    String nationality,
+    Map<String, dynamic> data,
   ) async {
     try {
-      String url = "${URLS.kPersonalUrl}$personalId/";
+      String url = '${URLS.kPersonalUrl}$personalId/';
       final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
         },
-        body: jsonEncode({
-          'first_name': firstName,
-          'last_name': lastName,
-          'about_me': aboutMe,
-          'date_of_birth': dateOfBirth, // 'YYYY-MM-DD
-          'city': city,
-          'state': state,
-          'country': country,
-          'nationality': nationality,
-        }),
+        body: jsonEncode(data),
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

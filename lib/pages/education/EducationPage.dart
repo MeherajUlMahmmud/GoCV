@@ -116,8 +116,7 @@ class _EducationPageState extends State<EducationPage> {
                       child: Text(
                         'No education added',
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                     )

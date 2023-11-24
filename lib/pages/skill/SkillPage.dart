@@ -116,8 +116,7 @@ class _SkillPageState extends State<SkillPage> {
                       child: Text(
                         'No skills added',
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                     )

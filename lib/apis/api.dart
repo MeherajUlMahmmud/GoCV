@@ -41,7 +41,42 @@ class APIService {
 
   // Future<Map<String, dynamic>> sendPostRequest() async {}
 
-  // Future<Map<String, dynamic>> sendPatchRequest() async {}
+  Future<Map<String, dynamic>> sendPatchRequest(
+    String accessToken,
+    Map<String, dynamic> data,
+    String url,
+  ) async {
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(data),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'data': data,
+          'status': response.statusCode,
+        };
+      } else {
+        final data = jsonDecode(response.body);
+        print(data);
+        return {
+          'error': data['detail'] ?? 'Something went wrong',
+          'status': response.statusCode,
+        };
+      }
+    } catch (e) {
+      print(e.toString());
+      return {
+        'error': e.toString(),
+        'status': 500,
+      };
+    }
+  }
 
   // Future<Map<String, dynamic>> sendDeleteRequest() async {}
 }

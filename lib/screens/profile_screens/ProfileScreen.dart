@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/user.dart';
+import 'package:gocv/models/applicant.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = '/profile';
@@ -16,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final LocalStorage localStorage = LocalStorage();
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
+
+  Applicant applicant = Applicant();
 
   bool isLoading = true;
   bool isError = false;
@@ -32,23 +37,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    setState(() {
-      isLoading = false;
-    });
+    fetchUserDetails(tokens['access']);
   }
 
-  fetchUserDetails() {
+  fetchUserDetails(String accessToken) {
     setState(() {
       isLoading = true;
     });
-    UserService()
-        .getUserDetails(tokens['access'], user['uuid'])
-        .then((data) async {
-      print(data);
+    String url = '${URLS.kUserUrl}profile/';
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      print(data['data']);
       if (data['status'] == 200) {
-        await localStorage.writeData('user', data['data']);
+        await localStorage.writeData('user', data['data']['user_data']);
         setState(() {
-          user = data['data'];
+          applicant = Applicant.fromJson(data['data']['applicant_data']);
+
           isLoading = false;
         });
       } else {
@@ -70,11 +73,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(12.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, UpdateProfileScreen.routeName)
-              .then((value) => {if (value == true) fetchUserDetails()});
+          Navigator.pushNamed(context, UpdateProfileScreen.routeName).then(
+              (value) =>
+                  {if (value == true) fetchUserDetails(tokens['access'])});
         },
         child: const Icon(Icons.edit),
       ),
@@ -87,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 return Future.delayed(
                   const Duration(seconds: 1),
                   () {
-                    fetchUserDetails();
+                    fetchUserDetails(tokens['access']);
                   },
                 );
               },
@@ -109,10 +144,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      '${user['applicant']['first_name']} ${user['applicant']['last_name']}',
+                      '${applicant.firstName!} ${applicant.lastName!}',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -160,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(
                           width: width * 0.8,
                           child: Text(
-                            user['applicant']['phone_number'] ?? 'N/A',
+                            applicant.phoneNumber ?? 'N/A',
                             style: const TextStyle(fontSize: 18),
                           ),
                         )

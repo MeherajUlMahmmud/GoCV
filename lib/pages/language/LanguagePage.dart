@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/language.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 
 class LanguagePage extends StatefulWidget {
   final String resumeId;
@@ -43,10 +45,11 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   fetchLanguages(String accessToken, String resumeId) {
-    LanguageService().getLanguageList(accessToken, resumeId).then((data) async {
+    String url = '${URLS.kLanguageUrl}$resumeId/';
+    APIService().sendGetRequest(accessToken, url).then((data) async {
       if (data['status'] == 200) {
         setState(() {
-          languageList = data['data'];
+          languageList = data['data']['data'];
           isLoading = false;
           isError = false;
           errorText = '';
@@ -111,8 +114,7 @@ class _LanguagePageState extends State<LanguagePage> {
                       child: Text(
                         'No languages added',
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                     )

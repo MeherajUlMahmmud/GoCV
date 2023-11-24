@@ -1,5 +1,6 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/contact.dart';
+import 'package:gocv/models/contact.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 class ContactPage extends StatefulWidget {
   final String resumeId;
   final String contactId;
+
   const ContactPage({
     Key? key,
     required this.resumeId,
@@ -27,7 +29,7 @@ class _ContactPageState extends State<ContactPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  late Map<String, dynamic> contactDetails = {};
+  Contact contactDetails = Contact();
 
   bool isLoading = true;
   bool isError = false;
@@ -40,13 +42,7 @@ class _ContactPageState extends State<ContactPage> {
   TextEditingController facebookController = TextEditingController();
   TextEditingController githubController = TextEditingController();
 
-  int id = 0;
-  String phoneNumber = '';
-  String email = '';
-  String address = '';
-  String linkedin = '';
-  String facebook = '';
-  String github = '';
+  Map<String, dynamic> updatedContactData = {};
 
   @override
   void initState() {
@@ -74,24 +70,32 @@ class _ContactPageState extends State<ContactPage> {
     fetchContactDetails(tokens['access'], widget.contactId);
   }
 
+  initiateControllers() {
+    phoneNumberController.text = contactDetails.phoneNumber ?? '';
+    emailController.text = contactDetails.email ?? '';
+    addressController.text = contactDetails.address ?? '';
+    linkedinController.text = contactDetails.linkedin ?? '';
+    facebookController.text = contactDetails.facebook ?? '';
+    githubController.text = contactDetails.github ?? '';
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   fetchContactDetails(String accessToken, String contactId) {
-    APIService()
-        .sendGetRequest(accessToken, '${URLS.kContactUrl}$contactId/details/')
-        .then((data) async {
-      print(data);
+    String url = '${URLS.kContactUrl}$contactId/details/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
       if (data['status'] == 200) {
         setState(() {
-          contactDetails = data['data'];
-          phoneNumberController.text = contactDetails['phone_number'] ?? '';
-          emailController.text = contactDetails['email'] ?? '';
-          addressController.text = contactDetails['address'] ?? '';
-          linkedinController.text = contactDetails['linkedin'] ?? '';
-          facebookController.text = contactDetails['facebook'] ?? '';
-          githubController.text = contactDetails['github'] ?? '';
-          isLoading = false;
+          contactDetails = Contact.fromJson(data['data']);
+
           isError = false;
           errorText = '';
         });
+
+        initiateControllers();
       } else {
         if (data['status'] == 401 || data['status'] == 403) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
@@ -111,19 +115,14 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   handleUpdateContactDetails() {
-    ContactService()
-        .updateContactDetails(
+    String url = '${URLS.kContactUrl}${widget.contactId}/update/';
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      widget.contactId,
-      phoneNumberController.text,
-      emailController.text,
-      addressController.text,
-      linkedinController.text,
-      facebookController.text,
-      githubController.text,
+      updatedContactData,
+      url,
     )
         .then((data) async {
-      print(data);
       if (data['status'] == 200) {
         Helper().showSnackBar(context, 'Contact details updated', Colors.green);
       } else {
@@ -169,7 +168,7 @@ class _ContactPageState extends State<ContactPage> {
                   keyboardType: TextInputType.phone,
                   onChanged: (value) {
                     setState(() {
-                      phoneNumber = value;
+                      updatedContactData['phone_number'] = value;
                     });
                   },
                 ),
@@ -185,7 +184,7 @@ class _ContactPageState extends State<ContactPage> {
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
                     setState(() {
-                      email = value;
+                      updatedContactData['email'] = value;
                     });
                   },
                   validator: (value) {
@@ -207,58 +206,58 @@ class _ContactPageState extends State<ContactPage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      address = value;
+                      updatedContactData['address'] = value;
                     });
                   },
                 ),
-                // const SizedBox(height: 10),
-                // CustomTextFormField(
-                //   width: width,
-                //   controller: linkedinController,
-                //   labelText: "LinkedIn",
-                //   hintText: "LinkedIn",
-                //   prefixIcon: Icons.link,
-                //   textCapitalization: TextCapitalization.none,
-                //   borderRadius: 10,
-                //   keyboardType: TextInputType.text,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       linkedin = value;
-                //     });
-                //   },
-                // ),
-                // const SizedBox(height: 10),
-                // CustomTextFormField(
-                //   width: width,
-                //   controller: facebookController,
-                //   labelText: "Facebook",
-                //   hintText: "Facebook",
-                //   prefixIcon: Icons.facebook,
-                //   textCapitalization: TextCapitalization.none,
-                //   borderRadius: 10,
-                //   keyboardType: TextInputType.text,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       facebook = value;
-                //     });
-                //   },
-                // ),
-                // const SizedBox(height: 10),
-                // CustomTextFormField(
-                //   width: width,
-                //   controller: githubController,
-                //   labelText: "Github",
-                //   hintText: "Github",
-                //   prefixIcon: Icons.code,
-                //   textCapitalization: TextCapitalization.none,
-                //   borderRadius: 10,
-                //   keyboardType: TextInputType.text,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       github = value;
-                //     });
-                //   },
-                // ),
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: linkedinController,
+                  labelText: 'LinkedIn',
+                  hintText: 'LinkedIn',
+                  prefixIcon: Icons.link,
+                  textCapitalization: TextCapitalization.none,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) {
+                    setState(() {
+                      updatedContactData['linkedin'] = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: facebookController,
+                  labelText: 'Facebook',
+                  hintText: 'Facebook',
+                  prefixIcon: Icons.facebook,
+                  textCapitalization: TextCapitalization.none,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) {
+                    setState(() {
+                      updatedContactData['facebook'] = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomTextFormField(
+                  width: width,
+                  controller: githubController,
+                  labelText: 'Github',
+                  hintText: 'Github',
+                  prefixIcon: Icons.code,
+                  textCapitalization: TextCapitalization.none,
+                  borderRadius: 10,
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) {
+                    setState(() {
+                      updatedContactData['github'] = value;
+                    });
+                  },
+                ),
                 const SizedBox(height: 50),
               ],
             ),

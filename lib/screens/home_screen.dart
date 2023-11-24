@@ -1,5 +1,6 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/resume.dart';
+import 'package:gocv/models/resume.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
@@ -7,8 +8,6 @@ import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:gocv/widgets/custom_button.dart';
-import 'package:gocv/widgets/profile_tile.dart';
 import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   TextEditingController titleController = TextEditingController();
 
-  late List<dynamic> resumes = [];
+  List<Resume> resumes = [];
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
@@ -50,10 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
     APIService()
         .sendGetRequest(tokens['access'], '${URLS.kResumeUrl}?user=$userId')
         .then((data) async {
-      print(data);
+      print(data['data']['data']);
       if (data['status'] == 200) {
         setState(() {
-          resumes = data['data'];
+          resumes = data['data']['data']
+              .map<Resume>((resume) => Resume.fromJson(resume))
+              .toList();
           isLoading = false;
           isError = false;
           errorText = '';
@@ -111,37 +112,44 @@ class _HomeScreenState extends State<HomeScreen> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('GoCV'),
-        // actions: <Widget>[
-        //   IconButton(
-        //     icon: const Icon(
-        //       Icons.settings,
-        //     ),
-        //     onPressed: () {
-        //       Navigator.pushNamed(context, SettingsScreen.routeName);
-        //     },
-        //   ),
-        // ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAddDialog(context);
-        },
-        child: const Icon(
-          Icons.add,
-          size: 35.0,
-          color: Colors.white,
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 0,
+        title: const Text(
+          'GoCV',
+          style: TextStyle(
+            color: Colors.black,
+          ),
         ),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, SettingsScreen.routeName);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              margin: const EdgeInsets.only(right: 10.0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: const Icon(
+                Icons.settings_outlined,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawer: Drawer(
         width: MediaQuery.of(context).size.width * 0.8,
-        backgroundColor: Colors.white,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
+            const DrawerHeader(
               curve: Curves.easeIn,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -154,8 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       //   width: 40,
                       //   height: 40,
                       // ),
-                      const SizedBox(width: 10),
-                      const Text(
+                      SizedBox(width: 10),
+                      Text(
                         'GoCV',
                         style: TextStyle(
                           fontSize: 28,
@@ -164,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const Text(
+                  Text(
                     'Build Resume on the Go',
                     style: TextStyle(
                       fontSize: 18,
@@ -293,112 +301,128 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     )
-                  : GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1.2,
-                      ),
-                      itemCount: resumes.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () => showBottomSheet(
-                            context,
-                            resumes[index],
-                            width,
-                          ),
-                          child: ResumeCard(
-                            resume: resumes[index],
-                          ),
-                        );
-                      },
-                    ),
-            ),
-    );
-  }
-
-  showBottomSheet(
-    BuildContext context,
-    Map<String, dynamic> resume,
-    double width,
-  ) {
-    showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
-        ),
-      ),
-      backgroundColor: Colors.white,
-      context: context,
-      builder: (context) => SizedBox(
-        height: 240.0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                children: <Widget>[
-                  const CircleAvatar(
-                    radius: 30.0,
-                    backgroundImage: AssetImage('assets/avatars/rdj.png'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ProfileTile(
-                      title: resume['name'],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const Divider(),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                CustomButton(
-                  text: 'Update Resume',
-                  height: 45,
-                  width: width * 0.45,
-                  textFontSize: 16,
-                  icon: Icons.edit,
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ResumeDetailsScreen(
-                          resume: resume,
+                  : SingleChildScrollView(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 10.0,
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.only(bottom: 15.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade100,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showAddDialog(context);
+                                    },
+                                    child: Container(
+                                      width: width * 0.45,
+                                      padding: const EdgeInsets.all(15.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.receipt_long),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'New Resume',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Container(
+                                    width: width * 0.45,
+                                    padding: const EdgeInsets.all(15.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.receipt_long),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          'Cover Letter',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: width,
+                              child: const Text(
+                                'My Resumes',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: resumes.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ResumeDetailsScreen(
+                                          resume: resumes[index],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ResumeCard(
+                                    resume: resumes[index],
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
-                CustomButton(
-                  text: 'Delete Resume',
-                  height: 45,
-                  width: width * 0.45,
-                  textFontSize: 16,
-                  icon: Icons.delete,
-                  onPressed: () {
-                    showDeleteDialog(context, resume);
-                  },
-                ),
-              ],
+                    ),
             ),
-          ],
-        ),
-        // ),
-      ),
     );
   }
 
   showAddDialog(BuildContext context) {
-    // set up the button
     Widget cancelButton = TextButton(
       child: const Text('Cancel'),
       onPressed: () {
@@ -407,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     Widget okButton = TextButton(
-      child: const Text('Save'),
+      child: const Text('Create'),
       onPressed: () async {
         String title = titleController.text;
         titleController.clear();
@@ -416,50 +440,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     AlertDialog alert = AlertDialog(
-      title: const Text('Resume title'),
-      content: TextFormField(
-        autofocus: true,
-        controller: titleController,
-        decoration: const InputDecoration(
-          hintText: 'Give a title',
-        ),
-        keyboardType: TextInputType.text,
+      title: const Text('Create a new resume'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Resume title',
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          TextFormField(
+            autofocus: true,
+            controller: titleController,
+            decoration: const InputDecoration(
+              hintText: 'Resume title',
+            ),
+            keyboardType: TextInputType.text,
+          ),
+        ],
       ),
-      actions: [
-        cancelButton,
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  void showDeleteDialog(BuildContext context, Map<String, dynamic> resume) {
-    // set up the button
-    Widget cancelButton = TextButton(
-      child: const Text('Cancel'),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-
-    Widget okButton = TextButton(
-      child: const Text('Delete'),
-      onPressed: () async {
-        Navigator.pop(context);
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text('Deleting ${resume['name']}'),
-      content: const Text('Are you sure about deleting this resume?'),
       actions: [
         cancelButton,
         okButton,

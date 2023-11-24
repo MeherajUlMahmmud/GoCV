@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/user.dart';
+import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/applicant.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
+import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -23,21 +26,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
+  Applicant applicant = Applicant();
+
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = true;
   bool isSubmitting = false;
   bool isError = false;
-  String errorText = '';
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  String uuid = '';
-  String firstName = '';
-  String lastName = '';
-  String phone = '';
+  Map<String, dynamic> updatedProfileData = {};
 
   // image
   File? imageFile;
@@ -64,15 +65,46 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
     imageFile = File('assets/avatars/rdj.png');
 
-    firstName = user['applicant']['first_name'];
-    lastName = user['applicant']['last_name'];
-    phone = user['applicant']['phone_number'] ?? '';
-    firstNameController.text = firstName;
-    lastNameController.text = lastName;
-    phoneController.text = phone;
+    fetchUserDetails(tokens['access']);
+  }
 
-    setState(() {
-      isLoading = false;
+  fetchUserDetails(String accessToken) {
+    String url = '${URLS.kUserUrl}profile/';
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      print(data['data']);
+      if (data['status'] == 200) {
+        await localStorage.writeData('user', data['data']['user_data']);
+        setState(() {
+          applicant = Applicant.fromJson(data['data']['applicant_data']);
+
+          isLoading = false;
+          isError = false;
+        });
+
+        firstNameController.text = applicant.firstName ?? '';
+        lastNameController.text = applicant.lastName ?? '';
+        phoneController.text = applicant.phoneNumber ?? '';
+      } else {
+        setState(() {
+          isError = true;
+        });
+        Helper().showSnackBar(
+          context,
+          'Failed to fetch user details',
+          Colors.red,
+        );
+        Navigator.of(context).pop(false);
+      }
+    }).catchError((error) {
+      setState(() {
+        isError = true;
+      });
+      Helper().showSnackBar(
+        context,
+        'Failed to fetch user details',
+        Colors.red,
+      );
+      Navigator.of(context).pop(false);
     });
   }
 
@@ -104,18 +136,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     setState(() {
       isSubmitting = true;
     });
-    UserService()
-        .updateApplicantDetails(
+    String url = '${URLS.kApplicantUrl}${applicant.id}/update/';
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      user['applicant']['uuid'],
-      firstName,
-      lastName,
-      phone,
+      updatedProfileData,
+      url,
     )
         .then((data) async {
-      print(data);
       if (data['status'] == 200) {
-        await localStorage.writeData('user', data['data']);
         setState(() {
           isSubmitting = false;
         });
@@ -124,15 +153,23 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         setState(() {
           isSubmitting = false;
           isError = true;
-          errorText = data['error'];
         });
+        Helper().showSnackBar(
+          context,
+          'Failed to update profile',
+          Colors.red,
+        );
       }
     }).catchError((e) {
       print(e);
       setState(() {
         isError = true;
-        errorText = e.toString();
       });
+      Helper().showSnackBar(
+        context,
+        'Failed to update profile',
+        Colors.red,
+      );
     });
   }
 
@@ -141,14 +178,39 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Update Profile')),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Update Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(12.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+      ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -215,8 +277,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                 });
                               },
                               child: Container(
-                                height: 35,
-                                width: 35,
+                                height: 40,
+                                width: 40,
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).primaryColor,
                                   borderRadius: BorderRadius.circular(15),
@@ -224,6 +286,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                 child: const Icon(
                                   Icons.edit,
                                   size: 18,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -242,7 +305,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         keyboardType: TextInputType.name,
                         onChanged: (value) {
                           setState(() {
-                            firstName = value;
+                            updatedProfileData['first_name'] = value;
                           });
                         },
                         validator: (value) {
@@ -264,7 +327,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         keyboardType: TextInputType.name,
                         onChanged: (value) {
                           setState(() {
-                            lastName = value;
+                            updatedProfileData['last_name'] = value;
                           });
                         },
                         validator: (value) {
@@ -286,7 +349,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
                           setState(() {
-                            phone = value;
+                            updatedProfileData['phone_number'] = value;
                           });
                         },
                       ),

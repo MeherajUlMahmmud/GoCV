@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/personal.dart';
+import 'package:gocv/models/personal.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 class PersonalPage extends StatefulWidget {
   final String resumeId;
   final String personalId;
+
   const PersonalPage({
     Key? key,
     required this.resumeId,
@@ -33,7 +34,7 @@ class _PersonalPageState extends State<PersonalPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  late Map<String, dynamic> personalDetails = {};
+  Personal personalDetails = Personal();
 
   bool isLoading = true;
   bool isError = false;
@@ -48,15 +49,7 @@ class _PersonalPageState extends State<PersonalPage> {
   TextEditingController countryController = TextEditingController();
   TextEditingController nationalityController = TextEditingController();
 
-  String id = '';
-  String firstName = '';
-  String lastName = '';
-  String aboutMe = '';
-  String dateOfBirth = '';
-  String city = '';
-  String state = '';
-  String country = '';
-  String nationality = '';
+  Map<String, dynamic> updatedPersonalData = {};
 
   // image
   File? imageFile;
@@ -92,34 +85,34 @@ class _PersonalPageState extends State<PersonalPage> {
     fetchPersonalDetails(tokens['access'], widget.personalId);
   }
 
-  fetchPersonalDetails(String accessToken, String personalId) {
-    String URL = '${URLS.kPersonalUrl}$personalId/details/';
-    APIService().sendGetRequest(accessToken, URL).then((data) async {
-      if (data['status'] == 200) {
-        setState(() {
-          personalDetails = data['data'];
-          id = personalDetails['id'].toString();
-          firstName = personalDetails['first_name'];
-          lastName = personalDetails['last_name'];
-          aboutMe = personalDetails['about_me'] ?? '';
-          dateOfBirth = personalDetails['date_of_birth'] ?? '';
-          city = personalDetails['city'] ?? '';
-          state = personalDetails['state'] ?? '';
-          country = personalDetails['country'] ?? '';
-          nationality = personalDetails['nationality'] ?? '';
-          firstNameController.text = firstName;
-          lastNameController.text = lastName;
-          aboutMeController.text = aboutMe;
-          dobController.text = dateOfBirth;
-          cityController.text = city;
-          stateController.text = state;
-          countryController.text = country;
-          nationalityController.text = nationality;
+  initiateControllers() {
+    firstNameController.text = personalDetails.firstName ?? '';
+    lastNameController.text = personalDetails.lastName ?? '';
+    aboutMeController.text = personalDetails.aboutMe ?? '';
+    dobController.text = personalDetails.dateOfBirth ?? '';
+    cityController.text = personalDetails.city ?? '';
+    stateController.text = personalDetails.state ?? '';
+    countryController.text = personalDetails.country ?? '';
+    nationalityController.text = personalDetails.nationality ?? '';
 
-          isLoading = false;
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  fetchPersonalDetails(String accessToken, String personalId) {
+    final String url = '${URLS.kPersonalUrl}$personalId/details/';
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == 200) {
+        print(data['data']);
+        setState(() {
+          personalDetails = Personal.fromJson(data['data']);
+
           isError = false;
           errorText = '';
         });
+
+        initiateControllers();
       } else {
         if (data['status'] == 401 || data['status'] == 403) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
@@ -163,18 +156,12 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   handleUpdatePersonalDetails() {
-    PersonalService()
-        .updatePersonalDetails(
+    String url = '${URLS.kPersonalUrl}${widget.personalId}/update/';
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      id,
-      firstName,
-      lastName,
-      aboutMe,
-      dateOfBirth,
-      city,
-      state,
-      country,
-      nationality,
+      updatedPersonalData,
+      url,
     )
         .then((data) async {
       if (data['status'] == 200) {
@@ -190,6 +177,16 @@ class _PersonalPageState extends State<PersonalPage> {
           Colors.red,
         );
       }
+    }).catchError((e) {
+      print(e);
+      setState(() {
+        isError = true;
+      });
+      Helper().showSnackBar(
+        context,
+        'Failed to update profile',
+        Colors.red,
+      );
     });
   }
 
@@ -209,238 +206,234 @@ class _PersonalPageState extends State<PersonalPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Stack(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(left: 5),
-                                height: 140,
-                                width: width * 0.28,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(
-                                    color: Colors.blueGrey,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ImageFullScreenWrapperWidget(
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchPersonalDetails(tokens['access'], widget.personalId);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const SizedBox(height: 10),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5),
+                          height: 180,
+                          width: width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Center(
+                            child: Stack(
+                              children: [
+                                ImageFullScreenWrapperWidget(
                                   dark: true,
-                                  // child: Image.asset("assets/avatars/rdj.png"),
-                                  child: Image.asset(imageFile!.path),
+                                  child: Image.asset('assets/avatars/rdj.png'),
                                 ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    getFromGallery().then((value) {
-                                      cropImage(imageFile: value).then((value) {
-                                        setState(() {
-                                          imageFile = value;
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      getFromGallery().then((value) {
+                                        cropImage(imageFile: value)
+                                            .then((value) {
+                                          setState(() {
+                                            imageFile = value;
+                                          });
                                         });
                                       });
-                                    });
-                                  },
-                                  child: Container(
-                                    height: 35,
-                                    width: 35,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: const Icon(
-                                      Icons.edit,
-                                      size: 18,
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: const Icon(
+                                        Icons.edit,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            margin: const EdgeInsets.all(5.0),
-                            child: Column(
-                              children: [
-                                CustomTextFormField(
-                                  width: width * 0.6,
-                                  controller: firstNameController,
-                                  labelText: 'First Name',
-                                  hintText: 'First Name',
-                                  prefixIcon: Icons.person_outline,
-                                  textCapitalization: TextCapitalization.words,
-                                  borderRadius: 10,
-                                  keyboardType: TextInputType.name,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      firstName = value;
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter first name';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 5),
-                                CustomTextFormField(
-                                  width: width * 0.6,
-                                  controller: lastNameController,
-                                  labelText: 'Surname',
-                                  hintText: 'Surname',
-                                  prefixIcon: Icons.person_outline,
-                                  textCapitalization: TextCapitalization.words,
-                                  borderRadius: 10,
-                                  keyboardType: TextInputType.name,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      lastName = value;
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter surname';
-                                    }
-                                    return null;
-                                  },
                                 ),
                               ],
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      CustomTextFormField(
-                        width: width,
-                        controller: aboutMeController,
-                        labelText: 'About Me',
-                        hintText: 'About Me',
-                        prefixIcon: Icons.person_outline,
-                        textCapitalization: TextCapitalization.sentences,
-                        borderRadius: 10,
-                        keyboardType: TextInputType.multiline,
-                        onChanged: (value) {
-                          setState(() {
-                            aboutMe = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 5.0,
-                          vertical: 5.0,
+                          ),
                         ),
-                        width: (width - 10) / 1,
-                        child: GestureDetector(
-                          onTap: () async {
-                            DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1985, 1),
-                              lastDate: DateTime(2101),
-                            );
-                            if (picked != null && picked != DateTime.now()) {
-                              setState(() {
-                                dateOfBirth =
-                                    picked.toString().substring(0, 10);
-                                dobController.text = dateOfBirth;
-                              });
-                            }
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: firstNameController,
+                          labelText: 'First Name',
+                          hintText: 'First Name',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.words,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.name,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['first_name'] = value;
+                            });
                           },
-                          child: AbsorbPointer(
-                            child: TextFormField(
-                              controller: dobController,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.calendar_today),
-                                labelText: 'Date of Birth',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter first name';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: lastNameController,
+                          labelText: 'Surname',
+                          hintText: 'Surname',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.words,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.name,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['last_name'] = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter surname';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: aboutMeController,
+                          labelText: 'About Me',
+                          hintText: 'About Me',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.sentences,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.multiline,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['about_me'] = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 5.0,
+                            vertical: 5.0,
+                          ),
+                          width: (width - 10) / 1,
+                          child: GestureDetector(
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1985, 1),
+                                lastDate: DateTime(2101),
+                              );
+                              if (picked != null && picked != DateTime.now()) {
+                                setState(() {
+                                  updatedPersonalData['date_of_birth'] =
+                                      picked.toString().substring(0, 10);
+                                  dobController.text =
+                                      updatedPersonalData['date_of_birth']
+                                          .toString()
+                                          .substring(0, 10);
+                                });
+                              }
+                            },
+                            child: AbsorbPointer(
+                              child: TextFormField(
+                                controller: dobController,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.calendar_today),
+                                  labelText: 'Date of Birth',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
+                                keyboardType: TextInputType.text,
                               ),
-                              keyboardType: TextInputType.text,
                             ),
                           ),
                         ),
-                      ),
-                      // const SizedBox(height: 10),
-                      // CustomTextFormField(
-                      //   width: width,
-                      //   controller: cityController,
-                      //   labelText: "City",
-                      //   hintText: "City",
-                      //   prefixIcon: Icons.location_city,
-                      //   textCapitalization: TextCapitalization.sentences,
-                      //   borderRadius: 10,
-                      //   keyboardType: TextInputType.text,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       city = value;
-                      //     });
-                      //   },
-                      // ),
-                      // const SizedBox(height: 10),
-                      // CustomTextFormField(
-                      //   width: width,
-                      //   controller: stateController,
-                      //   labelText: "State",
-                      //   hintText: "State",
-                      //   prefixIcon: Icons.person_outline,
-                      //   textCapitalization: TextCapitalization.sentences,
-                      //   borderRadius: 10,
-                      //   keyboardType: TextInputType.text,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       state = value;
-                      //     });
-                      //   },
-                      // ),
-                      // const SizedBox(height: 10),
-                      // CustomTextFormField(
-                      //   width: width,
-                      //   controller: countryController,
-                      //   labelText: "Country",
-                      //   hintText: "Country",
-                      //   prefixIcon: Icons.person_outline,
-                      //   textCapitalization: TextCapitalization.words,
-                      //   borderRadius: 10,
-                      //   keyboardType: TextInputType.text,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       country = value;
-                      //     });
-                      //   },
-                      // ),
-                      // const SizedBox(height: 10),
-                      // CustomTextFormField(
-                      //   width: width,
-                      //   controller: nationalityController,
-                      //   labelText: "Nationality",
-                      //   hintText: "Nationality",
-                      //   prefixIcon: Icons.person_outline,
-                      //   textCapitalization: TextCapitalization.sentences,
-                      //   borderRadius: 10,
-                      //   keyboardType: TextInputType.text,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       nationality = value;
-                      //     });
-                      //   },
-                      // ),
-                      const SizedBox(height: 50),
-                    ],
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: cityController,
+                          labelText: 'City',
+                          hintText: 'City',
+                          prefixIcon: Icons.location_city,
+                          textCapitalization: TextCapitalization.sentences,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['city'] = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: stateController,
+                          labelText: 'State',
+                          hintText: 'State',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.sentences,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['state'] = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: countryController,
+                          labelText: 'Country',
+                          hintText: 'Country',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.words,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['country'] = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextFormField(
+                          width: width,
+                          controller: nationalityController,
+                          labelText: 'Nationality',
+                          hintText: 'Nationality',
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.sentences,
+                          borderRadius: 10,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {
+                            setState(() {
+                              updatedPersonalData['nationality'] = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 50),
+                      ],
+                    ),
                   ),
                 ),
               ),

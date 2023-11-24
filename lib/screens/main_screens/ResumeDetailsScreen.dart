@@ -1,5 +1,5 @@
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/resume.dart';
+import 'package:gocv/models/resume.dart';
 import 'package:gocv/pages/award/AwardPage.dart';
 import 'package:gocv/pages/certification/CertificationPage.dart';
 import 'package:gocv/pages/contact/ContactPage.dart';
@@ -20,7 +20,7 @@ import 'package:gocv/utils/urls.dart';
 class ResumeDetailsScreen extends StatefulWidget {
   static const String routeName = '/resume-details';
 
-  final Map<String, dynamic> resume;
+  final Resume resume;
   const ResumeDetailsScreen({
     Key? key,
     required this.resume,
@@ -57,7 +57,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     tokens = await localStorage.readData('tokens');
     user = await localStorage.readData('user');
 
-    fetchResumeDetails(tokens['access'], widget.resume['id'].toString());
+    fetchResumeDetails(tokens['access'], widget.resume.id.toString());
   }
 
   fetchResumeDetails(String accessToken, String resumeId) {
@@ -92,147 +92,187 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.resume['name']),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResumePreviewScreen(
-                      resumeId: resumeDetails['id'],
-                    ),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.visibility),
-              tooltip: 'Preview',
-            ),
-          ],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Fill in your resume',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
         ),
-        body: Container(
-          child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : isError
-                  ? Center(
-                      child: Text(errorText),
-                    )
-                  : Column(
-                      children: [
-                        TabBar(
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResumePreviewScreen(
+                    resumeId: resumeDetails['id'],
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12.0),
+              margin: const EdgeInsets.only(right: 10.0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: const Icon(
+                Icons.visibility,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Container(
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : isError
+                ? Center(
+                    child: Text(errorText),
+                  )
+                : Column(
+                    children: [
+                      TabBar(
+                        controller: tabController,
+                        indicatorColor: Theme.of(context).primaryColor,
+                        indicatorWeight: 3.0,
+                        labelColor: Theme.of(context).primaryColor,
+                        unselectedLabelColor: Colors.grey,
+                        isScrollable: true,
+                        tabs: const [
+                          Tab(
+                            child: Text(
+                              'Personal',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Contact',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Work Experience',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Education',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Skills',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Awards',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Certifications',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Interests',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Languages',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'References',
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: TabBarView(
                           controller: tabController,
-                          indicatorColor: Theme.of(context).primaryColor,
-                          indicatorWeight: 3.0,
-                          labelColor: Theme.of(context).primaryColor,
-                          unselectedLabelColor: Colors.grey,
-                          isScrollable: true,
-                          tabs: const [
-                            Tab(
-                              child: Text(
-                                'Personal',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                          children: [
+                            PersonalPage(
+                              resumeId: widget.resume.id.toString(),
+                              personalId: personalId,
                             ),
-                            Tab(
-                              child: Text(
-                                'Contact',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            ContactPage(
+                              resumeId: widget.resume.id.toString(),
+                              contactId: contactId,
                             ),
-                            Tab(
-                              child: Text(
-                                'Work Experience',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            WorkExperiencePage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Education',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            EducationPage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Skills',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            SkillPage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Awards',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            AwardPage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Certifications',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            CertificationPage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Interests',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            InterestPage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'Languages',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            LanguagePage(
+                              resumeId: widget.resume.id.toString(),
                             ),
-                            Tab(
-                              child: Text(
-                                'References',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
+                            ReferencePage(
+                              resumeId: widget.resume.id.toString(),
                             ),
                           ],
                         ),
-                        Expanded(
-                          child: TabBarView(
-                            controller: tabController,
-                            children: [
-                              PersonalPage(
-                                resumeId: widget.resume['id'].toString(),
-                                personalId: personalId,
-                              ),
-                              ContactPage(
-                                resumeId: widget.resume['id'].toString(),
-                                contactId: contactId,
-                              ),
-                              WorkExperiencePage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              EducationPage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              SkillPage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              AwardPage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              CertificationPage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              InterestPage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              LanguagePage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                              ReferencePage(
-                                resumeId: widget.resume['id'].toString(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-        ));
+                      ),
+                    ],
+                  ),
+      ),
+    );
   }
 }

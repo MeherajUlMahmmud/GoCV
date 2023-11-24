@@ -1,5 +1,6 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/apis/experience.dart';
+import 'package:gocv/models/experience.dart';
 import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -23,7 +24,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
-  List<dynamic> experienceList = [];
+  List<Experience> experienceList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -50,7 +51,9 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
       if (data['status'] == 200) {
         print(data['data']);
         setState(() {
-          experienceList = data['data']['data'];
+          experienceList = data['data']['data']
+              .map<Experience>((experience) => Experience.fromJson(experience))
+              .toList();
           isLoading = false;
           isError = false;
           errorText = '';
@@ -115,8 +118,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                       child: Text(
                         'No work experiences added',
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                     )
@@ -134,7 +136,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                experienceList[index]['uuid'],
+                                experienceList[index].id.toString(),
                               );
                             },
                             child: Container(
@@ -169,14 +171,16 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                       const SizedBox(width: 10),
                                       SizedBox(
                                         width: width * 0.7,
-                                        child: Text(
-                                          experienceList[index]['position'] +
-                                              ' - ' +
-                                              experienceList[index]['type'],
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              '${experienceList[index].position}  - ${experienceList[index].type}',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -197,19 +201,16 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                           children: [
                                             Text(
                                               experienceList[index]
-                                                  ['company_name'],
+                                                      .companyName ??
+                                                  '',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold),
                                             ),
-                                            experienceList[index][
-                                                            'company_website'] ==
-                                                        null ||
-                                                    experienceList[index][
-                                                            'company_website'] ==
-                                                        ''
-                                                ? const SizedBox()
-                                                : Container(
+                                            experienceList[index]
+                                                        .companyWebsite !=
+                                                    null
+                                                ? Container(
                                                     margin:
                                                         const EdgeInsets.only(
                                                       left: 10,
@@ -218,14 +219,16 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                                       onTap: () {
                                                         Helper().launchInBrowser(
                                                             experienceList[
-                                                                    index][
-                                                                'company_website']);
+                                                                        index]
+                                                                    .companyWebsite ??
+                                                                '');
                                                       },
                                                       child: const Icon(
                                                         Icons.open_in_new,
                                                       ),
                                                     ),
-                                                  ),
+                                                  )
+                                                : const SizedBox(),
                                           ],
                                         ),
                                       ),
@@ -241,17 +244,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                       const SizedBox(width: 10),
                                       SizedBox(
                                         width: width * 0.7,
-                                        child: experienceList[index]
-                                                    ['end_date'] ==
+                                        child: experienceList[index].endDate ==
                                                 null
                                             ? Text(
-                                                '${Helper().formatMonthYear(experienceList[index]['start_date'])} - Present',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
+                                                '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - Present',
                                               )
                                             : Text(
-                                                '${Helper().formatMonthYear(experienceList[index]['start_date'])} - ${Helper().formatDate(experienceList[index]['end_date'])}',
+                                                '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - ${Helper().formatMonthYear(experienceList[index].endDate ?? '')}',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -260,11 +259,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  experienceList[index]['description'] ==
-                                              null ||
-                                          experienceList[index]
-                                                  ['description'] ==
-                                              ''
+                                  experienceList[index].description == null
                                       ? const SizedBox()
                                       : Row(
                                           children: [
@@ -277,7 +272,8 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                               width: width * 0.7,
                                               child: Text(
                                                 experienceList[index]
-                                                    ['description'],
+                                                        .description ??
+                                                    '',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
