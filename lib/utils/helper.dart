@@ -40,6 +40,14 @@ class Helper {
             ));
   }
 
+  bool isNullEmptyOrFalse(dynamic value) {
+    if (value == null || value == '' || value == false) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   String formatDateTime(String dateTime) {
     return DateFormat('MMM d, y h:mm a').format(DateTime.parse(dateTime));
   }
