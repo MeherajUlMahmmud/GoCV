@@ -541,7 +541,9 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
-                              initialDate: experienceData['start_date'] != ''
+                              initialDate: experienceData['start_date'] !=
+                                          null &&
+                                      experienceData['start_date'] != ''
                                   ? DateTime.parse(experienceData['start_date'])
                                   : DateTime.now(),
                               firstDate: DateTime(1990, 1),

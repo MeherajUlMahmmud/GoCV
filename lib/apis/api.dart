@@ -53,6 +53,7 @@ class APIService {
     Map<String, dynamic> data,
     String url,
   ) async {
+    print(data);
     try {
       final response = await http.patch(
         Uri.parse(url),

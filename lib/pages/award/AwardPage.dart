@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/award.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
@@ -22,7 +23,7 @@ class _AwardPageState extends State<AwardPage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
-  List<dynamic> awardList = [];
+  List<Award> awardList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -48,7 +49,9 @@ class _AwardPageState extends State<AwardPage> {
       print(data);
       if (data['status'] == 200) {
         setState(() {
-          awardList = data['data']['data'];
+          awardList = data['data']['data'].map<Award>((award) {
+            return Award.fromJson(award);
+          }).toList();
           isLoading = false;
           isError = false;
           errorText = '';
@@ -70,7 +73,7 @@ class _AwardPageState extends State<AwardPage> {
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch references',
+            'Failed to fetch awards',
             Colors.red,
           );
         }
@@ -80,6 +83,8 @@ class _AwardPageState extends State<AwardPage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
@@ -124,12 +129,7 @@ class _AwardPageState extends State<AwardPage> {
                         itemCount: awardList.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: () {
-                              // _showBottomSheet(
-                              //   context,
-                              //   awardList[index]['id'].toString(),
-                              // );
-                            },
+                            onTap: () {},
                             child: Container(
                               margin: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -152,6 +152,76 @@ class _AwardPageState extends State<AwardPage> {
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.price_change,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      SizedBox(
+                                        width: width * 0.8,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: width * 0.7,
+                                              child: Text(
+                                                awardList[index].title!,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                            awardList[index].link != null
+                                                ? Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                      left: 10,
+                                                    ),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Helper()
+                                                            .launchInBrowser(
+                                                                awardList[index]
+                                                                    .link!);
+                                                      },
+                                                      child: const Icon(
+                                                        Icons.open_in_new,
+                                                      ),
+                                                    ),
+                                                  )
+                                                : const SizedBox(),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Helper().isNullEmptyOrFalse(
+                                    awardList[index].description,
+                                  )
+                                      ? const SizedBox()
+                                      : Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.description,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            SizedBox(
+                                              width: width * 0.8,
+                                              child: Text(
+                                                awardList[index].description!,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                                textAlign: TextAlign.justify,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ],
                               ),
                             ),
                           );

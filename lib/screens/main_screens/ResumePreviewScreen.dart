@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gocv/apis/education.dart';
-import 'package:gocv/apis/experience.dart';
 import 'package:gocv/apis/interest.dart';
 import 'package:gocv/apis/language.dart';
 import 'package:gocv/apis/reference.dart';
@@ -95,75 +93,75 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchEducations(String accessToken, String resumeId) {
-    EducationService()
-        .getEducationList(accessToken, resumeId)
-        .then((data) async {
-      print(data);
-      if (data['status'] == 200) {
-        setState(() {
-          educationList = data['data'];
-        });
+    // EducationService()
+    //     .getEducationList(accessToken, resumeId)
+    //     .then((data) async {
+    //   print(data);
+    //   if (data['status'] == 200) {
+    //     setState(() {
+    //       educationList = data['data'];
+    //     });
 
-        fetchWorkExperiences(tokens['access'], resumeDetails['uuid']);
-      } else {
-        if (data['status'] == 401 || data['status'] == 403) {
-          Helper().showSnackBar(
-            context,
-            'Session expired',
-            Colors.red,
-          );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch educations',
-            Colors.red,
-          );
-        }
-      }
-    });
+    //     fetchWorkExperiences(tokens['access'], resumeDetails['uuid']);
+    //   } else {
+    //     if (data['status'] == 401 || data['status'] == 403) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Session expired',
+    //         Colors.red,
+    //       );
+    //       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch educations',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   fetchWorkExperiences(String accessToken, String resumeId) {
-    ExpreienceService()
-        .getExperienceList(accessToken, resumeId)
-        .then((data) async {
-      print(data);
-      if (data['status'] == 200) {
-        setState(() {
-          experienceList = data['data'];
-        });
+    // ExpreienceService()
+    //     .getExperienceList(accessToken, resumeId)
+    //     .then((data) async {
+    //   print(data);
+    //   if (data['status'] == 200) {
+    //     setState(() {
+    //       experienceList = data['data'];
+    //     });
 
-        fetchSkills(tokens['access'], resumeDetails['uuid']);
-      } else {
-        if (data['status'] == 401 || data['status'] == 403) {
-          Helper().showSnackBar(
-            context,
-            'Session expired',
-            Colors.red,
-          );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch work experiences',
-            Colors.red,
-          );
-        }
-      }
-    });
+    //     fetchSkills(tokens['access'], resumeDetails['uuid']);
+    //   } else {
+    //     if (data['status'] == 401 || data['status'] == 403) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Session expired',
+    //         Colors.red,
+    //       );
+    //       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch work experiences',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   fetchSkills(String accessToken, String resumeId) {

@@ -2,7 +2,7 @@ class UserBase {
   int? id;
   String? email;
   bool? isApplicant;
-  bool? isorganization;
+  bool? isOrganization;
   bool? isVerified;
   bool? isStaff;
   bool? isSuperuser;
@@ -11,7 +11,7 @@ class UserBase {
     this.id,
     this.email,
     this.isApplicant,
-    this.isorganization,
+    this.isOrganization,
     this.isVerified,
     this.isStaff,
     this.isSuperuser,
@@ -21,9 +21,20 @@ class UserBase {
     id = json['id'];
     email = json['email'];
     isApplicant = json['is_applicant'];
-    isorganization = json['is_organization'];
+    isOrganization = json['is_organization'];
     isVerified = json['is_verified'];
     isStaff = json['is_staff'];
     isSuperuser = json['is_superuser'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['email'] = email;
+    data['is_applicant'] = isApplicant;
+    data['is_organization'] = isOrganization;
+    data['is_verified'] = isVerified;
+    data['is_staff'] = isStaff;
+    data['is_superuser'] = isSuperuser;
+    return data;
   }
 }

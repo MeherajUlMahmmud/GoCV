@@ -36,7 +36,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
-  late Map<String, dynamic> resumeDetails = {};
+  Resume resumeDetails = Resume();
   late String personalId = '';
   late String contactId = '';
   bool isLoading = true;
@@ -67,7 +67,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
       print(data['data']['contact']);
       if (data['status'] == 200) {
         setState(() {
-          resumeDetails = data['data']['resume'];
+          resumeDetails = Resume.fromJson(data['data']['resume']);
           personalId = data['data']['personal']['id'].toString();
           contactId = data['data']['contact']['id'].toString();
           isLoading = false;
@@ -92,13 +92,14 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Fill in your resume',
-          style: TextStyle(
+        title: Text(
+          isLoading ? 'Loading...' : resumeDetails.name!,
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 22,
           ),
@@ -130,7 +131,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                 context,
                 MaterialPageRoute(
                   builder: (context) => ResumePreviewScreen(
-                    resumeId: resumeDetails['id'],
+                    resumeId: resumeDetails.id.toString(),
                   ),
                 ),
               );

@@ -48,7 +48,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
         .sendGetRequest(accessToken, '${URLS.kExperienceUrl}$resumeId/')
         .then((data) async {
       if (data['status'] == 200) {
-        print(data['data']);
         setState(() {
           experienceList = data['data']['data']
               .map<Experience>((experience) => Experience.fromJson(experience))
@@ -66,7 +65,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
           );
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
-          print(data['error']);
           setState(() {
             isLoading = false;
             isError = true;
@@ -87,6 +85,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -158,13 +157,9 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.shade300,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
+                                border: Border.all(
+                                  color: Colors.grey.shade200,
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,25 +171,23 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                         color: Colors.grey,
                                       ),
                                       const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              '${experienceList[index].position}  - ${experienceList[index].type}',
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: width * 0.8,
+                                            child: Text(
+                                              '${experienceList[index].position} - ${experienceList[index].type}',
                                               style: const TextStyle(
-                                                fontSize: 18,
+                                                fontSize: 20,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       const Icon(
@@ -203,15 +196,18 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
-                                        width: width * 0.7,
+                                        width: width * 0.8,
                                         child: Row(
                                           children: [
-                                            Text(
-                                              experienceList[index]
-                                                  .companyName!,
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                            SizedBox(
+                                              width: width * 0.7,
+                                              child: Text(
+                                                experienceList[index]
+                                                    .companyName!,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                ),
+                                              ),
                                             ),
                                             experienceList[index]
                                                         .companyWebsite !=
@@ -248,12 +244,15 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
-                                        width: width * 0.7,
+                                        width: width * 0.8,
                                         child: Helper().isNullEmptyOrFalse(
                                           experienceList[index].endDate,
                                         )
                                             ? Text(
                                                 '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - Present',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
                                               )
                                             : Text(
                                                 '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - ${Helper().formatMonthYear(experienceList[index].endDate ?? '')}',
@@ -277,7 +276,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                             ),
                                             const SizedBox(width: 10),
                                             SizedBox(
-                                              width: width * 0.7,
+                                              width: width * 0.8,
                                               child: Text(
                                                 experienceList[index]
                                                     .description!,

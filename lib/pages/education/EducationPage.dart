@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/education.dart';
+import 'package:gocv/models/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -23,7 +23,7 @@ class _EducationPageState extends State<EducationPage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> tokens = {};
 
-  List<dynamic> educationList = [];
+  List<Education> educationList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -47,10 +47,11 @@ class _EducationPageState extends State<EducationPage> {
     APIService()
         .sendGetRequest(accessToken, '${URLS.kEducationUrl}$resumeId/')
         .then((data) async {
-      print(data);
       if (data['status'] == 200) {
         setState(() {
-          educationList = data['data']['data'];
+          educationList = data['data']['data'].map<Education>((education) {
+            return Education.fromJson(education);
+          }).toList();
           isLoading = false;
           isError = false;
           errorText = '';
@@ -64,7 +65,6 @@ class _EducationPageState extends State<EducationPage> {
           );
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
-          print(data['error']);
           setState(() {
             isLoading = false;
             isError = true;
@@ -85,6 +85,7 @@ class _EducationPageState extends State<EducationPage> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -157,13 +158,9 @@ class _EducationPageState extends State<EducationPage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.shade300,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
+                                border: Border.all(
+                                  color: Colors.grey.shade200,
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,20 +173,18 @@ class _EducationPageState extends State<EducationPage> {
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
-                                        width: width * 0.7,
+                                        width: width * 0.8,
                                         child: Text(
-                                          educationList[index]['school_name'],
+                                          educationList[index].schoolName!,
                                           style: const TextStyle(
-                                            fontSize: 18,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       const Icon(
@@ -198,15 +193,11 @@ class _EducationPageState extends State<EducationPage> {
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
-                                        width: width * 0.7,
+                                        width: width * 0.8,
                                         child: Text(
-                                          educationList[index]['degree'] +
-                                              ' in ' +
-                                              educationList[index]
-                                                  ['department'],
+                                          '${educationList[index].degree!} in ${educationList[index].department!}',
                                           style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
                                           ),
                                         ),
                                       ),
@@ -221,9 +212,9 @@ class _EducationPageState extends State<EducationPage> {
                                       ),
                                       const SizedBox(width: 10),
                                       SizedBox(
-                                        width: width * 0.7,
+                                        width: width * 0.8,
                                         child: Text(
-                                          '${educationList[index]['grade']} out of ${educationList[index]['grade_scale']}',
+                                          '${educationList[index].grade!} out of ${educationList[index].gradeScale!}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ),
@@ -233,7 +224,7 @@ class _EducationPageState extends State<EducationPage> {
                                   ),
                                   const SizedBox(height: 10),
                                   Helper().isNullEmptyOrFalse(
-                                          educationList[index]['start_date'])
+                                          educationList[index].startDate)
                                       ? const SizedBox()
                                       : Row(
                                           children: [
@@ -243,35 +234,29 @@ class _EducationPageState extends State<EducationPage> {
                                             ),
                                             const SizedBox(width: 10),
                                             SizedBox(
-                                              width: width * 0.7,
-                                              child: Text(
-                                                Helper().isNullEmptyOrFalse(
-                                                        educationList[index]
-                                                            ['start_date'])
-                                                    ? ''
-                                                    : '${Helper().formatMonthYear(educationList[index]['start_date'])} - ' +
-                                                                educationList[
-                                                                        index][
-                                                                    'end_date'] ==
-                                                            null
-                                                        ? ''
-                                                        : Helper()
-                                                            .formatMonthYear(
-                                                                educationList[
-                                                                        index][
-                                                                    'end_date']),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
+                                              width: width * 0.8,
+                                              child: Helper()
+                                                      .isNullEmptyOrFalse(
+                                                          educationList[index]
+                                                              .endDate)
+                                                  ? Text(
+                                                      '${Helper().formatMonthYear(educationList[index].startDate ?? '')} - Present',
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      '${Helper().formatMonthYear(educationList[index].startDate ?? '')} - ${Helper().formatMonthYear(educationList[index].endDate ?? '')}',
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
                                             ),
                                           ],
                                         ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
                                   Helper().isNullEmptyOrFalse(
-                                          educationList[index]['description'])
+                                          educationList[index].description)
                                       ? const SizedBox()
                                       : Row(
                                           children: [
@@ -284,7 +269,7 @@ class _EducationPageState extends State<EducationPage> {
                                               width: width * 0.7,
                                               child: Text(
                                                 educationList[index]
-                                                    ['description']!,
+                                                    .description!,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),

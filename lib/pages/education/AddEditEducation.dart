@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/education.dart';
+import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/education.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -39,17 +41,20 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   TextEditingController endDateController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  int id = 0;
-  String uuid = '';
-  String schoolName = '';
-  String degree = '';
-  String department = '';
-  String gradeScale = '';
-  String grade = '';
-  String? startDate;
-  String? endDate;
-  String description = '';
-  bool isCurrentlyEnrolled = false;
+  Education education = Education();
+
+  Map<String, dynamic> educationData = {
+    'resume': '',
+    'school_name': '',
+    'degree': '',
+    'department': '',
+    'grade_scale': '',
+    'grade': '',
+    'start_date': '',
+    'end_date': '',
+    'description': '',
+    'is_current': false,
+  };
 
   @override
   void initState() {
@@ -77,53 +82,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     user = await localStorage.readData('user');
 
     if (widget.educationId != null) {
-      EducationService()
-          .getEducation(tokens['access'], widget.educationId!)
-          .then((data) {
-        print(data);
-        if (data['status'] == 200) {
-          setState(() {
-            isLoading = false;
-            isError = false;
-            uuid = data['data']['uuid'];
-            schoolName = data['data']['school_name'];
-            degree = data['data']['degree'];
-            department = data['data']['department'];
-            gradeScale = data['data']['grade_scale'];
-            grade = data['data']['grade'];
-            startDate = data['data']['start_date'];
-            endDate = data['data']['end_date'];
-            description = data['data']['description'];
-            isCurrentlyEnrolled = data['data']['is_current'];
-            schoolNameController.text = schoolName;
-            degreeController.text = degree;
-            departmentController.text = department;
-            gradeScaleController.text = gradeScale;
-            gradeController.text = grade;
-            startDateController.text = startDate ?? '';
-            endDateController.text = endDate ?? '';
-            descriptionController.text = description;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }).catchError((error) {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = error.toString();
-        });
-        Helper().showSnackBar(
-          context,
-          error.toString(),
-          Colors.red,
-        );
-      });
+      fetchEducation(tokens['access'], widget.educationId!);
     } else {
+      educationData['resume'] = widget.resumeId;
       setState(() {
         isLoading = false;
         isError = false;
@@ -131,30 +92,65 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     }
   }
 
-  createEducation() {
-    EducationService()
-        .createEducation(
-      tokens['access'],
-      widget.resumeId,
-      schoolName,
-      degree,
-      department,
-      gradeScale,
-      grade,
-      startDate,
-      endDate,
-      description,
-      isCurrentlyEnrolled,
-    )
-        .then((value) {
-      if (value['status'] == 201) {
-        Navigator.pop(context);
+  initiateControllers() {
+    schoolNameController.text =
+        educationData['school_name'] = education.schoolName ?? '';
+    degreeController.text = educationData['degree'] = education.degree ?? '';
+    departmentController.text =
+        educationData['department'] = education.department ?? '';
+    gradeScaleController.text =
+        educationData['grade_scale'] = education.gradeScale ?? '';
+    gradeController.text = educationData['grade'] = education.grade ?? '';
+    startDateController.text = education.startDate ?? '';
+    endDateController.text = education.endDate ?? '';
+    descriptionController.text =
+        educationData['description'] = education.description ?? '';
+    educationData['is_current'] = education.isCurrent ?? false;
+
+    educationData['resume'] = education.resume;
+    educationData['start_date'] = education.startDate;
+    educationData['end_date'] = education.endDate;
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  fetchEducation(String accessToken, String educationId) {
+    if (educationId == '') {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Education ID is empty';
+      });
+      Helper().showSnackBar(
+        context,
+        'Education ID is empty',
+        Colors.red,
+      );
+      return;
+    }
+    String url = '${URLS.kEducationUrl}$educationId/details/';
+    APIService().sendGetRequest(accessToken, url).then((data) {
+      print(data);
+      if (data['status'] == 200) {
+        setState(() {
+          education = Education.fromJson(data['data']);
+          isError = false;
+        });
+
+        initiateControllers();
       } else {
         setState(() {
           isLoading = false;
           isError = true;
-          errorText = value['error'];
+          errorText = data['data']['detail'];
         });
+        Helper().showSnackBar(
+          context,
+          errorText,
+          Colors.red,
+        );
       }
     }).catchError((error) {
       setState(() {
@@ -164,37 +160,91 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       });
       Helper().showSnackBar(
         context,
-        error.toString(),
+        'Error fetching education details',
         Colors.red,
       );
     });
   }
 
-  updateEducation() {
-    EducationService()
-        .updateEducation(
-      tokens['access'],
-      uuid,
-      schoolName,
-      degree,
-      department,
-      gradeScale,
-      grade,
-      startDate,
-      endDate,
-      description,
-      isCurrentlyEnrolled,
+  createEducation() {
+    // EducationService()
+    //     .createEducation(
+    //   tokens['access'],
+    //   widget.resumeId,
+    //   schoolName,
+    //   degree,
+    //   department,
+    //   gradeScale,
+    //   grade,
+    //   startDate,
+    //   endDate,
+    //   description,
+    //   isCurrentlyEnrolled,
+    // )
+    //     .then((value) {
+    //   if (value['status'] == 201) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = value['error'];
+    //     });
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
+  }
+
+  updateEducation(String accessToken, String educationId) {
+    String url = '${URLS.kEducationUrl}$educationId/update/';
+    APIService()
+        .sendPatchRequest(
+      accessToken,
+      educationData,
+      url,
     )
         .then((data) async {
+      print(data);
       if (data['status'] == 200) {
-        Navigator.pop(context);
+        setState(() {
+          education = Education.fromJson(data['data']);
+          isError = false;
+        });
+
+        initiateControllers();
       } else {
         setState(() {
           isLoading = false;
           isError = true;
-          errorText = data['error'];
+          errorText = data['data']['detail'];
         });
+        Helper().showSnackBar(
+          context,
+          errorText,
+          Colors.red,
+        );
       }
+    }).catchError((error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = error.toString();
+      });
+      Helper().showSnackBar(
+        context,
+        'Error updating education',
+        Colors.red,
+      );
     });
   }
 
@@ -203,7 +253,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       isLoading = true;
     });
     if (widget.educationId != null) {
-      updateEducation();
+      updateEducation(tokens['access'], widget.educationId!);
     } else {
       createEducation();
     }
@@ -214,10 +264,93 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: widget.educationId != null
-            ? const Text('Update Education')
-            : const Text('Add Education'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          widget.educationId == null
+              ? 'Create New Education'
+              : 'Update Education',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          widget.educationId != null
+              ? GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Delete Education'),
+                          content: const Text(
+                            'Are you sure you want to delete this education?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // deleteExperience(
+                                //   tokens['access'],
+                                //   widget.experienceId!,
+                                // );
+                              },
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12.0),
+                    margin: const EdgeInsets.only(right: 10.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
       ),
       resizeToAvoidBottomInset: false,
       // floatingActionButton: FloatingActionButton(
@@ -274,7 +407,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   keyboardType: TextInputType.name,
                   onChanged: (value) {
                     setState(() {
-                      schoolName = value!;
+                      educationData['school_name'] = value;
                     });
                   },
                   validator: (value) {
@@ -296,7 +429,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      degree = value!;
+                      educationData['degree'] = value;
                     });
                   },
                   validator: (value) {
@@ -318,7 +451,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      department = value!;
+                      educationData['department'] = value;
                     });
                   },
                   validator: (value) {
@@ -343,7 +476,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      gradeScale = value!;
+                      educationData['grade_scale'] = value;
                     });
                   },
                   validator: (value) {
@@ -368,7 +501,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      grade = value!;
+                      educationData['grade'] = value;
                     });
                   },
                   validator: (value) {
@@ -389,16 +522,19 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                     onTap: () async {
                       DateTime? picked = await showDatePicker(
                         context: context,
-                        initialDate: startDate != null
-                            ? DateTime.parse(startDate!)
+                        initialDate: educationData['start_date'] != null &&
+                                educationData['start_date'] != ''
+                            ? DateTime.parse(educationData['start_date'])
                             : DateTime.now(),
                         firstDate: DateTime(1990, 1),
                         lastDate: DateTime(2101),
                       );
                       if (picked != null && picked != DateTime.now()) {
                         setState(() {
-                          startDate = picked.toString().substring(0, 10);
-                          startDateController.text = startDate ?? '';
+                          educationData['start_date'] =
+                              picked.toString().substring(0, 10);
+                          startDateController.text =
+                              educationData['start_date'];
                         });
                       }
                     },
@@ -413,6 +549,12 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                           ),
                         ),
                         keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter start date';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                   ),
@@ -420,17 +562,17 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                 Row(
                   children: [
                     Checkbox(
-                      value: isCurrentlyEnrolled,
+                      value: educationData['is_current'],
                       onChanged: (value) {
                         setState(() {
-                          isCurrentlyEnrolled = value!;
+                          educationData['is_current'] = value!;
                         });
                       },
                     ),
                     const Text('Currently Enrolled'),
                   ],
                 ),
-                isCurrentlyEnrolled
+                educationData['is_current']
                     ? Container()
                     : Container(
                         margin: const EdgeInsets.symmetric(
@@ -442,16 +584,19 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
-                              initialDate: endDate != null
-                                  ? DateTime.parse(endDate!)
+                              initialDate: educationData['end_date'] != null &&
+                                      educationData['end_date'] != ''
+                                  ? DateTime.parse(educationData['end_data']!)
                                   : DateTime.now(),
                               firstDate: DateTime(1990, 1),
                               lastDate: DateTime(2101),
                             );
                             if (picked != null && picked != DateTime.now()) {
                               setState(() {
-                                endDate = picked.toString().substring(0, 10);
-                                endDateController.text = endDate ?? '';
+                                educationData['end_date'] =
+                                    picked.toString().substring(0, 10);
+                                endDateController.text =
+                                    educationData['end_date'] ?? '';
                               });
                             }
                           },
@@ -466,6 +611,12 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                                 ),
                               ),
                               keyboardType: TextInputType.text,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter end date';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                         ),
@@ -482,7 +633,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      description = value!;
+                      educationData['description'] = value;
                     });
                   },
                 ),
