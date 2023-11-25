@@ -1,5 +1,4 @@
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/contact.dart';
 import 'package:gocv/models/contact.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
