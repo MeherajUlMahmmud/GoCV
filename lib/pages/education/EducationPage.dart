@@ -132,9 +132,17 @@ class _EducationPageState extends State<EducationPage> {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              _showBottomSheet(
+                              Navigator.push(
                                 context,
-                                educationList[index]['id'].toString(),
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return AddEditEducationPage(
+                                      resumeId: widget.resumeId,
+                                      educationId:
+                                          educationList[index].id.toString(),
+                                    );
+                                  },
+                                ),
                               );
                             },
                             child: Container(
@@ -224,40 +232,46 @@ class _EducationPageState extends State<EducationPage> {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.date_range,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          educationList[index]['start_date'] ==
-                                                  null
-                                              ? ''
-                                              : '${Helper().formatMonthYear(educationList[index]['start_date'])} - ' +
-                                                          educationList[index]
-                                                              ['end_date'] ==
-                                                      null
-                                                  ? ''
-                                                  : Helper().formatMonthYear(
-                                                      educationList[index]
-                                                          ['end_date']),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
+                                  Helper().isNullEmptyOrFalse(
+                                          educationList[index]['start_date'])
+                                      ? const SizedBox()
+                                      : Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.date_range,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            SizedBox(
+                                              width: width * 0.7,
+                                              child: Text(
+                                                Helper().isNullEmptyOrFalse(
+                                                        educationList[index]
+                                                            ['start_date'])
+                                                    ? ''
+                                                    : '${Helper().formatMonthYear(educationList[index]['start_date'])} - ' +
+                                                                educationList[
+                                                                        index][
+                                                                    'end_date'] ==
+                                                            null
+                                                        ? ''
+                                                        : Helper()
+                                                            .formatMonthYear(
+                                                                educationList[
+                                                                        index][
+                                                                    'end_date']),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  educationList[index]['description'] == null ||
-                                          educationList[index]['description'] ==
-                                              ''
+                                  Helper().isNullEmptyOrFalse(
+                                          educationList[index]['description'])
                                       ? const SizedBox()
                                       : Row(
                                           children: [
@@ -270,7 +284,7 @@ class _EducationPageState extends State<EducationPage> {
                                               width: width * 0.7,
                                               child: Text(
                                                 educationList[index]
-                                                    ['description'],
+                                                    ['description']!,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -285,121 +299,6 @@ class _EducationPageState extends State<EducationPage> {
                         },
                       ),
                     ),
-    );
-  }
-
-  void _showBottomSheet(BuildContext context, String educationId) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16.0),
-        ),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-            horizontal: 16.0,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return AddEditEducationPage(
-                      resumeId: widget.resumeId,
-                      educationId: educationId,
-                    );
-                  }));
-                },
-                child: const Row(
-                  children: [
-                    Icon(Icons.edit),
-                    SizedBox(width: 8.0),
-                    Text('Update'),
-                  ],
-                ),
-              ),
-              const Divider(),
-              TextButton(
-                onPressed: () {
-                  _showDeleteConfirmationDialog(context, educationId);
-                },
-                child: const Row(
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 8.0),
-                    Text('Delete'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-    BuildContext context,
-    String educationId,
-  ) {
-    deleteEducation() {
-      EducationService()
-          .deleteEducation(tokens['access'], educationId)
-          .then((data) async {
-        if (data['status'] == 200) {
-          Navigator.of(context).pop();
-          Helper().showSnackBar(
-            context,
-            'Education deleted successfully',
-            Colors.green,
-          );
-          fetchEducations(tokens['access'], widget.resumeId);
-        } else {
-          if (data['status'] == 401 || data['status'] == 403) {
-            Helper().showSnackBar(
-              context,
-              'Session expired',
-              Colors.red,
-            );
-            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-          } else {
-            Helper().showSnackBar(
-              context,
-              'Failed to delete education',
-              Colors.red,
-            );
-          }
-        }
-      });
-    }
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete this item?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                deleteEducation();
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
