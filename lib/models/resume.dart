@@ -1,7 +1,7 @@
 import 'package:gocv/models/user.dart';
 
 class Resume {
-  String? name;
+  String name = '';
   int? id;
   UserBase? user;
   bool? isEducationVisible;
@@ -15,20 +15,21 @@ class Resume {
   String? createdAt;
   String? updatedAt;
 
-  Resume(
-      {this.name,
-      this.id,
-      this.user,
-      this.isEducationVisible,
-      this.isExperienceVisible,
-      this.isSkillVisible,
-      this.isLanguageVisible,
-      this.isInterestVisible,
-      this.isReferenceVisible,
-      this.isAwardVisible,
-      this.isCertificationVisible,
-      this.createdAt,
-      this.updatedAt});
+  Resume({
+    required this.name,
+    this.id,
+    this.user,
+    this.isEducationVisible,
+    this.isExperienceVisible,
+    this.isSkillVisible,
+    this.isLanguageVisible,
+    this.isInterestVisible,
+    this.isReferenceVisible,
+    this.isAwardVisible,
+    this.isCertificationVisible,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   Resume.fromJson(Map<String, dynamic> json) {
     name = json['name'];

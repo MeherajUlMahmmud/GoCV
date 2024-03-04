@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/resume.dart';
+import 'package:gocv/providers/CurrentResumeProvider.dart';
+import 'package:gocv/providers/ResumeListProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
@@ -25,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late String accessToken;
   late String userId;
 
+  late ResumeListProvider resumeListProvider;
+  late CurrentResumeProvider currentResumeProvider;
+
   TextEditingController titleController = TextEditingController();
 
   List<Resume> resumes = [];
@@ -38,7 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    resumeListProvider = Provider.of<ResumeListProvider>(
+      context,
+      listen: false,
+    );
+    currentResumeProvider = Provider.of<CurrentResumeProvider>(
+      context,
+      listen: false,
+    );
+
     setState(() {
       accessToken = userProvider.tokens['access'].toString();
       userId = userProvider.userData!.id.toString();
@@ -55,16 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
     )
         .then((data) async {
       if (data['status'] == 200) {
+        resumes = data['data']['data']
+            .map<Resume>((resume) => Resume.fromJson(resume))
+            .toList();
+        resumeListProvider.setResumeList(resumes);
         setState(() {
-          resumes = data['data']['data']
-              .map<Resume>((resume) => Resume.fromJson(resume))
-              .toList();
           isLoading = false;
           isError = false;
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
           Navigator.pushReplacementNamed(
             context,
@@ -95,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
     )
         .then((data) async {
       if (data['status'] == 201) {
+        resumeListProvider.addResume(Resume.fromJson(data['data']));
         setState(() {
           isLoading = false;
           isError = false;
@@ -110,6 +131,36 @@ class _HomeScreenState extends State<HomeScreen> {
         Helper().showSnackBar(
           context,
           'Failed to create resume',
+          Colors.red,
+        );
+      }
+    });
+  }
+
+  deleteResume(int index) {
+    APIService()
+        .sendDeleteRequest(
+      accessToken,
+      '${URLS.kResumeUrl}${resumeListProvider.resumeList[index].id}/destroy/',
+    )
+        .then((data) async {
+      if (data['status'] == 204) {
+        resumeListProvider.removeResume(index);
+        setState(() {
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        log(data.toString());
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = data['error'];
+        });
+        Helper().showSnackBar(
+          context,
+          'Failed to delete resume',
           Colors.red,
         );
       }
@@ -133,25 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.black,
           ),
         ),
-        actions: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, SettingsScreen.routeName);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(10.0),
-              margin: const EdgeInsets.only(right: 10.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: const Icon(
-                Icons.settings_outlined,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ],
       ),
       drawer: Drawer(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -212,6 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.pushNamed(context, ProfileScreen.routeName);
               },
             ),
@@ -227,6 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.pushNamed(context, SettingsScreen.routeName);
               },
             ),
@@ -359,29 +393,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Container(
-                                    width: width * 0.45,
-                                    padding: const EdgeInsets.all(15.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    child: const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.receipt_long),
-                                        SizedBox(width: 10),
-                                        Text(
-                                          'Cover Letter',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  // GestureDetector(
+                                  //   onTap: () {
+                                  //     // Navigator.pushNamed(
+                                  //     //   context,
+                                  //     //   CoverLetterScreen.routeName,
+                                  //     // );
+                                  //   },
+                                  //   child: Container(
+                                  //     width: width * 0.45,
+                                  //     padding: const EdgeInsets.all(15.0),
+                                  //     decoration: BoxDecoration(
+                                  //       color: Colors.grey.shade100,
+                                  //       borderRadius:
+                                  //           BorderRadius.circular(10.0),
+                                  //     ),
+                                  //     child: const Row(
+                                  //       mainAxisAlignment:
+                                  //           MainAxisAlignment.center,
+                                  //       children: [
+                                  //         Icon(Icons.receipt_long),
+                                  //         SizedBox(width: 10),
+                                  //         Text(
+                                  //           'Cover Letter',
+                                  //           style: TextStyle(
+                                  //             fontSize: 16,
+                                  //           ),
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -400,22 +442,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             ListView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: resumes.length,
+                              itemCount: resumeListProvider.resumeList.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
+                                    currentResumeProvider.setCurrentResume(
+                                      resumeListProvider.resumeList[index],
+                                    );
+                                    Navigator.pushNamed(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ResumeDetailsScreen(
-                                          resume: resumes[index],
-                                        ),
-                                      ),
+                                      ResumeDetailsScreen.routeName,
                                     );
                                   },
                                   child: ResumeCard(
-                                    resume: resumes[index],
+                                    resume:
+                                        resumeListProvider.resumeList[index],
+                                    onDeleteAction: () {
+                                      deleteResume(index);
+                                    },
                                   ),
                                 );
                               },

@@ -54,7 +54,7 @@ class _CertificationPageState extends State<CertificationPage> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',

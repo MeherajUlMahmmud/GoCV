@@ -10,20 +10,20 @@ import 'package:gocv/pages/personal/PersonalPage.dart';
 import 'package:gocv/pages/reference/Referencepage.dart';
 import 'package:gocv/pages/skill/SkillPage.dart';
 import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
+import 'package:gocv/providers/CurrentResumeProvider.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class ResumeDetailsScreen extends StatefulWidget {
   static const String routeName = '/resume-details';
 
-  final Resume resume;
   const ResumeDetailsScreen({
     Key? key,
-    required this.resume,
   }) : super(key: key);
 
   @override
@@ -32,13 +32,13 @@ class ResumeDetailsScreen extends StatefulWidget {
 
 class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     with SingleTickerProviderStateMixin {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+  late String userId;
 
-  Resume resumeDetails = Resume();
-  late String personalId = '';
-  late String contactId = '';
+  late CurrentResumeProvider currentResumeProvider;
+  late String resumeId;
+
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
@@ -50,32 +50,42 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     super.initState();
     tabController = TabController(length: 10, vsync: this);
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    currentResumeProvider = Provider.of<CurrentResumeProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      userId = userProvider.userData!.id.toString();
+
+      resumeId = currentResumeProvider.currentResume.id.toString();
+    });
+
+    fetchResumeDetails();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchResumeDetails(tokens['access'], widget.resume.id.toString());
-  }
-
-  fetchResumeDetails(String accessToken, String resumeId) {
+  fetchResumeDetails() {
     APIService()
         .sendGetRequest(accessToken, '${URLS.kResumeUrl}$resumeId/details/')
         .then((data) async {
       print(data['data']['contact']);
       if (data['status'] == 200) {
+        print(data['data']);
+        currentResumeProvider
+            .setCurrentResume(Resume.fromJson(data['data']['data']));
+
         setState(() {
-          resumeDetails = Resume.fromJson(data['data']['resume']);
-          personalId = data['data']['personal']['id'].toString();
-          contactId = data['data']['contact']['id'].toString();
           isLoading = false;
           isError = false;
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         }
@@ -89,6 +99,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     });
   }
 
+  // fetchPersonalDetails
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +109,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
         elevation: 0,
         centerTitle: true,
         title: Text(
-          isLoading ? 'Loading...' : resumeDetails.name!,
+          isLoading ? 'Loading...' : currentResumeProvider.currentResume.name,
           style: const TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -127,26 +138,16 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResumePreviewScreen(
-                    resumeId: resumeDetails.id.toString(),
-                  ),
-                ),
-              );
+              Navigator.pushNamed(context, ResumePreviewScreen.routeName);
             },
             child: Container(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(10.0),
               margin: const EdgeInsets.only(right: 10.0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: const Icon(
-                Icons.visibility,
-                color: Colors.black,
-              ),
+              child: const Icon(Icons.visibility, color: Colors.black),
             ),
           ),
         ],
@@ -236,38 +237,16 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                         child: TabBarView(
                           controller: tabController,
                           children: [
-                            PersonalPage(
-                              resumeId: widget.resume.id.toString(),
-                              personalId: personalId,
-                            ),
-                            ContactPage(
-                              resumeId: widget.resume.id.toString(),
-                              contactId: contactId,
-                            ),
-                            WorkExperiencePage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            EducationPage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            SkillPage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            AwardPage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            CertificationPage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            InterestPage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            LanguagePage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
-                            ReferencePage(
-                              resumeId: widget.resume.id.toString(),
-                            ),
+                            PersonalPage(resumeId: resumeId),
+                            ContactPage(resumeId: resumeId),
+                            WorkExperiencePage(resumeId: resumeId),
+                            EducationPage(resumeId: resumeId),
+                            SkillPage(resumeId: resumeId),
+                            AwardPage(resumeId: resumeId),
+                            CertificationPage(resumeId: resumeId),
+                            InterestPage(resumeId: resumeId),
+                            LanguagePage(resumeId: resumeId),
+                            ReferencePage(resumeId: resumeId),
                           ],
                         ),
                       ),

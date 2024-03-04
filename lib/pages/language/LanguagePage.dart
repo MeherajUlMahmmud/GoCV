@@ -59,7 +59,7 @@ class _LanguagePageState extends State<LanguagePage> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',
@@ -300,7 +300,7 @@ class _LanguagePageState extends State<LanguagePage> {
           );
           // fetchLanguages(tokens['access'], widget.resumeId);
         } else {
-          if (data['status'] == 401 || data['status'] == 403) {
+          if (Helper().isUnauthorizedAccess(data['status'])) {
             Helper().showSnackBar(
               context,
               'Session expired',

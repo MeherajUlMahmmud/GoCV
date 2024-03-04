@@ -1,15 +1,15 @@
 class Applicant {
   int? id;
-  String? firstName;
-  String? lastName;
+  String firstName = '';
+  String lastName = '';
   String? profilePicture;
   String? phoneNumber;
   int? resume;
 
   Applicant({
     this.id,
-    this.firstName,
-    this.lastName,
+    required this.firstName,
+    required this.lastName,
     this.profilePicture,
     this.phoneNumber,
     this.resume,

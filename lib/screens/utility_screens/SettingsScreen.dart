@@ -1,4 +1,5 @@
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/screens/utility_screens/AccountSettingsScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
@@ -63,9 +64,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               leading: const Icon(Icons.account_box_outlined, size: 30),
               title: const Text('Account'),
               onTap: () {
-                // Navigator.of(context).pushNamed(
-                //   AccountSettingsScreen.routeName,
-                // );
+                Navigator.of(context).pushNamed(
+                  AccountSettingsScreen.routeName,
+                );
               },
             ),
           ),

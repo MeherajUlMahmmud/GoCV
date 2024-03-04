@@ -57,7 +57,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',

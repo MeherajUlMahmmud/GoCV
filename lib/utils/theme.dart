@@ -9,6 +9,7 @@ ThemeData createTheme() {
     appBarTheme: const AppBarTheme(
       centerTitle: true,
     ),
+    scaffoldBackgroundColor: Colors.white,
     inputDecorationTheme: InputDecorationTheme(
       prefixIconColor: Colors.grey,
       suffixIconColor: createMaterialColor(const Color(0xFF532AD6)),

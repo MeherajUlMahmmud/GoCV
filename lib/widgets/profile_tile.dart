@@ -4,13 +4,14 @@ class ProfileTile extends StatelessWidget {
   final title;
   final subtitle;
   final textColor;
-  const ProfileTile({super.key, this.title, this.subtitle, this.textColor = Colors.black});
+  const ProfileTile(
+      {super.key, this.title, this.subtitle, this.textColor = Colors.black});
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       // mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Text(
           title,
           style: TextStyle(

@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/providers/CurrentResumeProvider.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
 // import 'package:printing/printing.dart';
 
 class ResumePreviewScreen extends StatefulWidget {
-  final String resumeId;
-  const ResumePreviewScreen({
-    Key? key,
-    required this.resumeId,
-  }) : super(key: key);
+  static const String routeName = '/resume-preview';
+
+  const ResumePreviewScreen({Key? key}) : super(key: key);
 
   @override
   State<ResumePreviewScreen> createState() => _ResumePreviewScreenState();
 }
 
 class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+  late String userId;
+
+  late CurrentResumeProvider currentResumeProvider;
+  late String resumeId;
 
   late Map<String, dynamic> resumeDetails = {};
   List<dynamic> educationList = [];
@@ -53,20 +56,32 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    currentResumeProvider = Provider.of<CurrentResumeProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      userId = userProvider.userData!.id.toString();
+
+      resumeId = currentResumeProvider.currentResume.id.toString();
+    });
+
+    loadImage();
+    fetchResumeDetails();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
+  loadImage() async {
     image = await rootBundle.load('assets/avatars/rdj.png');
     imageData = (image).buffer.asUint8List();
-
-    fetchResumeDetails(tokens['access'], widget.resumeId);
   }
 
-  fetchResumeDetails(String accessToken, String resumeId) {
+  fetchResumeDetails() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -78,9 +93,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           resumeDetails = data['data'];
         });
 
-        fetchEducations(tokens['access'], resumeDetails['uuid']);
+        fetchEducations();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         }
@@ -94,7 +109,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     });
   }
 
-  fetchEducations(String accessToken, String resumeId) {
+  fetchEducations() {
     // EducationService()
     //     .getEducationList(accessToken, resumeId)
     //     .then((data) async {
@@ -104,9 +119,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     //       educationList = data['data'];
     //     });
 
-    //     fetchWorkExperiences(tokens['access'], resumeDetails['uuid']);
+    //     fetchWorkExperiences();
     //   } else {
-    //     if (data['status'] == 401 || data['status'] == 403) {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
     //       Helper().showSnackBar(
     //         context,
     //         'Session expired',
@@ -130,7 +145,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     // });
   }
 
-  fetchWorkExperiences(String accessToken, String resumeId) {
+  fetchWorkExperiences() {
     // ExpreienceService()
     //     .getExperienceList(accessToken, resumeId)
     //     .then((data) async {
@@ -140,9 +155,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     //       experienceList = data['data'];
     //     });
 
-    //     fetchSkills(tokens['access'], resumeDetails['uuid']);
+    //     fetchSkills();
     //   } else {
-    //     if (data['status'] == 401 || data['status'] == 403) {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
     //       Helper().showSnackBar(
     //         context,
     //         'Session expired',
@@ -166,7 +181,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     // });
   }
 
-  fetchSkills(String accessToken, String resumeId) {
+  fetchSkills() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -178,9 +193,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           skillList = data['data'];
         });
 
-        fetchInterests(tokens['access'], resumeDetails['uuid']);
+        fetchInterests();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',
@@ -204,7 +219,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     });
   }
 
-  fetchInterests(String accessToken, String resumeId) {
+  fetchInterests() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -216,9 +231,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           interestList = data['data'];
         });
 
-        fetchLanguages(tokens['access'], resumeDetails['uuid']);
+        fetchLanguages();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',
@@ -242,7 +257,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     });
   }
 
-  fetchLanguages(String accessToken, String resumeId) {
+  fetchLanguages() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -254,9 +269,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           languageList = data['data'];
         });
 
-        fetchReferences(tokens['access'], resumeDetails['uuid']);
+        fetchReferences();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',
@@ -280,7 +295,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     });
   }
 
-  fetchReferences(String accessToken, String resumeId) {
+  fetchReferences() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -296,7 +311,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',
@@ -327,6 +342,21 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resume Preview'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Printing.layoutPdf(
+              //   onLayout: (format) => _generatePdf(format, 'Resume', width),
+              // );
+
+              // Printing.sharePdf(
+              //   bytes: _generatePdf(PdfPageFormat.a4, 'Resume', width),
+              //   filename: resumeDetails['name'] + '.pdf',
+              // );
+            },
+            icon: const Icon(Icons.save),
+          ),
+        ],
       ),
       body: const Center(child: Text('Resume Preview')),
       // body: isLoading

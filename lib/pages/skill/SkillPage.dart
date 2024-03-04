@@ -56,7 +56,7 @@ class _SkillPageState extends State<SkillPage> {
           errorText = '';
         });
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
             'Session expired',

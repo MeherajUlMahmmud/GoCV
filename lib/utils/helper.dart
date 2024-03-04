@@ -15,6 +15,10 @@ class Helper {
     }
   }
 
+  bool isUnauthorizedAccess(String status) {
+    return status == '401' || status == '403';
+  }
+
   Future<void> launchInBrowser(String url) async {
     Uri uri = Uri.parse(url);
     if (!await launchUrl(

@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/models/resume.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/helper.dart';
 
 class ResumeCard extends StatefulWidget {
   final Resume resume;
+  final Function onDeleteAction;
 
-  const ResumeCard({super.key, required this.resume});
+  const ResumeCard({
+    super.key,
+    required this.resume,
+    required this.onDeleteAction,
+  });
 
   @override
   _ResumeCardState createState() => _ResumeCardState();
 }
 
 class _ResumeCardState extends State<ResumeCard> {
+  late UserProvider userProvider;
+  late String accessToken;
+
   TextEditingController titleController = TextEditingController();
 
   late String title;
@@ -27,17 +36,18 @@ class _ResumeCardState extends State<ResumeCard> {
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: Row(
-        children: <Widget>[
-          const CircleAvatar(
+        children: [
+          CircleAvatar(
             radius: 30.0,
-            backgroundImage: AssetImage('assets/avatars/rdj.png'),
+            backgroundColor: Colors.grey[200],
+            backgroundImage: const AssetImage('assets/avatars/rdj.png'),
           ),
           const SizedBox(width: 10.0),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.resume.name ?? 'Resume name',
+                widget.resume.name,
                 style: const TextStyle(
                   fontSize: 20.0,
                 ),
@@ -67,7 +77,7 @@ class _ResumeCardState extends State<ResumeCard> {
             },
             onSelected: (value) {
               if (value == 'update') {
-                title = widget.resume.name!;
+                title = widget.resume.name;
                 showTitleUpdateDialog(context);
               } else {
                 showDeleteDialog(context, widget.resume);
@@ -134,7 +144,8 @@ class _ResumeCardState extends State<ResumeCard> {
 
     Widget okButton = TextButton(
       child: const Text('Delete'),
-      onPressed: () async {
+      onPressed: () {
+        widget.onDeleteAction();
         Navigator.pop(context);
       },
     );

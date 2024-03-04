@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AddEditEducationPage extends StatefulWidget {
   final String resumeId;
@@ -22,9 +23,8 @@ class AddEditEducationPage extends StatefulWidget {
 }
 
 class _AddEditEducationPageState extends State<AddEditEducationPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -60,7 +60,16 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchData();
   }
 
   @override
@@ -77,12 +86,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
+  fetchData() async {
     if (widget.educationId != null) {
-      fetchEducation(tokens['access'], widget.educationId!);
+      fetchEducation(widget.educationId!);
     } else {
       educationData['resume'] = widget.resumeId;
       setState(() {
@@ -116,23 +122,14 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     });
   }
 
-  fetchEducation(String accessToken, String educationId) {
-    if (educationId == '') {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Education ID is empty';
-      });
-      Helper().showSnackBar(
-        context,
-        'Education ID is empty',
-        Colors.red,
-      );
-      return;
-    }
+  fetchEducation(String educationId) {
     String url = '${URLS.kEducationUrl}$educationId/details/';
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      url,
+    )
+        .then((data) {
       if (data['status'] == 200) {
         setState(() {
           education = Education.fromJson(data['data']);
@@ -152,17 +149,6 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
           Colors.red,
         );
       }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        'Error fetching education details',
-        Colors.red,
-      );
     });
   }
 
@@ -205,7 +191,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     // });
   }
 
-  updateEducation(String accessToken, String educationId) {
+  updateEducation(String educationId) {
     String url = '${URLS.kEducationUrl}$educationId/update/';
     APIService()
         .sendPatchRequest(
@@ -214,14 +200,18 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       url,
     )
         .then((data) async {
-      print(data);
       if (data['status'] == 200) {
         setState(() {
           education = Education.fromJson(data['data']);
+          isLoading = false;
           isError = false;
         });
 
-        initiateControllers();
+        Helper().showSnackBar(
+          context,
+          'Education details updated',
+          Colors.green,
+        );
       } else {
         setState(() {
           isLoading = false;
@@ -253,7 +243,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       isLoading = true;
     });
     if (widget.educationId != null) {
-      updateEducation(tokens['access'], widget.educationId!);
+      updateEducation(widget.educationId!);
     } else {
       createEducation();
     }
@@ -337,7 +327,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(10.0),
                     margin: const EdgeInsets.only(right: 10.0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,

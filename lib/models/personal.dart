@@ -11,6 +11,7 @@ class Personal {
   String? state;
   String? country;
   int? resume;
+  String? resumePicture;
   UserBase? createdBy;
   String? createdAt;
   UserBase? updatedBy;
@@ -27,6 +28,7 @@ class Personal {
     this.state,
     this.country,
     this.resume,
+    this.resumePicture,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
@@ -44,6 +46,7 @@ class Personal {
     country = json['country'];
     id = json['id'];
     resume = json['resume'];
+    resumePicture = json['resume_picture'];
     createdBy = json['created_by'] != null
         ? UserBase.fromJson(json['created_by'])
         : null;
@@ -65,43 +68,7 @@ class Personal {
     data['state'] = state;
     data['country'] = country;
     data['resume'] = resume;
-    return data;
-  }
-}
-
-class CreatedBy {
-  String? email;
-  bool? isApplicant;
-  bool? isOrganization;
-  bool? isVerified;
-  bool? isStaff;
-  bool? isSuperuser;
-
-  CreatedBy(
-      {this.email,
-      this.isApplicant,
-      this.isOrganization,
-      this.isVerified,
-      this.isStaff,
-      this.isSuperuser});
-
-  CreatedBy.fromJson(Map<String, dynamic> json) {
-    email = json['email'];
-    isApplicant = json['is_applicant'];
-    isOrganization = json['is_organization'];
-    isVerified = json['is_verified'];
-    isStaff = json['is_staff'];
-    isSuperuser = json['is_superuser'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['email'] = email;
-    data['is_applicant'] = isApplicant;
-    data['is_organization'] = isOrganization;
-    data['is_verified'] = isVerified;
-    data['is_staff'] = isStaff;
-    data['is_superuser'] = isSuperuser;
+    data['resume_picture'] = resumePicture;
     return data;
   }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/applicant.dart';
+import 'package:gocv/models/user.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = '/profile';
@@ -15,11 +18,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+  late String userId;
 
-  Applicant applicant = Applicant();
+  late UserProfileProvider userProfileProvider;
 
   bool isLoading = true;
   bool isError = false;
@@ -29,28 +32,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    userProfileProvider = Provider.of<UserProfileProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      userId = userProvider.userData!.id.toString();
+    });
+    fetchUserProfile();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchUserDetails(tokens['access']);
-  }
-
-  fetchUserDetails(String accessToken) {
+  fetchUserProfile() {
     setState(() {
       isLoading = true;
     });
     String url = '${URLS.kUserUrl}profile/';
-    APIService().sendGetRequest(accessToken, url).then((data) async {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      url,
+    )
+        .then((data) async {
       print(data['data']);
       if (data['status'] == 200) {
-        await localStorage.writeData('user', data['data']['user_data']);
+        final UserBase userBase = UserBase.fromJson(data['data']['user_data']);
+        final Applicant applicant =
+            Applicant.fromJson(data['data']['applicant_data']);
+        final UserProfile userProfile = UserProfile(
+          userData: userBase,
+          applicantData: applicant,
+        );
+        userProfileProvider.setUserProfile(userProfile);
+        // await localStorage.writeData('user', data['data']['user_data']);
         setState(() {
-          applicant = Applicant.fromJson(data['data']['applicant_data']);
-
           isLoading = false;
         });
       } else {
@@ -88,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.pop(context);
           },
           child: Container(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(10.0),
             margin: const EdgeInsets.only(left: 10.0),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -106,9 +126,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, UpdateProfileScreen.routeName).then(
-              (value) =>
-                  {if (value == true) fetchUserDetails(tokens['access'])});
+          Navigator.pushNamed(context, UpdateProfileScreen.routeName)
+              .then((value) => {if (value == true) fetchUserProfile()});
         },
         child: const Icon(Icons.edit),
       ),
@@ -121,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 return Future.delayed(
                   const Duration(seconds: 1),
                   () {
-                    fetchUserDetails(tokens['access']);
+                    fetchUserProfile();
                   },
                 );
               },
@@ -143,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      '${applicant.firstName!} ${applicant.lastName!}',
+                      '${userProfileProvider.userProfile.applicantData?.firstName} ${userProfileProvider.userProfile.applicantData?.lastName}',
                       style: const TextStyle(
                         fontSize: 22,
                       ),
@@ -153,24 +172,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(50),
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           child: const Icon(
                             Icons.email,
-                            size: 20,
-                            color: Colors.white,
+                            size: 24,
+                            color: Colors.black,
                           ),
                         ),
-                        const SizedBox(width: 15),
-                        SizedBox(
-                          width: width * 0.8,
-                          child: Text(
-                            user['email'],
-                            style: const TextStyle(fontSize: 18),
-                          ),
+                        const SizedBox(width: 10),
+                        Text(
+                          userProvider.userData!.email ?? 'N/A',
+                          style: const TextStyle(fontSize: 18),
                         )
                       ],
                     ),
@@ -178,24 +194,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(50),
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           child: const Icon(
                             Icons.phone,
-                            size: 20,
-                            color: Colors.white,
+                            size: 24,
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(width: 15),
-                        SizedBox(
-                          width: width * 0.8,
-                          child: Text(
-                            applicant.phoneNumber ?? 'N/A',
-                            style: const TextStyle(fontSize: 18),
-                          ),
+                        Text(
+                          userProfileProvider
+                                  .userProfile.applicantData?.phoneNumber ??
+                              'N/A',
+                          style: const TextStyle(fontSize: 18),
                         )
                       ],
                     ),

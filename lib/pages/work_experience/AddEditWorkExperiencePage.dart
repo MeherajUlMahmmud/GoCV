@@ -358,7 +358,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(10.0),
                     margin: const EdgeInsets.only(right: 10.0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,

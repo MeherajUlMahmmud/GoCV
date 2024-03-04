@@ -8,7 +8,7 @@ class EmptyView extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
+        children: [
           Image.asset(
             'assets/images/empty.png',
             height: 300.0,

@@ -1,26 +1,28 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/models/personal.dart';
-import 'package:gocv/utils/urls.dart';
+import 'package:flutter/material.dart';
+import 'package:gocv/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/personal.dart';
+import 'package:gocv/providers/PersonalDataProvider.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
-import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:flutter/material.dart';
 
 class PersonalPage extends StatefulWidget {
+  static const String routeName = '/personal';
+
   final String resumeId;
-  final String personalId;
 
   const PersonalPage({
     Key? key,
     required this.resumeId,
-    required this.personalId,
   }) : super(key: key);
 
   @override
@@ -28,37 +30,50 @@ class PersonalPage extends StatefulWidget {
 }
 
 class _PersonalPageState extends State<PersonalPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+
+  late PersonalDataProvider personalDataProvider;
+  late String personalId;
 
   final _formKey = GlobalKey<FormState>();
-
-  Personal personalDetails = Personal();
 
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
 
-  TextEditingController firstNameController = TextEditingController();
-  TextEditingController lastNameController = TextEditingController();
-  TextEditingController aboutMeController = TextEditingController();
-  TextEditingController dobController = TextEditingController();
-  TextEditingController cityController = TextEditingController();
-  TextEditingController stateController = TextEditingController();
-  TextEditingController countryController = TextEditingController();
-  TextEditingController nationalityController = TextEditingController();
+  late TextEditingController firstNameController = TextEditingController();
+  late TextEditingController lastNameController = TextEditingController();
+  late TextEditingController aboutMeController = TextEditingController();
+  late TextEditingController dobController = TextEditingController();
+  late TextEditingController cityController = TextEditingController();
+  late TextEditingController stateController = TextEditingController();
+  late TextEditingController countryController = TextEditingController();
+  late TextEditingController nationalityController = TextEditingController();
 
   Map<String, dynamic> updatedPersonalData = {};
 
   // image
-  File? imageFile;
+  File? updatedImageFile;
 
   @override
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    personalDataProvider = Provider.of<PersonalDataProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchPersonalDetails();
   }
 
   @override
@@ -75,47 +90,45 @@ class _PersonalPageState extends State<PersonalPage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    // get from "assets/avatars/rdj.png"
-    imageFile = File('assets/avatars/rdj.png');
-
-    fetchPersonalDetails(tokens['access'], widget.personalId);
-  }
-
   initiateControllers() {
-    firstNameController.text = personalDetails.firstName ?? '';
-    lastNameController.text = personalDetails.lastName ?? '';
-    aboutMeController.text = personalDetails.aboutMe ?? '';
-    dobController.text = personalDetails.dateOfBirth ?? '';
-    cityController.text = personalDetails.city ?? '';
-    stateController.text = personalDetails.state ?? '';
-    countryController.text = personalDetails.country ?? '';
-    nationalityController.text = personalDetails.nationality ?? '';
+    firstNameController.text =
+        personalDataProvider.personalData.firstName ?? '';
+    lastNameController.text = personalDataProvider.personalData.lastName ?? '';
+    aboutMeController.text = personalDataProvider.personalData.aboutMe ?? '';
+    dobController.text = personalDataProvider.personalData.dateOfBirth ?? '';
+    cityController.text = personalDataProvider.personalData.city ?? '';
+    stateController.text = personalDataProvider.personalData.state ?? '';
+    countryController.text = personalDataProvider.personalData.country ?? '';
+    nationalityController.text =
+        personalDataProvider.personalData.nationality ?? '';
 
     setState(() {
       isLoading = false;
     });
   }
 
-  fetchPersonalDetails(String accessToken, String personalId) {
-    final String url = '${URLS.kPersonalUrl}$personalId/details/';
+  fetchPersonalDetails() {
+    final String url = '${URLS.kPersonalUrl}${widget.resumeId}/details/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       if (data['status'] == 200) {
-        print(data['data']);
-        setState(() {
-          personalDetails = Personal.fromJson(data['data']);
+        Personal personal = Personal.fromJson(data['data']);
+        personalDataProvider.setPersonalData(personal);
 
+        setState(() {
+          personalId = personal.id.toString();
+          updatedImageFile = null;
           isError = false;
           errorText = '';
         });
 
         initiateControllers();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
-          Helper().showSnackBar(context, 'Session expired', Colors.red);
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            'Session expired',
+            Colors.red,
+          );
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
           setState(() {
@@ -124,7 +137,10 @@ class _PersonalPageState extends State<PersonalPage> {
             errorText = data['error'];
           });
           Helper().showSnackBar(
-              context, 'Failed to fetch personal data', Colors.red);
+            context,
+            'Failed to fetch personal data',
+            Colors.red,
+          );
           Navigator.pop(context);
         }
       }
@@ -156,10 +172,10 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   handleUpdatePersonalDetails() {
-    String url = '${URLS.kPersonalUrl}${widget.personalId}/update/';
+    String url = '${URLS.kPersonalUrl}$personalId/update/';
     APIService()
         .sendPatchRequest(
-      tokens['access'],
+      accessToken,
       updatedPersonalData,
       url,
     )
@@ -208,7 +224,7 @@ class _PersonalPageState extends State<PersonalPage> {
             )
           : RefreshIndicator(
               onRefresh: () async {
-                fetchPersonalDetails(tokens['access'], widget.personalId);
+                fetchPersonalDetails();
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -217,7 +233,7 @@ class _PersonalPageState extends State<PersonalPage> {
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
+                      children: [
                         const SizedBox(height: 10),
                         Container(
                           margin: const EdgeInsets.only(left: 5),
@@ -229,9 +245,22 @@ class _PersonalPageState extends State<PersonalPage> {
                           child: Center(
                             child: Stack(
                               children: [
-                                ImageFullScreenWrapperWidget(
-                                  dark: true,
-                                  child: Image.asset('assets/avatars/rdj.png'),
+                                Container(
+                                  height: 180,
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 2,
+                                    ),
+                                    image: DecorationImage(
+                                      image: updatedImageFile != null
+                                          ? AssetImage(updatedImageFile!.path)
+                                          : const AssetImage(
+                                              Constants.defultAvatarPath),
+                                    ),
+                                  ),
                                 ),
                                 Positioned(
                                   bottom: 0,
@@ -242,7 +271,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                         cropImage(imageFile: value)
                                             .then((value) {
                                           setState(() {
-                                            imageFile = value;
+                                            updatedImageFile = value;
                                           });
                                         });
                                       });

@@ -1,20 +1,20 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/contact.dart';
+import 'package:gocv/providers/ContactDataProvider.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ContactPage extends StatefulWidget {
   final String resumeId;
-  final String contactId;
 
   const ContactPage({
     Key? key,
     required this.resumeId,
-    required this.contactId,
   }) : super(key: key);
 
   @override
@@ -22,13 +22,13 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+
+  late ContactDataProvider contactDataProvider;
+  late String contactId;
 
   final _formKey = GlobalKey<FormState>();
-
-  Contact contactDetails = Contact();
 
   bool isLoading = true;
   bool isError = false;
@@ -47,7 +47,20 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    contactDataProvider = Provider.of<ContactDataProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchContactDetails();
   }
 
   @override
@@ -62,42 +75,42 @@ class _ContactPageState extends State<ContactPage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchContactDetails(tokens['access'], widget.contactId);
-  }
-
   initiateControllers() {
-    phoneNumberController.text = contactDetails.phoneNumber ?? '';
-    emailController.text = contactDetails.email ?? '';
-    addressController.text = contactDetails.address ?? '';
-    linkedinController.text = contactDetails.linkedin ?? '';
-    facebookController.text = contactDetails.facebook ?? '';
-    githubController.text = contactDetails.github ?? '';
+    phoneNumberController.text =
+        contactDataProvider.contactData.phoneNumber ?? '';
+    emailController.text = contactDataProvider.contactData.email ?? '';
+    addressController.text = contactDataProvider.contactData.address ?? '';
+    linkedinController.text = contactDataProvider.contactData.linkedin ?? '';
+    facebookController.text = contactDataProvider.contactData.facebook ?? '';
+    githubController.text = contactDataProvider.contactData.github ?? '';
 
     setState(() {
       isLoading = false;
     });
   }
 
-  fetchContactDetails(String accessToken, String contactId) {
-    String url = '${URLS.kContactUrl}$contactId/details/';
+  fetchContactDetails() {
+    String url = '${URLS.kContactUrl}${widget.resumeId}/details/';
 
     APIService().sendGetRequest(accessToken, url).then((data) async {
       if (data['status'] == 200) {
-        setState(() {
-          contactDetails = Contact.fromJson(data['data']);
+        Contact contact = Contact.fromJson(data['data']);
+        contactDataProvider.setContactData(contact);
 
+        setState(() {
+          contactId = contact.id.toString();
           isError = false;
           errorText = '';
         });
 
         initiateControllers();
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
-          Helper().showSnackBar(context, 'Session expired', Colors.red);
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            'Session expired',
+            Colors.red,
+          );
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
           setState(() {
@@ -106,7 +119,10 @@ class _ContactPageState extends State<ContactPage> {
             errorText = data['error'];
           });
           Helper().showSnackBar(
-              context, 'Failed to fetch personal data', Colors.red);
+            context,
+            'Failed to fetch personal data',
+            Colors.red,
+          );
           Navigator.pop(context);
         }
       }
@@ -114,10 +130,10 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   handleUpdateContactDetails() {
-    String url = '${URLS.kContactUrl}${widget.contactId}/update/';
+    String url = '${URLS.kContactUrl}$contactId/update/';
     APIService()
         .sendPatchRequest(
-      tokens['access'],
+      accessToken,
       updatedContactData,
       url,
     )
@@ -125,7 +141,7 @@ class _ContactPageState extends State<ContactPage> {
       if (data['status'] == 200) {
         Helper().showSnackBar(context, 'Contact details updated', Colors.green);
       } else {
-        if (data['status'] == 401 || data['status'] == 403) {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(context, 'Session expired', Colors.red);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {

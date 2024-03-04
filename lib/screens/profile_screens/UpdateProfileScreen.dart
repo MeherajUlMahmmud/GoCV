@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/models/applicant.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   static const String routeName = '/update-profile';
@@ -22,15 +23,15 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
-  Applicant applicant = Applicant();
+  late UserProfileProvider userProfileProvider;
+  late String applicantId, firstName, lastName, phoneNumber;
 
   final _formKey = GlobalKey<FormState>();
 
-  bool isLoading = true;
+  bool isLoading = false;
   bool isSubmitting = false;
   bool isError = false;
 
@@ -38,7 +39,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  Map<String, dynamic> updatedProfileData = {};
+  Map<String, dynamic> updatedProfileData = {
+    'first_name': '',
+    'last_name': '',
+    'phone_number': '',
+  };
 
   // image
   File? imageFile;
@@ -47,7 +52,34 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+    userProfileProvider = Provider.of<UserProfileProvider>(
+      context,
+      listen: false,
+    );
+    firstName = userProfileProvider.userProfile.applicantData?.firstName ?? '';
+    lastName = userProfileProvider.userProfile.applicantData?.lastName ?? '';
+    phoneNumber =
+        userProfileProvider.userProfile.applicantData?.phoneNumber ?? '';
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      applicantId =
+          userProfileProvider.userProfile.applicantData!.id.toString();
+
+      updatedProfileData['first_name'] = firstName;
+      updatedProfileData['last_name'] = lastName;
+      updatedProfileData['phone_number'] = phoneNumber;
+
+      firstNameController.text = firstName;
+      lastNameController.text = lastName;
+      phoneController.text = phoneNumber;
+    });
+
+    imageFile = File('assets/avatars/rdj.png');
   }
 
   @override
@@ -57,55 +89,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     phoneController.dispose();
 
     super.dispose();
-  }
-
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    imageFile = File('assets/avatars/rdj.png');
-
-    fetchUserDetails(tokens['access']);
-  }
-
-  fetchUserDetails(String accessToken) {
-    String url = '${URLS.kUserUrl}profile/';
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data['data']);
-      if (data['status'] == 200) {
-        await localStorage.writeData('user', data['data']['user_data']);
-        setState(() {
-          applicant = Applicant.fromJson(data['data']['applicant_data']);
-
-          isLoading = false;
-          isError = false;
-        });
-
-        firstNameController.text = applicant.firstName ?? '';
-        lastNameController.text = applicant.lastName ?? '';
-        phoneController.text = applicant.phoneNumber ?? '';
-      } else {
-        setState(() {
-          isError = true;
-        });
-        Helper().showSnackBar(
-          context,
-          'Failed to fetch user details',
-          Colors.red,
-        );
-        Navigator.of(context).pop(false);
-      }
-    }).catchError((error) {
-      setState(() {
-        isError = true;
-      });
-      Helper().showSnackBar(
-        context,
-        'Failed to fetch user details',
-        Colors.red,
-      );
-      Navigator.of(context).pop(false);
-    });
   }
 
   Future<File> getFromGallery() async {
@@ -136,10 +119,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     setState(() {
       isSubmitting = true;
     });
-    String url = '${URLS.kApplicantUrl}${applicant.id}/update/';
+    String url = '${URLS.kApplicantUrl}$applicantId/update/';
     APIService()
         .sendPatchRequest(
-      tokens['access'],
+      accessToken,
       updatedProfileData,
       url,
     )
@@ -150,6 +133,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         });
         Navigator.of(context).pop(true);
       } else {
+        print(data);
         setState(() {
           isSubmitting = false;
           isError = true;
@@ -195,7 +179,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             Navigator.pop(context);
           },
           child: Container(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(10.0),
             margin: const EdgeInsets.only(left: 10.0),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -250,7 +234,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
+                    children: [
                       const SizedBox(height: 10),
                       Stack(
                         children: [

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   static const routeName = '/account-settings';
@@ -13,13 +14,13 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+  late String userId;
 
   final _formKey = GlobalKey<FormState>();
 
-  bool isLoading = true;
+  bool isLoading = false;
   bool isSubmitting = false;
   bool isError = false;
   bool isOtpSent = false;
@@ -29,14 +30,25 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   TextEditingController otpController = TextEditingController();
 
   String uuid = '';
-  String email = '';
+  late String email;
   String otp = '';
 
   @override
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      userId = userProvider.userData!.id.toString();
+
+      email = userProvider.userData!.email!;
+      emailController.text = email;
+    });
   }
 
   @override
@@ -45,18 +57,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     otpController.dispose();
 
     super.dispose();
-  }
-
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    email = user['email'];
-    emailController.text = email;
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   handleSubmit() {}
