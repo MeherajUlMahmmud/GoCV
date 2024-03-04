@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/auth.dart';
+import 'package:gocv/models/user.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/SignUpScreen.dart';
 import 'package:gocv/screens/home_screen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login';
@@ -17,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final LocalStorage localStorage = LocalStorage();
+  late UserProvider userProvider;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -28,6 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+  }
 
   @override
   void dispose() {
@@ -52,6 +64,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (data['status'] == 200) {
         await localStorage.writeData('user', data['data']['user']);
         await localStorage.writeData('tokens', data['data']['tokens']);
+
+        UserBase user = UserBase.fromJson(data['data']['user']);
+        userProvider.setUserData(user);
+        userProvider.setTokens(data['data']['tokens']);
 
         if (!context.mounted) return;
         Helper().showSnackBar(
@@ -91,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'GoCV',
+                  Constants.appName,
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,

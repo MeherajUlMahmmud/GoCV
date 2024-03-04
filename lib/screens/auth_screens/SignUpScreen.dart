@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/auth.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
@@ -98,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'GoCV',
+                  Constants.appName,
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,

@@ -1,14 +1,16 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/resume.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -19,9 +21,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+  late String userId;
 
   TextEditingController titleController = TextEditingController();
 
@@ -30,21 +32,22 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isError = false;
   String errorText = '';
 
+  Map<String, dynamic> newResumeData = {};
+
   @override
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+      userId = userProvider.userData!.id.toString();
+    });
+
+    fetchResumes();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchResumes(tokens['access'], user['id'].toString());
-  }
-
-  fetchResumes(String accessToken, String userId) {
+  fetchResumes() {
     APIService()
         .sendGetRequest(
       accessToken,
@@ -83,15 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  createResume(String accessToken, String userId, String name) {
-    Map<String, dynamic> data = {
-      'name': name,
-      'user': userId,
-    };
+  createResume() {
     APIService()
         .sendPostRequest(
       accessToken,
-      data,
+      newResumeData,
       '${URLS.kResumeUrl}create/',
     )
         .then((data) async {
@@ -129,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
         title: const Text(
-          'GoCV',
+          Constants.appName,
           style: TextStyle(
             color: Colors.black,
           ),
@@ -174,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // ),
                       SizedBox(width: 10),
                       Text(
-                        'GoCV',
+                        Constants.appName,
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -213,7 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onTap: () {
-                // Navigator.pop(context);
                 Navigator.pushNamed(context, ProfileScreen.routeName);
               },
             ),
@@ -229,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onTap: () {
-                // Navigator.pop(context);
                 Navigator.pushNamed(context, SettingsScreen.routeName);
               },
             ),
@@ -267,12 +264,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         TextButton(
                           child: const Text('Logout'),
                           onPressed: () {
-                            localStorage
-                                .clearData()
-                                .then((value) => Navigator.pushNamed(
-                                      context,
-                                      LoginScreen.routeName,
-                                    ));
+                            // localStorage
+                            //     .clearData()
+                            //     .then((value) => Navigator.pushNamed(
+                            //           context,
+                            //           LoginScreen.routeName,
+                            //         ));
                           },
                         ),
                       ],
@@ -288,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: () async {
-                fetchResumes(tokens['access'], user['id'].toString());
+                fetchResumes();
               },
               child: isError
                   ? Center(
@@ -304,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 10.0),
                           ElevatedButton(
                             onPressed: () {
-                              fetchResumes(tokens['access'], user['uuid']);
+                              fetchResumes();
                             },
                             child: const Text('Retry'),
                           ),
@@ -443,9 +440,13 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget okButton = TextButton(
       child: const Text('Create'),
       onPressed: () async {
-        String title = titleController.text;
+        setState(() {
+          newResumeData['name'] = titleController.text;
+          newResumeData['user'] = userId;
+          isLoading = true;
+        });
         titleController.clear();
-        createResume(tokens['access'], user['uuid'], title);
+        createResume();
       },
     );
 
