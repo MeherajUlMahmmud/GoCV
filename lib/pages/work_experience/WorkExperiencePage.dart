@@ -45,7 +45,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
 
   fetchWorkExperiences(String accessToken, String resumeId) {
     APIService()
-        .sendGetRequest(accessToken, '${URLS.kExperienceUrl}$resumeId/')
+        .sendGetRequest(accessToken, '${URLS.kExperienceUrl}$resumeId/list/')
         .then((data) async {
       if (data['status'] == 200) {
         setState(() {

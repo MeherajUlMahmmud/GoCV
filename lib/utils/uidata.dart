@@ -20,10 +20,10 @@ class UIData {
   ];
 
   //randomcolor
-  static final Random _random = new Random();
+  static final Random _random = Random();
 
   /// Returns a random color.
   static Color next() {
-    return new Color(0xFF000000 + _random.nextInt(0x00FFFFFF));
+    return Color(0xFF000000 + _random.nextInt(0x00FFFFFF));
   }
 }

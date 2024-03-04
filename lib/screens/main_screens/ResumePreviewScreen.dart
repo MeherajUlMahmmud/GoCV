@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gocv/apis/interest.dart';
-import 'package:gocv/apis/language.dart';
-import 'package:gocv/apis/reference.dart';
-import 'package:gocv/apis/resume.dart';
-import 'package:gocv/apis/skill.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
 // import 'package:printing/printing.dart';
@@ -70,7 +67,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchResumeDetails(String accessToken, String resumeId) {
-    ResumeService().getResumeDetails(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kResumeUrl}$resumeId/details/',
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           resumeDetails = data['data'];
@@ -165,7 +167,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchSkills(String accessToken, String resumeId) {
-    SkillService().getSkillList(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kSkillUrl}$resumeId/list/',
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           skillList = data['data'];
@@ -198,7 +205,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchInterests(String accessToken, String resumeId) {
-    InterestService().getInterestList(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kInterestUrl}$resumeId/list/',
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           interestList = data['data'];
@@ -231,7 +243,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchLanguages(String accessToken, String resumeId) {
-    LanguageService().getLanguageList(accessToken, resumeId).then((data) async {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kLanguageUrl}$resumeId/list/',
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           languageList = data['data'];
@@ -264,8 +281,11 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchReferences(String accessToken, String resumeId) {
-    ReferenceService()
-        .getReferenceList(accessToken, resumeId)
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kReferenceUrl}$resumeId/list/',
+    )
         .then((data) async {
       print(data);
       if (data['status'] == 200) {
@@ -308,7 +328,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       appBar: AppBar(
         title: const Text('Resume Preview'),
       ),
-      body: Center(child: Text('Resume Preview')),
+      body: const Center(child: Text('Resume Preview')),
       // body: isLoading
       //     ? const Center(
       //         child: CircularProgressIndicator(),

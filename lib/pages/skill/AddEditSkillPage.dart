@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/skill.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/skill.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -80,7 +81,12 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   }
 
   getSkill(String accessToken, String skillId) {
-    SkillService().getSkill(accessToken, skillId).then((data) {
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kSkillUrl}$skillId/details/',
+    )
+        .then((data) {
       print(data);
       if (data['status'] == 200) {
         setState(() {
@@ -116,13 +122,16 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   }
 
   createSkill() {
-    SkillService()
-        .createSkill(
+    Map<String, dynamic> data = {
+      'skill': skill,
+      'proficiency': proficiency,
+      'description': description,
+    };
+    APIService()
+        .sendPostRequest(
       tokens['access'],
-      widget.resumeId,
-      skill,
-      proficiency,
-      description,
+      data,
+      '${URLS.kSkillUrl}${widget.resumeId}/create/',
     )
         .then((value) {
       if (value['status'] == 201) {
@@ -149,13 +158,16 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   }
 
   updateSkill() {
-    SkillService()
-        .updateSkill(
+    Map<String, dynamic> data = {
+      'skill': skill,
+      'proficiency': proficiency,
+      'description': description,
+    };
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      uuid,
-      skill,
-      proficiency,
-      description,
+      data,
+      '${URLS.kSkillUrl}${widget.skillId}/update/',
     )
         .then((data) async {
       if (data['status'] == 200) {

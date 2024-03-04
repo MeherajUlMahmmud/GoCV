@@ -45,7 +45,7 @@ class _EducationPageState extends State<EducationPage> {
 
   fetchEducations(String accessToken, String resumeId) {
     APIService()
-        .sendGetRequest(accessToken, '${URLS.kEducationUrl}$resumeId/')
+        .sendGetRequest(accessToken, '${URLS.kEducationUrl}$resumeId/list/')
         .then((data) async {
       if (data['status'] == 200) {
         setState(() {

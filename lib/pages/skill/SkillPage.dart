@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/skill.dart';
 import 'package:gocv/pages/skill/AddEditSkillPage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -46,7 +45,7 @@ class _SkillPageState extends State<SkillPage> {
 
   fetchSkills(String accessToken, String resumeId) {
     APIService()
-        .sendGetRequest(accessToken, '${URLS.kSkillUrl}$resumeId/')
+        .sendGetRequest(accessToken, '${URLS.kSkillUrl}$resumeId/list/')
         .then((data) async {
       if (data['status'] == 200) {
         print(data['data']['data']);

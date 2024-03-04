@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/reference.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -72,8 +73,11 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     user = await localStorage.readData('user');
 
     if (widget.referenceId != null) {
-      ReferenceService()
-          .getReference(tokens['access'], widget.referenceId!)
+      APIService()
+          .sendGetRequest(
+        tokens['access'],
+        '${URLS.kReferenceUrl}${widget.referenceId}/details/',
+      )
           .then((data) {
         print(data);
         if (data['status'] == 200) {
@@ -122,16 +126,19 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   }
 
   createReference() {
-    ReferenceService()
-        .createReference(
+    Map<String, dynamic> data = {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'company_name': companyName,
+      'position': position,
+      'description': description,
+    };
+    APIService()
+        .sendPostRequest(
       tokens['access'],
-      widget.resumeId,
-      name,
-      email,
-      phone,
-      companyName,
-      position,
-      description,
+      data,
+      '${URLS.kReferenceUrl}${widget.resumeId}/create/',
     )
         .then((value) {
       if (value['status'] == 201) {
@@ -158,16 +165,19 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   }
 
   updateReference() {
-    ReferenceService()
-        .updateReference(
+    Map<String, dynamic> data = {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'company_name': companyName,
+      'position': position,
+      'description': description,
+    };
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      uuid,
-      name,
-      email,
-      phone,
-      companyName,
-      position,
-      description,
+      data,
+      '${URLS.kReferenceUrl}${widget.referenceId}/update/',
     )
         .then((data) async {
       if (data['status'] == 200) {

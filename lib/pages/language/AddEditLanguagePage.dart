@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/language.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -68,8 +69,11 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     user = await localStorage.readData('user');
 
     if (widget.languageId != null) {
-      LanguageService()
-          .getLanguage(tokens['access'], widget.languageId!)
+      APIService()
+          .sendGetRequest(
+        tokens['access'],
+        '${URLS.kLanguageUrl}${widget.languageId}/details/',
+      )
           .then((data) {
         print(data);
         if (data['status'] == 200) {
@@ -112,13 +116,16 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   }
 
   createLanguage() {
-    LanguageService()
-        .createLanguage(
+    Map<String, dynamic> data = {
+      'language': language,
+      'proficiency': proficiency,
+      'description': description,
+    };
+    APIService()
+        .sendPostRequest(
       tokens['access'],
-      widget.resumeId,
-      language,
-      proficiency,
-      description,
+      data,
+      '${URLS.kLanguageUrl}${widget.resumeId}/create/',
     )
         .then((value) {
       if (value['status'] == 201) {
@@ -145,13 +152,16 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   }
 
   updateLanguage() {
-    LanguageService()
-        .updateLanguage(
+    Map<String, dynamic> data = {
+      'language': language,
+      'proficiency': proficiency,
+      'description': description,
+    };
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      uuid,
-      language,
-      proficiency,
-      description,
+      data,
+      '${URLS.kLanguageUrl}${widget.languageId}/update/',
     )
         .then((data) async {
       if (data['status'] == 200) {
@@ -260,14 +270,14 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                   child: TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(
                       style: const TextStyle(fontSize: 16),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                         // errorText: typeError == "" ? null : typeError,
                         labelText: 'Proficiency Type',
                         hintText: 'Proficiency Type',
-                        prefixIcon: const Icon(Icons.work_outline_rounded),
+                        prefixIcon: Icon(Icons.work_outline_rounded),
                       ),
                       controller: proficiencyController,
                     ),

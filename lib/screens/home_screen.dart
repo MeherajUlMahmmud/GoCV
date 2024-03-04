@@ -1,5 +1,4 @@
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/resume.dart';
 import 'package:gocv/models/resume.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
@@ -47,9 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   fetchResumes(String accessToken, String userId) {
     APIService()
-        .sendGetRequest(tokens['access'], '${URLS.kResumeUrl}?user=$userId')
+        .sendGetRequest(
+      accessToken,
+      '${URLS.kResumeUrl}list/?user=$userId',
+    )
         .then((data) async {
-      print(data['data']['data']);
       if (data['status'] == 200) {
         setState(() {
           resumes = data['data']['data']
@@ -83,8 +84,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   createResume(String accessToken, String userId, String name) {
-    ResumeService().createResume(accessToken, userId, name).then((data) async {
-      print(data);
+    Map<String, dynamic> data = {
+      'name': name,
+      'user': userId,
+    };
+    APIService()
+        .sendPostRequest(
+      accessToken,
+      data,
+      '${URLS.kResumeUrl}create/',
+    )
+        .then((data) async {
       if (data['status'] == 201) {
         setState(() {
           isLoading = false;

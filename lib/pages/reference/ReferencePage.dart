@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/reference.dart';
 import 'package:gocv/pages/reference/AddEditReferencePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -44,7 +43,7 @@ class _ReferencePageState extends State<ReferencePage> {
   }
 
   fetchReferences(String accessToken, String resumeId) {
-    String url = '${URLS.kReferenceUrl}$resumeId/';
+    String url = '${URLS.kReferenceUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
       if (data['status'] == 200) {
@@ -326,8 +325,11 @@ class _ReferencePageState extends State<ReferencePage> {
     String referenceId,
   ) {
     deleteReference() {
-      ReferenceService()
-          .deleteReference(tokens['access'], referenceId)
+      APIService()
+          .sendDeleteRequest(
+        tokens['access'],
+        '${URLS.kReferenceUrl}$referenceId/delete/',
+      )
           .then((data) async {
         if (data['status'] == 200) {
           Navigator.of(context).pop(true);

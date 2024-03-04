@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/interest.dart';
 import 'package:gocv/pages/interest/AddEditInterestPage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -45,7 +44,7 @@ class _InterestPageState extends State<InterestPage> {
   }
 
   fetchInterests(String accessToken, String resumeId) {
-    String url = '${URLS.kInterestUrl}$resumeId/';
+    String url = '${URLS.kInterestUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       if (data['status'] == 200) {
         print(data);

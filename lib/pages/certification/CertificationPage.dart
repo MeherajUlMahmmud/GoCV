@@ -43,7 +43,7 @@ class _CertificationPageState extends State<CertificationPage> {
   }
 
   fetchReferences(String accessToken, String resumeId) {
-    String url = '${URLS.kCertificationUrl}$resumeId/';
+    String url = '${URLS.kCertificationUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
       if (data['status'] == 200) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/language.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/helper.dart';
@@ -45,8 +44,13 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   fetchLanguages(String accessToken, String resumeId) {
-    String url = '${URLS.kLanguageUrl}$resumeId/';
-    APIService().sendGetRequest(accessToken, url).then((data) async {
+    String url = '${URLS.kLanguageUrl}$resumeId/list/';
+    APIService()
+        .sendGetRequest(
+      accessToken,
+      url,
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         setState(() {
           languageList = data['data']['data'];
@@ -279,9 +283,12 @@ class _LanguagePageState extends State<LanguagePage> {
     BuildContext context,
     String languageId,
   ) {
-    deleteLanguage() {
-      LanguageService()
-          .deleteLanguage(tokens['access'], languageId)
+    void deleteLanguage() {
+      APIService()
+          .sendDeleteRequest(
+        tokens['access'],
+        '${URLS.kLanguageUrl}${widget.resumeId}/delete/',
+      )
           .then((data) async {
         print(data);
         if (data['status'] == 204) {

@@ -44,7 +44,7 @@ class _AwardPageState extends State<AwardPage> {
   }
 
   fetchAwards(String accessToken, String resumeId) {
-    String url = '${URLS.kAwardUrl}$resumeId/';
+    String url = '${URLS.kAwardUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
       if (data['status'] == 200) {

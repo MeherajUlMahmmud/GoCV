@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/interest.dart';
+import 'package:gocv/apis/api.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
+import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -58,8 +59,11 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
     user = await localStorage.readData('user');
 
     if (widget.interestId != null) {
-      InterestService()
-          .getInterest(tokens['access'], widget.interestId!)
+      APIService()
+          .sendGetRequest(
+        tokens['access'],
+        '${URLS.kInterestUrl}${widget.interestId}/details/',
+      )
           .then((data) {
         print(data);
         if (data['status'] == 200) {
@@ -100,12 +104,15 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   }
 
   createInterest() {
-    InterestService()
-        .createInterest(
+    Map<String, dynamic> data = {
+      'interest': interest,
+      'description': description,
+    };
+    APIService()
+        .sendPostRequest(
       tokens['access'],
-      widget.resumeId,
-      interest,
-      description,
+      data,
+      '${URLS.kInterestUrl}${widget.resumeId}/create/',
     )
         .then((value) {
       if (value['status'] == 201) {
@@ -132,12 +139,15 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   }
 
   updateInterest() {
-    InterestService()
-        .updateInterest(
+    Map<String, dynamic> data = {
+      'interest': interest,
+      'description': description,
+    };
+    APIService()
+        .sendPatchRequest(
       tokens['access'],
-      uuid,
-      interest,
-      description,
+      data,
+      '${URLS.kInterestUrl}${widget.interestId}/update/',
     )
         .then((data) async {
       if (data['status'] == 200) {
