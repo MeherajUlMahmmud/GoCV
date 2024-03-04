@@ -19,13 +19,13 @@ class Reference {
 
   Map<String, dynamic> toMap() {
     return {
-      "personId": personId,
-      "id": id,
-      "fullName": fullName,
-      "workPlace": workPlace,
-      "designation": designation,
-      "email": email,
-      "phone": phone,
+      'personId': personId,
+      'id': id,
+      'fullName': fullName,
+      'workPlace': workPlace,
+      'designation': designation,
+      'email': email,
+      'phone': phone,
     };
   }
 }

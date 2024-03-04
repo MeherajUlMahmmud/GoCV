@@ -309,7 +309,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   prefixIcon: Icons.phone,
                   textCapitalization: TextCapitalization.none,
                   borderRadius: 10,
-                  keyboardType: TextInputType.numberWithOptions(
+                  keyboardType: const TextInputType.numberWithOptions(
                     signed: true,
                   ),
                   onChanged: (value) {

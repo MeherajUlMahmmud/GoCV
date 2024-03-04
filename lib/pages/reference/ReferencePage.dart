@@ -290,8 +290,8 @@ class _ReferencePageState extends State<ReferencePage> {
                     );
                   }));
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.edit),
                     SizedBox(width: 8.0),
                     Text('Update'),
@@ -305,8 +305,8 @@ class _ReferencePageState extends State<ReferencePage> {
 
                   _showDeleteConfirmationDialog(context, referenceId);
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8.0),
                     Text('Delete'),

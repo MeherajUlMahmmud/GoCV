@@ -246,8 +246,8 @@ class _InterestPageState extends State<InterestPage> {
                     );
                   }));
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.edit),
                     SizedBox(width: 8.0),
                     Text('Update'),
@@ -259,8 +259,8 @@ class _InterestPageState extends State<InterestPage> {
                 onPressed: () {
                   // _showDeleteConfirmationDialog(context, experienceId);
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8.0),
                     Text('Delete'),

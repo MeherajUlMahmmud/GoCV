@@ -250,8 +250,8 @@ class _LanguagePageState extends State<LanguagePage> {
                     );
                   }));
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.edit),
                     SizedBox(width: 8.0),
                     Text('Update'),
@@ -264,8 +264,8 @@ class _LanguagePageState extends State<LanguagePage> {
                   Navigator.of(context).pop();
                   _showDeleteConfirmationDialog(context, languageId);
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8.0),
                     Text('Delete'),

@@ -241,8 +241,8 @@ class _SkillPageState extends State<SkillPage> {
                     );
                   }));
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.edit),
                     SizedBox(width: 8.0),
                     Text('Update'),
@@ -254,8 +254,8 @@ class _SkillPageState extends State<SkillPage> {
                 onPressed: () {
                   // _showDeleteConfirmationDialog(context, experienceId);
                 },
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8.0),
                     Text('Delete'),

@@ -13,10 +13,10 @@ class Skill {
 
   Map<String, dynamic> toMap() {
     return {
-      "personId": personId,
-      "id": id,
-      "name": name,
-      "proficiency": proficiency,
+      'personId': personId,
+      'id': id,
+      'name': name,
+      'proficiency': proficiency,
     };
   }
 }

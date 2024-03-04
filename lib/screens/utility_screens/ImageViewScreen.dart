@@ -35,7 +35,7 @@ class ImageFullScreenWrapperWidget extends StatelessWidget {
 }
 
 class FullScreenPage extends StatefulWidget {
-  FullScreenPage({
+  const FullScreenPage({super.key, 
     required this.child,
     required this.dark,
   });

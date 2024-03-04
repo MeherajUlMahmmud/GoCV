@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/apis/user.dart';
 import 'package:gocv/models/applicant.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';

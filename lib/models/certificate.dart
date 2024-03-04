@@ -15,11 +15,11 @@ class Certificate {
 
   Map<String, dynamic> toMap() {
     return {
-      "personId": personId,
-      "id": id,
-      "name": name,
-      "issuedBy": issuedBy,
-      "date": date,
+      'personId': personId,
+      'id': id,
+      'name': name,
+      'issuedBy': issuedBy,
+      'date': date,
     };
   }
 }

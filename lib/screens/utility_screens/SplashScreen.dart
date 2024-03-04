@@ -4,7 +4,7 @@ import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
-  static const routeName = "/";
+  static const routeName = '/';
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Text(
-          "GoCV",
+          'GoCV',
           style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.bold,

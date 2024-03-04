@@ -19,13 +19,13 @@ class Work {
 
   Map<String, dynamic> toMap() {
     return {
-      "personId": personId,
-      "id": id,
-      "jobTitle": jobTitle,
-      "company": company,
-      "department": department,
-      "years": years,
-      "notes": notes,
+      'personId': personId,
+      'id': id,
+      'jobTitle': jobTitle,
+      'company': company,
+      'department': department,
+      'years': years,
+      'notes': notes,
     };
   }
 }
