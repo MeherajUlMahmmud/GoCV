@@ -43,22 +43,36 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    AuthService().loginUser(email, password).then((data) async {
-      print(data);
+    AuthService()
+        .loginUser(
+      email,
+      password,
+    )
+        .then((data) async {
       if (data['status'] == 200) {
         await localStorage.writeData('user', data['data']['user']);
         await localStorage.writeData('tokens', data['data']['tokens']);
 
-        Helper().showSnackBar(context, 'Login Successful', Colors.green);
+        if (!context.mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Login Successful',
+          Colors.green,
+        );
         setState(() {
           isLoading = false;
         });
+
         Navigator.pushReplacementNamed(context, HomeScreen.routeName);
       } else {
         setState(() {
           isLoading = false;
         });
-        Helper().showSnackBar(context, data['error'], Colors.red);
+        Helper().showSnackBar(
+          context,
+          data['error'],
+          Colors.red,
+        );
       }
     });
   }
