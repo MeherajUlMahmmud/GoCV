@@ -56,7 +56,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password,
     )
         .then((data) async {
-      print(data);
       if (data['status'] == 200) {
         setState(() {
           isLoading = false;
@@ -67,6 +66,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'Registration Successful',
           Colors.green,
         );
+        setState(() {
+          isLoading = false;
+        });
 
         Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       } else {
