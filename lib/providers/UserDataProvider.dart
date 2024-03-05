@@ -21,4 +21,11 @@ class UserProvider with ChangeNotifier {
     _userData = userData;
     notifyListeners();
   }
+
+  void clearData() {
+    _tokens['access'] = '';
+    _tokens['refresh'] = '';
+    _userData = null;
+    notifyListeners();
+  }
 }
