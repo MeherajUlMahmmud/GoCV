@@ -19,8 +19,9 @@ class Helper {
     }
   }
 
-  bool isUnauthorizedAccess(String status) {
-    return status == '401' || status == '403';
+  bool isUnauthorizedAccess(int status) {
+    return status == Constants.httpUnauthorizedCode ||
+        status == Constants.httpForbiddenCode;
   }
 
   Future<void> launchInBrowser(String url) async {
@@ -94,7 +95,7 @@ class Helper {
   void refreshToken(BuildContext context, String refreshToken) {
     LocalStorage localStorage = LocalStorage();
     AuthService().refreshToken(refreshToken).then((data) {
-      if (data['status'] == Constants.HTTP_OK) {
+      if (data['status'] == Constants.httpOkCode) {
         localStorage.writeData('tokens', {
           'access': data['data']['access'],
           'refresh': refreshToken,
