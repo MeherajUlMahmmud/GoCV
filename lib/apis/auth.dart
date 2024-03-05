@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,7 +27,7 @@ class AuthService {
           'is_organization': false,
         }),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == Constants.HTTP_OK) {
         final data = jsonDecode(response.body);
         return {
           'data': data,
@@ -58,7 +59,7 @@ class AuthService {
           'password': password,
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == Constants.HTTP_OK) {
         final data = jsonDecode(response.body);
         return {
           'data': data,
@@ -88,7 +89,7 @@ class AuthService {
           'refresh': refreshToken,
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == Constants.HTTP_OK) {
         final data = jsonDecode(response.body);
         return {
           'data': data,
