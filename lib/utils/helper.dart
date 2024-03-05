@@ -1,4 +1,6 @@
 import 'package:gocv/apis/auth.dart';
+import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,6 +76,12 @@ class Helper {
     );
   }
 
+  void logoutUser(BuildContext context) {
+    LocalStorage localStorage = LocalStorage();
+    localStorage.clearData();
+    navigateAndClearStack(context, LoginScreen.routeName);
+  }
+
   void navigateAndClearStack(BuildContext context, String route) {
     Navigator.of(context).pushNamedAndRemoveUntil(route, (route) => false);
   }
@@ -81,7 +89,7 @@ class Helper {
   void refreshToken(BuildContext context, String refreshToken) {
     LocalStorage localStorage = LocalStorage();
     AuthService().refreshToken(refreshToken).then((data) {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         localStorage.writeData('tokens', {
           'access': data['data']['access'],
           'refresh': refreshToken,
