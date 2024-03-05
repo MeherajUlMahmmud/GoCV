@@ -7,13 +7,17 @@ class Constants {
 
   static const String defultAvatarPath = 'assets/avatars/rdj.png';
 
-  static const int HTTP_OK = 200;
-  static const int HTTP_CREATED = 201;
-  static const int HTTP_DELETED = 204;
-  static const int HTTP_NOT_FOUND = 404;
-  static const int HTTP_UNAUTHORIZED = 401;
-  static const int HTTP_FORBIDDEN = 403;
+  static const int httpOkCode = 200;
+  static const int httpCreatedCode = 201;
+  static const int httpDeletedCode = 204;
+  static const int httpBadRequestCode = 400;
+  static const int httpUnauthorizedCode = 401;
+  static const int httpForbiddenCode = 403;
+  static const int httpNotFoundCode = 404;
+  static const int httpInternalServerErrorCode = 500;
 
-  static const String SESSION_EXPIRED_MSG =
-      'Session expired, please login again';
+  static const String dataUpdatedMsg = 'Data updated successfully';
+  static const String sessionExpiredMsg = 'Session expired, please login again';
+  static const String genericErrorMsg =
+      'Unable to process your request, please try again later';
 }
