@@ -5,6 +5,7 @@ import 'package:gocv/apis/api.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
@@ -119,41 +120,38 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     setState(() {
       isSubmitting = true;
     });
-    String url = '${URLS.kApplicantUrl}$applicantId/update/';
+
+    final String url = '${URLS.kApplicantUrl}$applicantId/update/';
+
     APIService()
-        .sendPatchRequest(
-      accessToken,
-      updatedProfileData,
-      url,
-    )
+        .sendPatchRequest(accessToken, updatedProfileData, url)
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           isSubmitting = false;
         });
         Navigator.of(context).pop(true);
       } else {
-        print(data);
-        setState(() {
-          isSubmitting = false;
-          isError = true;
-        });
-        Helper().showSnackBar(
-          context,
-          'Failed to update profile',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          print(data);
+          setState(() {
+            isSubmitting = false;
+            isError = true;
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to update profile',
+            Colors.red,
+          );
+        }
       }
-    }).catchError((e) {
-      print(e);
-      setState(() {
-        isError = true;
-      });
-      Helper().showSnackBar(
-        context,
-        'Failed to update profile',
-        Colors.red,
-      );
     });
   }
 
