@@ -27,7 +27,7 @@ class AuthService {
           'is_organization': false,
         }),
       );
-      if (response.statusCode == Constants.HTTP_OK) {
+      if (response.statusCode == Constants.httpOkCode) {
         final data = jsonDecode(response.body);
         return {
           'data': data,
@@ -59,7 +59,7 @@ class AuthService {
           'password': password,
         },
       );
-      if (response.statusCode == Constants.HTTP_OK) {
+      if (response.statusCode == Constants.httpOkCode) {
         final data = jsonDecode(response.body);
         return {
           'data': data,
@@ -89,7 +89,7 @@ class AuthService {
           'refresh': refreshToken,
         },
       );
-      if (response.statusCode == Constants.HTTP_OK) {
+      if (response.statusCode == Constants.httpOkCode) {
         final data = jsonDecode(response.body);
         return {
           'data': data,

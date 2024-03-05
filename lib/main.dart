@@ -15,8 +15,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => UserProvider()), // Use ChangeNotifierProvider
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => UserProfileProvider()),
         ChangeNotifierProvider(create: (context) => ResumeListProvider()),
         ChangeNotifierProvider(create: (context) => CurrentResumeProvider()),

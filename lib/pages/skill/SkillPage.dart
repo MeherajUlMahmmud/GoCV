@@ -37,39 +37,39 @@ class _SkillPageState extends State<SkillPage> {
   }
 
   fetchSkills(String resumeId) {
-    final String url = '${URLS.kSkillUrl}$resumeId/list/';
+    // final String url = '${URLS.kSkillUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          skillList = data['data']['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch skills',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       skillList = data['data']['data'];
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch skills',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override

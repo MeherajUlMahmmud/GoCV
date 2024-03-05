@@ -36,7 +36,7 @@ class _AwardPageState extends State<AwardPage> {
     Map<String, dynamic> response = awardRepository.getAwards(widget.resumeId);
     print(response);
 
-    if (response['status'] == Constants.HTTP_OK) {
+    if (response['status'] == Constants.httpOkCode) {
       setState(() {
         awardList = response['data'].map<Award>((award) {
           return Award.fromJson(award);
@@ -49,7 +49,7 @@ class _AwardPageState extends State<AwardPage> {
       if (Helper().isUnauthorizedAccess(response['status'])) {
         Helper().showSnackBar(
           context,
-          Constants.SESSION_EXPIRED_MSG,
+          Constants.sessionExpiredMsg,
           Colors.red,
         );
         Helper().logoutUser(context);
@@ -61,7 +61,7 @@ class _AwardPageState extends State<AwardPage> {
         });
         Helper().showSnackBar(
           context,
-          'Failed to fetch awards',
+          Constants.genericErrorMsg,
           Colors.red,
         );
       }

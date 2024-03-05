@@ -75,47 +75,47 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   }
 
   getReferenceDetails(String referenceId) {
-    final String url = '${URLS.kReferenceUrl}$referenceId/details/';
+    // final String url = '${URLS.kReferenceUrl}$referenceId/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          isLoading = false;
-          isError = false;
-          uuid = data['data']['uuid'];
-          name = data['data']['name'];
-          email = data['data']['email'];
-          phone = data['data']['phone'];
-          companyName = data['data']['company_name'];
-          position = data['data']['position'];
-          description = data['data']['description'];
-          nameController.text = name;
-          emailController.text = email;
-          phoneController.text = phone;
-          companyNameController.text = companyName;
-          positionController.text = position;
-          descriptionController.text = description;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = false;
+    //       uuid = data['data']['uuid'];
+    //       name = data['data']['name'];
+    //       email = data['data']['email'];
+    //       phone = data['data']['phone'];
+    //       companyName = data['data']['company_name'];
+    //       position = data['data']['position'];
+    //       description = data['data']['description'];
+    //       nameController.text = name;
+    //       emailController.text = email;
+    //       phoneController.text = phone;
+    //       companyNameController.text = companyName;
+    //       positionController.text = position;
+    //       descriptionController.text = description;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['error'];
+    //     });
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   createReference() {
@@ -129,52 +129,52 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     };
     final String url = '${URLS.kReferenceUrl}${widget.resumeId}/create/';
 
-    APIService().sendPostRequest(accessToken, data, url).then((value) {
-      if (value['status'] == Constants.HTTP_CREATED) {
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = value['error'];
-        });
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendPostRequest(accessToken, data, url).then((value) {
+    //   if (value['status'] == Constants.HTTP_CREATED) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = value['error'];
+    //     });
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   updateReference() {
-    Map<String, dynamic> data = {
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'company_name': companyName,
-      'position': position,
-      'description': description,
-    };
-    final String url = '${URLS.kReferenceUrl}${widget.referenceId}/update/';
+    // Map<String, dynamic> data = {
+    //   'name': name,
+    //   'email': email,
+    //   'phone': phone,
+    //   'company_name': companyName,
+    //   'position': position,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kReferenceUrl}${widget.referenceId}/update/';
 
-    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-      }
-    });
+    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['error'];
+    //     });
+    //   }
+    // });
   }
 
   handleSubmit() {

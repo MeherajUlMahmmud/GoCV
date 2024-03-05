@@ -40,6 +40,22 @@ class ResumeRepository {
     }
   }
 
+  Future<Map<String, dynamic>> getResumeDetails(String resumeId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kResumeUrl}$resumeId/details/';
+
+      final data = await APIService().sendGetRequest(accessToken, url);
+      return data;
+    } catch (error) {
+      print('Error getting resume details: $error');
+      return {
+        'status': 500,
+        'message': 'Error getting resume details: $error',
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> createResume(
       Map<String, dynamic> resumeData) async {
     try {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/repositories/language.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -22,7 +23,7 @@ class AddEditLanguagePage extends StatefulWidget {
 }
 
 class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
-  UserProvider userProvider = UserProvider();
+  LanguageRepository languageRepository = LanguageRepository();
 
   List<String> proficiencyTypes = [
     'Basic',
@@ -71,101 +72,101 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   }
 
   getEducationDetails(String educationId) {
-    final String url = '${URLS.kLanguageUrl}${widget.languageId}/details/';
+    // final String url = '${URLS.kLanguageUrl}${widget.languageId}/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          isLoading = false;
-          isError = false;
-          id = data['data']['id'];
-          language = data['data']['language'];
-          proficiency = data['data']['proficiency'];
-          description = data['data']['description'];
-          languageController.text = language;
-          proficiencyController.text = proficiency;
-          descriptionController.text = description;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = false;
+    //       id = data['data']['id'];
+    //       language = data['data']['language'];
+    //       proficiency = data['data']['proficiency'];
+    //       description = data['data']['description'];
+    //       languageController.text = language;
+    //       proficiencyController.text = proficiency;
+    //       descriptionController.text = description;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['error'];
+    //     });
+    //   }
+    // });
   }
 
   createLanguage() {
-    Map<String, dynamic> data = {
-      'language': language,
-      'proficiency': proficiency,
-      'description': description,
-    };
-    final String url = '${URLS.kLanguageUrl}${widget.resumeId}/create/';
+    // Map<String, dynamic> data = {
+    //   'language': language,
+    //   'proficiency': proficiency,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kLanguageUrl}${widget.resumeId}/create/';
 
-    APIService().sendPostRequest(accessToken, data, url).then((value) {
-      if (value['status'] == Constants.HTTP_CREATED) {
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = value['error'];
-          });
-        }
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendPostRequest(accessToken, data, url).then((value) {
+    //   if (value['status'] == Constants.HTTP_CREATED) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = value['error'];
+    //       });
+    //     }
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   updateLanguage() {
-    Map<String, dynamic> data = {
-      'language': language,
-      'proficiency': proficiency,
-      'description': description,
-    };
-    final String url = '${URLS.kLanguageUrl}${widget.languageId}/update/';
+    // Map<String, dynamic> data = {
+    //   'language': language,
+    //   'proficiency': proficiency,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kLanguageUrl}${widget.languageId}/update/';
 
-    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }
-    });
+    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   handleSubmit() {

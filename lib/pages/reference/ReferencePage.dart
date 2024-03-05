@@ -37,38 +37,38 @@ class _ReferencePageState extends State<ReferencePage> {
   fetchReferences(String resumeId) {
     final String url = '${URLS.kReferenceUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          referenceList = data['data']['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch references',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) async {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       referenceList = data['data']['data'];
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch references',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -317,32 +317,32 @@ class _ReferencePageState extends State<ReferencePage> {
     deleteReference() {
       final String url = '${URLS.kReferenceUrl}$referenceId/delete/';
 
-      APIService().sendDeleteRequest(accessToken, url).then((data) async {
-        if (data['status'] == Constants.HTTP_OK) {
-          Navigator.of(context).pop(true);
-          Helper().showSnackBar(
-            context,
-            'Experience deleted successfully',
-            Colors.green,
-          );
-        } else {
-          if (Helper().isUnauthorizedAccess(data['status'])) {
-            Helper().showSnackBar(
-              context,
-              'Session expired',
-              Colors.red,
-            );
-            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-          } else {
-            print(data['error']);
-            Helper().showSnackBar(
-              context,
-              'Failed to delete experience',
-              Colors.red,
-            );
-          }
-        }
-      });
+      // APIService().sendDeleteRequest(accessToken, url).then((data) async {
+      //   if (data['status'] == Constants.HTTP_OK) {
+      //     Navigator.of(context).pop(true);
+      //     Helper().showSnackBar(
+      //       context,
+      //       'Experience deleted successfully',
+      //       Colors.green,
+      //     );
+      //   } else {
+      //     if (Helper().isUnauthorizedAccess(data['status'])) {
+      //       Helper().showSnackBar(
+      //         context,
+      //         'Session expired',
+      //         Colors.red,
+      //       );
+      //       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+      //     } else {
+      //       print(data['error']);
+      //       Helper().showSnackBar(
+      //         context,
+      //         'Failed to delete experience',
+      //         Colors.red,
+      //       );
+      //     }
+      //   }
+      // });
     }
 
     showDialog(

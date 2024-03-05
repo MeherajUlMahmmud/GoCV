@@ -1,10 +1,8 @@
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/contact.dart';
 import 'package:gocv/providers/ContactDataProvider.dart';
 import 'package:gocv/repositories/contact.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 
@@ -75,74 +73,75 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   fetchContactDetails() {
-    final String url = '${URLS.kContactUrl}${widget.resumeId}/details/';
+    Map<String, dynamic> response =
+        contactRepository.getContactDetails(widget.resumeId);
+    print(response);
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Contact contact = Contact.fromJson(data['data']);
-        contactDataProvider.setContactData(contact);
+    if (response['status'] == Constants.httpOkCode) {
+      Contact contact = Contact.fromJson(response['data']);
+      contactDataProvider.setContactData(contact);
 
-        setState(() {
-          contactId = contact.id.toString();
-          isError = false;
-          errorText = '';
-        });
-
-        initiateControllers();
+      setState(() {
+        contactId = contact.id.toString();
+        isLoading = false;
+        isError = false;
+        errorText = '';
+      });
+    } else {
+      if (Helper().isUnauthorizedAccess(response['status'])) {
+        Helper().showSnackBar(
+          context,
+          Constants.sessionExpiredMsg,
+          Colors.red,
+        );
+        Helper().logoutUser(context);
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch personal data',
-            Colors.red,
-          );
-          Navigator.pop(context);
-        }
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['message'];
+        });
+        Helper().showSnackBar(
+          context,
+          Constants.genericErrorMsg,
+          Colors.red,
+        );
       }
-    });
+    }
   }
 
   handleUpdateContactDetails() {
-    final String url = '${URLS.kContactUrl}$contactId/update/';
+    Map<String, dynamic> response =
+        contactRepository.updateContactDetails(contactId, updatedContactData);
+    print(response);
 
-    APIService()
-        .sendPatchRequest(accessToken, updatedContactData, url)
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
+    if (response['status'] == Constants.httpOkCode) {
+      Helper().showSnackBar(
+        context,
+        Constants.dataUpdatedMsg,
+        Colors.green,
+      );
+    } else {
+      if (Helper().isUnauthorizedAccess(response['status'])) {
         Helper().showSnackBar(
           context,
-          'Contact details updated',
-          Colors.green,
+          Constants.sessionExpiredMsg,
+          Colors.red,
         );
+        Helper().logoutUser(context);
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          Helper().showSnackBar(
-            context,
-            'Failed to update contact details',
-            Colors.red,
-          );
-        }
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['message'];
+        });
+        Helper().showSnackBar(
+          context,
+          Constants.genericErrorMsg,
+          Colors.red,
+        );
       }
-    });
+    }
   }
 
   @override

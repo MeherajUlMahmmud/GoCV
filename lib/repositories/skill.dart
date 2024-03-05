@@ -3,9 +3,8 @@ import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/urls.dart';
 
 class SkillRepository {
-  UserProvider userProvider = UserProvider();
-
+  // Method to get the access token from UserProvider
   String getAccessToken() {
-    return userProvider.tokens['access'];
+    return UserProvider().tokens['access'];
   }
 }

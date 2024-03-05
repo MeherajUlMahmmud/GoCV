@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/repositories/interest.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -60,117 +61,117 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   }
 
   getInterest(String interestId) {
-    final String url = '${URLS.kInterestUrl}${interestId}/details/';
+    // final String url = '${URLS.kInterestUrl}${interestId}/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          isLoading = false;
-          isError = false;
-          uuid = data['data']['uuid'];
-          interest = data['data']['interest'];
-          description = data['data']['description'];
-          interestController.text = interest;
-          descriptionController.text = description;
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = false;
+    //       uuid = data['data']['uuid'];
+    //       interest = data['data']['interest'];
+    //       description = data['data']['description'];
+    //       interestController.text = interest;
+    //       descriptionController.text = description;
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //     }
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   createInterest() {
-    Map<String, dynamic> data = {
-      'interest': interest,
-      'description': description,
-    };
-    final String url = '${URLS.kInterestUrl}${widget.resumeId}/create/';
+    // Map<String, dynamic> data = {
+    //   'interest': interest,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kInterestUrl}${widget.resumeId}/create/';
 
-    APIService().sendPostRequest(accessToken, data, url).then((value) {
-      if (value['status'] == Constants.HTTP_CREATED) {
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = value['error'];
-          });
-        }
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendPostRequest(accessToken, data, url).then((value) {
+    //   if (value['status'] == Constants.HTTP_CREATED) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = value['error'];
+    //       });
+    //     }
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   updateInterest() {
-    Map<String, dynamic> data = {
-      'interest': interest,
-      'description': description,
-    };
-    final String url = '${URLS.kInterestUrl}${widget.interestId}/update/';
+    // Map<String, dynamic> data = {
+    //   'interest': interest,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kInterestUrl}${widget.interestId}/update/';
 
-    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }
-    });
+    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   handleSubmit() {

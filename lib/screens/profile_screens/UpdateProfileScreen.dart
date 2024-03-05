@@ -62,7 +62,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         userProfileProvider.userProfile.applicantData?.phoneNumber ?? '';
 
     setState(() {
-      accessToken = userProvider.tokens['access'].toString();
+      // accessToken = userProvider.tokens['access'].toString();
       applicantId =
           userProfileProvider.userProfile.applicantData!.id.toString();
 
@@ -118,36 +118,36 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
     final String url = '${URLS.kApplicantUrl}$applicantId/update/';
 
-    APIService()
-        .sendPatchRequest(accessToken, updatedProfileData, url)
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          isSubmitting = false;
-        });
-        Navigator.of(context).pop(true);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data);
-          setState(() {
-            isSubmitting = false;
-            isError = true;
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to update profile',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService()
+    //     .sendPatchRequest(accessToken, updatedProfileData, url)
+    //     .then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       isSubmitting = false;
+    //     });
+    //     Navigator.of(context).pop(true);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       print(data);
+    //       setState(() {
+    //         isSubmitting = false;
+    //         isError = true;
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to update profile',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override

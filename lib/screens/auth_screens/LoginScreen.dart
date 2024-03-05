@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
       password,
     )
         .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
+      if (data['status'] == Constants.httpOkCode) {
         await localStorage.writeData('user', data['data']['user']);
         await localStorage.writeData('tokens', data['data']['tokens']);
 

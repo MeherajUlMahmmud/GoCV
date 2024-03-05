@@ -35,40 +35,40 @@ class _InterestPageState extends State<InterestPage> {
   }
 
   fetchInterests(String resumeId) {
-    final String url = '${URLS.kInterestUrl}$resumeId/list/';
+    // final String url = '${URLS.kInterestUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        print(data);
-        setState(() {
-          interestList = data['data']['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch interests',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     print(data);
+    //     setState(() {
+    //       interestList = data['data']['data'];
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch interests',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override

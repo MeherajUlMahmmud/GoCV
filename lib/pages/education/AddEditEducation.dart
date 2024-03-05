@@ -113,33 +113,33 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   }
 
   fetchEducation(String educationId) {
-    String url = '${URLS.kEducationUrl}$educationId/details/';
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      url,
-    )
-        .then((data) {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          education = Education.fromJson(data['data']);
-          isError = false;
-        });
+    // String url = '${URLS.kEducationUrl}$educationId/details/';
+    // APIService()
+    //     .sendGetRequest(
+    //   accessToken,
+    //   url,
+    // )
+    //     .then((data) {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       education = Education.fromJson(data['data']);
+    //       isError = false;
+    //     });
 
-        initiateControllers();
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['data']['detail'];
-        });
-        Helper().showSnackBar(
-          context,
-          errorText,
-          Colors.red,
-        );
-      }
-    });
+    //     initiateControllers();
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['data']['detail'];
+    //     });
+    //     Helper().showSnackBar(
+    //       context,
+    //       errorText,
+    //       Colors.red,
+    //     );
+    //   }
+    // });
   }
 
   createEducation() {
@@ -182,50 +182,50 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   }
 
   updateEducation(String educationId) {
-    String url = '${URLS.kEducationUrl}$educationId/update/';
-    APIService()
-        .sendPatchRequest(
-      accessToken,
-      educationData,
-      url,
-    )
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          education = Education.fromJson(data['data']);
-          isLoading = false;
-          isError = false;
-        });
+    // String url = '${URLS.kEducationUrl}$educationId/update/';
+    // APIService()
+    //     .sendPatchRequest(
+    //   accessToken,
+    //   educationData,
+    //   url,
+    // )
+    //     .then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       education = Education.fromJson(data['data']);
+    //       isLoading = false;
+    //       isError = false;
+    //     });
 
-        Helper().showSnackBar(
-          context,
-          'Education details updated',
-          Colors.green,
-        );
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['data']['detail'];
-        });
-        Helper().showSnackBar(
-          context,
-          errorText,
-          Colors.red,
-        );
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        'Error updating education',
-        Colors.red,
-      );
-    });
+    //     Helper().showSnackBar(
+    //       context,
+    //       'Education details updated',
+    //       Colors.green,
+    //     );
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['data']['detail'];
+    //     });
+    //     Helper().showSnackBar(
+    //       context,
+    //       errorText,
+    //       Colors.red,
+    //     );
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     'Error updating education',
+    //     Colors.red,
+    //   );
+    // });
   }
 
   handleSubmit() {

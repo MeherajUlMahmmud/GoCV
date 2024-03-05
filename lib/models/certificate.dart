@@ -22,4 +22,14 @@ class Certificate {
       'date': date,
     };
   }
+
+  factory Certificate.fromJson(Map<String, dynamic> json) {
+    return Certificate(
+      personId: json['personId'],
+      id: json['id'],
+      name: json['name'],
+      issuedBy: json['issuedBy'],
+      date: json['date'],
+    );
+  }
 }

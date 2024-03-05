@@ -1,4 +1,3 @@
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/resume.dart';
 import 'package:gocv/pages/award/AwardPage.dart';
 import 'package:gocv/pages/certification/CertificationPage.dart';
@@ -11,12 +10,11 @@ import 'package:gocv/pages/reference/Referencepage.dart';
 import 'package:gocv/pages/skill/SkillPage.dart';
 import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
+import 'package:flutter/material.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:flutter/material.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:provider/provider.dart';
 
 class ResumeDetailsScreen extends StatefulWidget {
@@ -32,7 +30,7 @@ class ResumeDetailsScreen extends StatefulWidget {
 
 class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     with SingleTickerProviderStateMixin {
-  UserProvider userProvider = UserProvider();
+  ResumeRepository resumeRepository = ResumeRepository();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
@@ -60,13 +58,14 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     fetchResumeDetails();
   }
 
-  fetchResumeDetails() {
-    final String url = '${URLS.kResumeUrl}$resumeId/details/';
+  fetchResumeDetails() async {
+    try {
+      final response = await resumeRepository.getResumeDetails(resumeId);
+      print(response);
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        currentResumeProvider
-            .setCurrentResume(Resume.fromJson(data['data']['data']));
+      if (response['status'] == Constants.httpOkCode) {
+        final Resume fetchedResume = Resume.fromJson(response['data']['data']);
+        currentResumeProvider.setCurrentResume(fetchedResume);
 
         setState(() {
           isLoading = false;
@@ -74,10 +73,11 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
           errorText = '';
         });
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.SESSION_EXPIRED_MSG,
+            Constants.sessionExpiredMsg,
             Colors.red,
           );
           Helper().logoutUser(context);
@@ -85,16 +85,28 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
           setState(() {
             isLoading = false;
             isError = true;
-            errorText = data['error'];
+            errorText = response['message'];
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch resumes',
+            Constants.genericErrorMsg,
             Colors.red,
           );
         }
       }
-    });
+    } catch (error) {
+      print(error);
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching resume details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        'Error fetching resume details',
+        Colors.red,
+      );
+    }
   }
 
   @override

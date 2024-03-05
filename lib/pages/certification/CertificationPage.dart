@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/certificate.dart';
 import 'package:gocv/repositories/certificate.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 
 class CertificationPage extends StatefulWidget {
   final String resumeId;
@@ -34,38 +33,40 @@ class _CertificationPageState extends State<CertificationPage> {
   }
 
   fetchCertifications(String resumeId) {
-    String url = '${URLS.kCertificationUrl}$resumeId/list/';
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          certificationList = data['data']['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
+    Map<String, dynamic> response =
+        certificateRepository.getCertificates(widget.resumeId);
+    print(response);
+
+    if (response['status'] == Constants.httpOkCode) {
+      setState(() {
+        certificationList = response['data'].map<Certificate>((award) {
+          return Certificate.fromJson(award);
+        }).toList();
+        isLoading = false;
+        isError = false;
+        errorText = '';
+      });
+    } else {
+      if (Helper().isUnauthorizedAccess(response['status'])) {
+        Helper().showSnackBar(
+          context,
+          Constants.sessionExpiredMsg,
+          Colors.red,
+        );
+        Helper().logoutUser(context);
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch references',
-            Colors.red,
-          );
-        }
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['message'];
+        });
+        Helper().showSnackBar(
+          context,
+          Constants.genericErrorMsg,
+          Colors.red,
+        );
       }
-    });
+    }
   }
 
   @override

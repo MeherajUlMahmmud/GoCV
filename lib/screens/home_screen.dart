@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   TextEditingController titleController = TextEditingController();
 
-  List<Resume> resumes = [];
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
@@ -60,15 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
   fetchResumes() async {
     try {
       final response = await resumeRepository.getResumes(userId);
-      print(response);
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Resume> fetchedResumes = (response['data'] as List)
             .map<Resume>((resume) => Resume.fromJson(resume))
             .toList();
+        resumeListProvider.setResumeList(fetchedResumes);
         setState(() {
-          resumes = fetchedResumes;
-          resumeListProvider.setResumeList(resumes);
           isLoading = false;
           isError = false;
           errorText = '';
@@ -101,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
         isError = true;
         errorText = 'Error fetching resumes: $error';
       });
+      if (!mounted) return;
       Helper().showSnackBar(
         context,
         'Error fetching resumes',
@@ -121,9 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
           isError = false;
           errorText = '';
         });
+        if (!mounted) return;
         Navigator.pop(context);
       } else {
         if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
             Constants.sessionExpiredMsg,
@@ -138,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             errorText = response['error'];
           });
 
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
             'Failed to create resume',
@@ -146,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
     } catch (error) {
+      if (!mounted) return;
       // Handle error
       Helper().showSnackBar(
         context,
@@ -168,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
           errorText = '';
         });
       } else {
+        if (!mounted) return;
         // Handle error
         Helper().showSnackBar(
           context,
@@ -176,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     } catch (error) {
+      if (!mounted) return;
       // Handle error
       Helper().showSnackBar(
         context,

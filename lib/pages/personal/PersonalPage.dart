@@ -7,10 +7,8 @@ import 'package:gocv/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/personal.dart';
 import 'package:gocv/providers/PersonalDataProvider.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -97,12 +95,13 @@ class _PersonalPageState extends State<PersonalPage> {
     });
   }
 
-  fetchPersonalDetails() {
-    final String url = '${URLS.kPersonalUrl}${widget.resumeId}/details/';
+  fetchPersonalDetails() async {
+    try {
+      final response =
+          await personalRepository.getPersonalDetails(widget.resumeId);
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Personal personal = Personal.fromJson(data['data']);
+      if (response['status'] == Constants.httpOkCode) {
+        Personal personal = Personal.fromJson(response['data']);
         personalDataProvider.setPersonalData(personal);
 
         setState(() {
@@ -114,10 +113,11 @@ class _PersonalPageState extends State<PersonalPage> {
 
         initiateControllers();
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.SESSION_EXPIRED_MSG,
+            Constants.sessionExpiredMsg,
             Colors.red,
           );
           Helper().logoutUser(context);
@@ -125,8 +125,9 @@ class _PersonalPageState extends State<PersonalPage> {
           setState(() {
             isLoading = false;
             isError = true;
-            errorText = data['error'];
+            errorText = response['error'];
           });
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
             'Failed to fetch personal data',
@@ -135,7 +136,19 @@ class _PersonalPageState extends State<PersonalPage> {
           Navigator.pop(context);
         }
       }
-    });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching personal details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching personal details',
+        Colors.red,
+      );
+    }
   }
 
   Future<File> getFromGallery() async {
@@ -163,34 +176,34 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   handleUpdatePersonalDetails() {
-    final String url = '${URLS.kPersonalUrl}$personalId/update/';
+    // final String url = '${URLS.kPersonalUrl}$personalId/update/';
 
-    APIService()
-        .sendPatchRequest(accessToken, updatedPersonalData, url)
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Helper().showSnackBar(
-          context,
-          'Personal details updated successfully',
-          Colors.green,
-        );
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          Helper().showSnackBar(
-            context,
-            'Failed to update personal details',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService()
+    //     .sendPatchRequest(accessToken, updatedPersonalData, url)
+    //     .then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     Helper().showSnackBar(
+    //       context,
+    //       'Personal details updated successfully',
+    //       Colors.green,
+    //     );
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to update personal details',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override

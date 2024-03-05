@@ -77,90 +77,90 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   getSkill(String skillId) {
     final String url = '${URLS.kSkillUrl}$skillId/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          isLoading = false;
-          isError = false;
-          uuid = data['data']['uuid'];
-          skill = data['data']['skill'];
-          proficiency = data['data']['proficiency'];
-          description = data['data']['description'];
-          skillController.text = skill;
-          proficiencyController.text = proficiency;
-          descriptionController.text = description;
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = false;
+    //       uuid = data['data']['uuid'];
+    //       skill = data['data']['skill'];
+    //       proficiency = data['data']['proficiency'];
+    //       description = data['data']['description'];
+    //       skillController.text = skill;
+    //       proficiencyController.text = proficiency;
+    //       descriptionController.text = description;
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   createSkill() {
-    Map<String, dynamic> data = {
-      'skill': skill,
-      'proficiency': proficiency,
-      'description': description,
-    };
-    final String url = '${URLS.kSkillUrl}${widget.resumeId}/create/';
+    // Map<String, dynamic> data = {
+    //   'skill': skill,
+    //   'proficiency': proficiency,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kSkillUrl}${widget.resumeId}/create/';
 
-    APIService().sendPostRequest(accessToken, data, url).then((value) {
-      if (value['status'] == Constants.HTTP_CREATED) {
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = value['error'];
-        });
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
-    });
+    // APIService().sendPostRequest(accessToken, data, url).then((value) {
+    //   if (value['status'] == Constants.HTTP_CREATED) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = value['error'];
+    //     });
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     error.toString(),
+    //     Colors.red,
+    //   );
+    // });
   }
 
   updateSkill() {
-    Map<String, dynamic> data = {
-      'skill': skill,
-      'proficiency': proficiency,
-      'description': description,
-    };
-    final String url = '${URLS.kSkillUrl}${widget.skillId}/update/';
+    // Map<String, dynamic> data = {
+    //   'skill': skill,
+    //   'proficiency': proficiency,
+    //   'description': description,
+    // };
+    // final String url = '${URLS.kSkillUrl}${widget.skillId}/update/';
 
-    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-      }
-    });
+    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     Navigator.pop(context);
+    //   } else {
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //       errorText = data['error'];
+    //     });
+    //   }
+    // });
   }
 
   handleSubmit() {

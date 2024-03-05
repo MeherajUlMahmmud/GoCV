@@ -37,38 +37,38 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   fetchWorkExperiences(String resumeId) {
     final String url = '${URLS.kExperienceUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          experienceList = data['data']['data']
-              .map<Experience>((experience) => Experience.fromJson(experience))
-              .toList();
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch work experiences',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       experienceList = data['data']['data']
+    //           .map<Experience>((experience) => Experience.fromJson(experience))
+    //           .toList();
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch work experiences',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override

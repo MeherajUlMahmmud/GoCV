@@ -61,14 +61,14 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       listen: false,
     );
 
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
+    // setState(() {
+    //   accessToken = userProvider.tokens['access'].toString();
 
-      resumeId = currentResumeProvider.currentResume.id.toString();
-    });
+    //   resumeId = currentResumeProvider.currentResume.id.toString();
+    // });
 
     loadImage();
-    fetchResumeDetails();
+    // fetchResumeDetails();
   }
 
   loadImage() async {
@@ -76,255 +76,255 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     imageData = (image).buffer.asUint8List();
   }
 
-  fetchResumeDetails() {
-    final String url = '${URLS.kResumeUrl}$resumeId/details/';
+  // fetchResumeDetails() {
+  //   final String url = '${URLS.kResumeUrl}$resumeId/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          resumeDetails = data['data'];
-        });
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         resumeDetails = data['data'];
+  //       });
 
-        fetchEducations();
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch resumes',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //       fetchEducations();
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch resumes',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchEducations() {
-    final String url = '${URLS.kEducationUrl}$resumeId/list/';
+  // fetchEducations() {
+  //   final String url = '${URLS.kEducationUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          educationList = data['data']['data'].map<Education>((education) {
-            return Education.fromJson(education);
-          }).toList();
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch educations',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         educationList = data['data']['data'].map<Education>((education) {
+  //           return Education.fromJson(education);
+  //         }).toList();
+  //         isLoading = false;
+  //         isError = false;
+  //         errorText = '';
+  //       });
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch educations',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchWorkExperiences() {
-    final String url = '${URLS.kExperienceUrl}$resumeId/list/';
+  // fetchWorkExperiences() {
+  //   final String url = '${URLS.kExperienceUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          experienceList = data['data']['data']
-              .map<Experience>((experience) => Experience.fromJson(experience))
-              .toList();
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch work experiences',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         experienceList = data['data']['data']
+  //             .map<Experience>((experience) => Experience.fromJson(experience))
+  //             .toList();
+  //         isLoading = false;
+  //         isError = false;
+  //         errorText = '';
+  //       });
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch work experiences',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchSkills() {
-    final String url = '${URLS.kSkillUrl}$resumeId/list/';
+  // fetchSkills() {
+  //   final String url = '${URLS.kSkillUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          skillList = data['data'];
-        });
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         skillList = data['data'];
+  //       });
 
-        fetchInterests();
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch skills',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //       fetchInterests();
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         print(data['error']);
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch skills',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchInterests() {
-    final String url = '${URLS.kInterestUrl}$resumeId/list/';
+  // fetchInterests() {
+  //   final String url = '${URLS.kInterestUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          interestList = data['data'];
-        });
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         interestList = data['data'];
+  //       });
 
-        fetchLanguages();
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch interests',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //       fetchLanguages();
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         print(data['error']);
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch interests',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchLanguages() {
-    final String url = '${URLS.kLanguageUrl}$resumeId/list/';
+  // fetchLanguages() {
+  //   final String url = '${URLS.kLanguageUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          languageList = data['data'];
-        });
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         languageList = data['data'];
+  //       });
 
-        fetchReferences();
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch languages',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //       fetchReferences();
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         print(data['error']);
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch languages',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
-  fetchReferences() {
-    final String url = '${URLS.kReferenceUrl}$resumeId/list/';
+  // fetchReferences() {
+  //   final String url = '${URLS.kReferenceUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          referenceList = data['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch references',
-            Colors.red,
-          );
-        }
-      }
-    });
-  }
+  //   APIService().sendGetRequest(accessToken, url).then((data) async {
+  //     print(data);
+  //     if (data['status'] == Constants.HTTP_OK) {
+  //       setState(() {
+  //         referenceList = data['data'];
+  //         isLoading = false;
+  //         isError = false;
+  //         errorText = '';
+  //       });
+  //     } else {
+  //       if (Helper().isUnauthorizedAccess(data['status'])) {
+  //         Helper().showSnackBar(
+  //           context,
+  //           Constants.SESSION_EXPIRED_MSG,
+  //           Colors.red,
+  //         );
+  //         Helper().logoutUser(context);
+  //       } else {
+  //         print(data['error']);
+  //         setState(() {
+  //           isLoading = false;
+  //           isError = true;
+  //           errorText = data['error'];
+  //         });
+  //         Helper().showSnackBar(
+  //           context,
+  //           'Failed to fetch references',
+  //           Colors.red,
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

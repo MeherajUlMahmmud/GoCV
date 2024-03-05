@@ -38,49 +38,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
       listen: false,
     );
 
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-      userId = userProvider.userData!.id.toString();
-    });
+    // setState(() {
+    //   accessToken = userProvider.tokens['access'].toString();
+    //   userId = userProvider.userData!.id.toString();
+    // });
     fetchUserProfile();
   }
 
   fetchUserProfile() {
-    setState(() {
-      isLoading = true;
-    });
-    const String url = '${URLS.kUserUrl}profile/';
+    // setState(() {
+    //   isLoading = true;
+    // });
+    // const String url = '${URLS.kUserUrl}profile/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        final UserBase userBase = UserBase.fromJson(data['data']['user_data']);
-        final Applicant applicant =
-            Applicant.fromJson(data['data']['applicant_data']);
-        final UserProfile userProfile = UserProfile(
-          userData: userBase,
-          applicantData: applicant,
-        );
-        userProfileProvider.setUserProfile(userProfile);
-        // await localStorage.writeData('user', data['data']['user_data']);
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }
-    });
+    // APIService().sendGetRequest(accessToken, url).then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     final UserBase userBase = UserBase.fromJson(data['data']['user_data']);
+    //     final Applicant applicant =
+    //         Applicant.fromJson(data['data']['applicant_data']);
+    //     final UserProfile userProfile = UserProfile(
+    //       userData: userBase,
+    //       applicantData: applicant,
+    //     );
+    //     userProfileProvider.setUserProfile(userProfile);
+    //     // await localStorage.writeData('user', data['data']['user_data']);
+    //     setState(() {
+    //       isLoading = false;
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   @override

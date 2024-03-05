@@ -139,160 +139,160 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
 
     final String url = '${URLS.kExperienceUrl}$experienceId/details/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          experience = Experience.fromJson(data['data']);
-          isError = false;
-        });
+    // APIService().sendGetRequest(accessToken, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       experience = Experience.fromJson(data['data']);
+    //       isError = false;
+    //     });
 
-        initiateControllers();
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['data']['detail'];
-          });
-          Helper().showSnackBar(context, errorText, Colors.red);
-        }
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        'Error fetching experience',
-        Colors.red,
-      );
-    });
+    //     initiateControllers();
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['data']['detail'];
+    //       });
+    //       Helper().showSnackBar(context, errorText, Colors.red);
+    //     }
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //     errorText = error.toString();
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     'Error fetching experience',
+    //     Colors.red,
+    //   );
+    // });
   }
 
   createExperience() {
     const String url = '${URLS.kExperienceUrl}create/';
 
-    APIService().sendPostRequest(accessToken, experienceData, url).then((data) {
-      print(data);
-      if (data['status'] == Constants.HTTP_CREATED) {
-        Helper().showSnackBar(
-          context,
-          'Experience created successfully',
-          Colors.green,
-        );
-        setState(() {
-          isLoading = false;
-          isError = true;
-        });
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          Helper().showSnackBar(
-            context,
-            'Error creating experience',
-            Colors.red,
-          );
-          setState(() {
-            isLoading = false;
-            isError = true;
-          });
-        }
-      }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-      });
-      Helper().showSnackBar(
-        context,
-        'Error creating experience',
-        Colors.red,
-      );
-    });
+    // APIService().sendPostRequest(accessToken, experienceData, url).then((data) {
+    //   print(data);
+    //   if (data['status'] == Constants.HTTP_CREATED) {
+    //     Helper().showSnackBar(
+    //       context,
+    //       'Experience created successfully',
+    //       Colors.green,
+    //     );
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = true;
+    //     });
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Error creating experience',
+    //         Colors.red,
+    //       );
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //       });
+    //     }
+    //   }
+    // }).catchError((error) {
+    //   setState(() {
+    //     isLoading = false;
+    //     isError = true;
+    //   });
+    //   Helper().showSnackBar(
+    //     context,
+    //     'Error creating experience',
+    //     Colors.red,
+    //   );
+    // });
   }
 
   updateExperience(String experienceId) {
-    final String url = '${URLS.kExperienceUrl}$experienceId/update/';
-    APIService()
-        .sendPatchRequest(accessToken, experienceData, url)
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        print(data);
-        setState(() {
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-        Helper().showSnackBar(
-          context,
-          'Experience updated successfully',
-          Colors.green,
-        );
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Error updating experience',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // final String url = '${URLS.kExperienceUrl}$experienceId/update/';
+    // APIService()
+    //     .sendPatchRequest(accessToken, experienceData, url)
+    //     .then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     print(data);
+    //     setState(() {
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //     Helper().showSnackBar(
+    //       context,
+    //       'Experience updated successfully',
+    //       Colors.green,
+    //     );
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Error updating experience',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   deleteExperience(String experienceId) {
-    final String url = '${URLS.kExperienceUrl}$experienceId/delete/';
+    // final String url = '${URLS.kExperienceUrl}$experienceId/delete/';
 
-    APIService().sendDeleteRequest(accessToken, url).then((data) async {
-      print(data);
-      if (data['status'] == 204) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-          });
-        }
-      }
-    });
+    // APIService().sendDeleteRequest(accessToken, url).then((data) async {
+    //   print(data);
+    //   if (data['status'] == 204) {
+    //     Navigator.pop(context);
+    //     Navigator.pop(context);
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   handleSubmit() {

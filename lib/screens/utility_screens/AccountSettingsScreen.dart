@@ -37,7 +37,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     super.initState();
 
     setState(() {
-      accessToken = userProvider.tokens['access'].toString();
+      // accessToken = userProvider.tokens['access'].toString();
       userId = userProvider.userData!.id.toString();
 
       email = userProvider.userData!.email!;

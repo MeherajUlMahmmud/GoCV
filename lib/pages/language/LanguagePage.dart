@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
+import 'package:gocv/repositories/language.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -18,7 +19,7 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguagePageState extends State<LanguagePage> {
-  UserProvider userProvider = UserProvider();
+  LanguageRepository languageRepository = LanguageRepository();
 
   List<dynamic> languageList = [];
 
@@ -34,43 +35,43 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   fetchLanguages(String resumeId) {
-    String url = '${URLS.kLanguageUrl}$resumeId/list/';
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      url,
-    )
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          languageList = data['data']['data'];
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch languages',
-            Colors.red,
-          );
-        }
-      }
-    });
+    // String url = '${URLS.kLanguageUrl}$resumeId/list/';
+    // APIService()
+    //     .sendGetRequest(
+    //   accessToken,
+    //   url,
+    // )
+    //     .then((data) async {
+    //   if (data['status'] == Constants.HTTP_OK) {
+    //     setState(() {
+    //       languageList = data['data']['data'];
+    //       isLoading = false;
+    //       isError = false;
+    //       errorText = '';
+    //     });
+    //   } else {
+    //     if (Helper().isUnauthorizedAccess(data['status'])) {
+    //       Helper().showSnackBar(
+    //         context,
+    //         Constants.SESSION_EXPIRED_MSG,
+    //         Colors.red,
+    //       );
+    //       Helper().logoutUser(context);
+    //     } else {
+    //       print(data['error']);
+    //       setState(() {
+    //         isLoading = false;
+    //         isError = true;
+    //         errorText = data['error'];
+    //       });
+    //       Helper().showSnackBar(
+    //         context,
+    //         'Failed to fetch languages',
+    //         Colors.red,
+    //       );
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -268,35 +269,35 @@ class _LanguagePageState extends State<LanguagePage> {
 
   void _showDeleteConfirmationDialog(BuildContext context, String languageId) {
     void deleteLanguage() {
-      final String url = '${URLS.kLanguageUrl}$languageId/delete/';
+      // final String url = '${URLS.kLanguageUrl}$languageId/delete/';
 
-      APIService().sendDeleteRequest(accessToken, url).then((data) async {
-        print(data);
-        if (data['status'] == Constants.HTTP_DELETED) {
-          Navigator.of(context).pop();
-          Helper().showSnackBar(
-            context,
-            'Language deleted successfully',
-            Colors.green,
-          );
-        } else {
-          if (Helper().isUnauthorizedAccess(data['status'])) {
-            Helper().showSnackBar(
-              context,
-              Constants.SESSION_EXPIRED_MSG,
-              Colors.red,
-            );
-            Helper().logoutUser(context);
-          } else {
-            print(data['error']);
-            Helper().showSnackBar(
-              context,
-              'Failed to delete language',
-              Colors.red,
-            );
-          }
-        }
-      });
+      // APIService().sendDeleteRequest(accessToken, url).then((data) async {
+      //   print(data);
+      //   if (data['status'] == Constants.HTTP_DELETED) {
+      //     Navigator.of(context).pop();
+      //     Helper().showSnackBar(
+      //       context,
+      //       'Language deleted successfully',
+      //       Colors.green,
+      //     );
+      //   } else {
+      //     if (Helper().isUnauthorizedAccess(data['status'])) {
+      //       Helper().showSnackBar(
+      //         context,
+      //         Constants.SESSION_EXPIRED_MSG,
+      //         Colors.red,
+      //       );
+      //       Helper().logoutUser(context);
+      //     } else {
+      //       print(data['error']);
+      //       Helper().showSnackBar(
+      //         context,
+      //         'Failed to delete language',
+      //         Colors.red,
+      //       );
+      //     }
+      //   }
+      // });
     }
 
     showDialog(
