@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
       password,
     )
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         await localStorage.writeData('user', data['data']['user']);
         await localStorage.writeData('tokens', data['data']['tokens']);
 

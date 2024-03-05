@@ -57,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password,
     )
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           isLoading = false;
         });
