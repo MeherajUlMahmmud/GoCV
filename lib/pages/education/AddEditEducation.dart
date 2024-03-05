@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
@@ -130,7 +131,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       url,
     )
         .then((data) {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           education = Education.fromJson(data['data']);
           isError = false;
@@ -168,7 +169,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     //   isCurrentlyEnrolled,
     // )
     //     .then((value) {
-    //   if (value['status'] == 201) {
+    //   if (value['status'] == Constants.HTTP_CREATED) {
     //     Navigator.pop(context);
     //   } else {
     //     setState(() {
@@ -200,7 +201,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       url,
     )
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           education = Education.fromJson(data['data']);
           isLoading = false;

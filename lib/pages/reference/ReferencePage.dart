@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/reference/AddEditReferencePage.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class ReferencePage extends StatefulWidget {
   final String resumeId;
@@ -18,9 +20,8 @@ class ReferencePage extends StatefulWidget {
 }
 
 class _ReferencePageState extends State<ReferencePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<dynamic> referenceList = [];
 
@@ -32,21 +33,24 @@ class _ReferencePageState extends State<ReferencePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchReferences(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchReferences(String resumeId) {
+    final String url = '${URLS.kReferenceUrl}$resumeId/list/';
 
-    fetchReferences(tokens['access'], widget.resumeId);
-  }
-
-  fetchReferences(String accessToken, String resumeId) {
-    String url = '${URLS.kReferenceUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           referenceList = data['data']['data'];
           isLoading = false;
@@ -57,10 +61,10 @@ class _ReferencePageState extends State<ReferencePage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -122,7 +126,7 @@ class _ReferencePageState extends State<ReferencePage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchReferences(tokens['access'], widget.resumeId);
+                        fetchReferences(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: referenceList.length,
@@ -320,18 +324,12 @@ class _ReferencePageState extends State<ReferencePage> {
     );
   }
 
-  void _showDeleteConfirmationDialog(
-    BuildContext context,
-    String referenceId,
-  ) {
+  void _showDeleteConfirmationDialog(BuildContext context, String referenceId) {
     deleteReference() {
-      APIService()
-          .sendDeleteRequest(
-        tokens['access'],
-        '${URLS.kReferenceUrl}$referenceId/delete/',
-      )
-          .then((data) async {
-        if (data['status'] == 200) {
+      final String url = '${URLS.kReferenceUrl}$referenceId/delete/';
+
+      APIService().sendDeleteRequest(accessToken, url).then((data) async {
+        if (data['status'] == Constants.HTTP_OK) {
           Navigator.of(context).pop(true);
           Helper().showSnackBar(
             context,

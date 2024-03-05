@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/skill/AddEditSkillPage.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class SkillPage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class SkillPage extends StatefulWidget {
 }
 
 class _SkillPageState extends State<SkillPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<dynamic> skillList = [];
 
@@ -33,22 +33,23 @@ class _SkillPageState extends State<SkillPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchSkills(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchSkills(String resumeId) {
+    final String url = '${URLS.kSkillUrl}$resumeId/list/';
 
-    fetchSkills(tokens['access'], widget.resumeId);
-  }
-
-  fetchSkills(String accessToken, String resumeId) {
-    APIService()
-        .sendGetRequest(accessToken, '${URLS.kSkillUrl}$resumeId/list/')
-        .then((data) async {
-      if (data['status'] == 200) {
-        print(data['data']['data']);
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           skillList = data['data']['data'];
           isLoading = false;
@@ -59,10 +60,10 @@ class _SkillPageState extends State<SkillPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -121,10 +122,7 @@ class _SkillPageState extends State<SkillPage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchSkills(
-                          tokens['access'],
-                          widget.resumeId,
-                        );
+                        fetchSkills(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: skillList.length,

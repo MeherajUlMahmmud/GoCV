@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AddEditSkillPage extends StatefulWidget {
   final String resumeId;
@@ -22,9 +24,9 @@ class AddEditSkillPage extends StatefulWidget {
 }
 
 class _AddEditSkillPageState extends State<AddEditSkillPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+
   List<String> proficiencyTypes = [
     'Beginner',
     'Intermediate',
@@ -53,7 +55,23 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    if (widget.skillId != null) {
+      getSkill(widget.skillId!);
+    } else {
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
   @override
@@ -65,29 +83,12 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  getSkill(String skillId) {
+    final String url = '${URLS.kSkillUrl}$skillId/details/';
 
-    if (widget.skillId != null) {
-      getSkill(tokens['access'], widget.skillId!);
-    } else {
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
-  }
-
-  getSkill(String accessToken, String skillId) {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kSkillUrl}$skillId/details/',
-    )
-        .then((data) {
+    APIService().sendGetRequest(accessToken, url).then((data) {
       print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           isLoading = false;
           isError = false;
@@ -100,23 +101,21 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
           descriptionController.text = description;
         });
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+        }
       }
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        error.toString(),
-        Colors.red,
-      );
     });
   }
 
@@ -126,14 +125,10 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
       'proficiency': proficiency,
       'description': description,
     };
-    APIService()
-        .sendPostRequest(
-      tokens['access'],
-      data,
-      '${URLS.kSkillUrl}${widget.resumeId}/create/',
-    )
-        .then((value) {
-      if (value['status'] == 201) {
+    final String url = '${URLS.kSkillUrl}${widget.resumeId}/create/';
+
+    APIService().sendPostRequest(accessToken, data, url).then((value) {
+      if (value['status'] == Constants.HTTP_CREATED) {
         Navigator.pop(context);
       } else {
         setState(() {
@@ -162,14 +157,10 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
       'proficiency': proficiency,
       'description': description,
     };
-    APIService()
-        .sendPatchRequest(
-      tokens['access'],
-      data,
-      '${URLS.kSkillUrl}${widget.skillId}/update/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kSkillUrl}${widget.skillId}/update/';
+
+    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         Navigator.pop(context);
       } else {
         setState(() {

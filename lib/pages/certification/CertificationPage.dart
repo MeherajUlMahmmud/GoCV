@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class CertificationPage extends StatefulWidget {
   final String resumeId;
@@ -18,9 +19,8 @@ class CertificationPage extends StatefulWidget {
 }
 
 class _CertificationPageState extends State<CertificationPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<dynamic> certificationList = [];
 
@@ -32,21 +32,22 @@ class _CertificationPageState extends State<CertificationPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchCertifications(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchReferences(tokens['access'], widget.resumeId);
-  }
-
-  fetchReferences(String accessToken, String resumeId) {
+  fetchCertifications(String resumeId) {
     String url = '${URLS.kCertificationUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           certificationList = data['data']['data'];
           isLoading = false;
@@ -57,10 +58,10 @@ class _CertificationPageState extends State<CertificationPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -116,7 +117,17 @@ class _CertificationPageState extends State<CertificationPage> {
                         ),
                       ),
                     )
-                  : Container(),
+                  : RefreshIndicator(
+                      onRefresh: () async {
+                        fetchCertifications(widget.resumeId);
+                      },
+                      child: ListView.builder(
+                        itemCount: certificationList.length,
+                        itemBuilder: (context, index) {
+                          return Container();
+                        },
+                      ),
+                    ),
     );
   }
 }

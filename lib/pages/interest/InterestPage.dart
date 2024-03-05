@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/interest/AddEditInterestPage.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class InterestPage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class InterestPage extends StatefulWidget {
 }
 
 class _InterestPageState extends State<InterestPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<dynamic> interestList = [];
 
@@ -33,20 +33,23 @@ class _InterestPageState extends State<InterestPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchInterests(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchInterests(String resumeId) {
+    final String url = '${URLS.kInterestUrl}$resumeId/list/';
 
-    fetchInterests(tokens['access'], widget.resumeId);
-  }
-
-  fetchInterests(String accessToken, String resumeId) {
-    String url = '${URLS.kInterestUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         print(data);
         setState(() {
           interestList = data['data']['data'];
@@ -58,10 +61,10 @@ class _InterestPageState extends State<InterestPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -123,10 +126,7 @@ class _InterestPageState extends State<InterestPage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchInterests(
-                          tokens['access'],
-                          widget.resumeId,
-                        );
+                        fetchInterests(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: interestList.length,

@@ -1,11 +1,12 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/experience.dart';
 import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class WorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class WorkExperiencePage extends StatefulWidget {
 }
 
 class _WorkExperiencePageState extends State<WorkExperiencePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<Experience> experienceList = [];
 
@@ -33,21 +33,23 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchWorkExperiences(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchWorkExperiences(String resumeId) {
+    final String url = '${URLS.kExperienceUrl}$resumeId/list/';
 
-    fetchWorkExperiences(tokens['access'], widget.resumeId);
-  }
-
-  fetchWorkExperiences(String accessToken, String resumeId) {
-    APIService()
-        .sendGetRequest(accessToken, '${URLS.kExperienceUrl}$resumeId/list/')
-        .then((data) async {
-      if (data['status'] == 200) {
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           experienceList = data['data']['data']
               .map<Experience>((experience) => Experience.fromJson(experience))
@@ -60,10 +62,10 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
@@ -122,10 +124,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchWorkExperiences(
-                          tokens['access'],
-                          widget.resumeId,
-                        );
+                        fetchWorkExperiences(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: experienceList.length,

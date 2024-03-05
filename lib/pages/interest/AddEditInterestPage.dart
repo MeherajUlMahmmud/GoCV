@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AddEditInterestPage extends StatefulWidget {
   final String resumeId;
@@ -21,9 +23,8 @@ class AddEditInterestPage extends StatefulWidget {
 }
 
 class _AddEditInterestPageState extends State<AddEditInterestPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -43,7 +44,23 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    if (widget.interestId != null) {
+      getInterest(widget.interestId!);
+    } else {
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
   @override
@@ -54,28 +71,29 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  getInterest(String interestId) {
+    final String url = '${URLS.kInterestUrl}${interestId}/details/';
 
-    if (widget.interestId != null) {
-      APIService()
-          .sendGetRequest(
-        tokens['access'],
-        '${URLS.kInterestUrl}${widget.interestId}/details/',
-      )
-          .then((data) {
-        print(data);
-        if (data['status'] == 200) {
-          setState(() {
-            isLoading = false;
-            isError = false;
-            uuid = data['data']['uuid'];
-            interest = data['data']['interest'];
-            description = data['data']['description'];
-            interestController.text = interest;
-            descriptionController.text = description;
-          });
+    APIService().sendGetRequest(accessToken, url).then((data) {
+      print(data);
+      if (data['status'] == Constants.HTTP_OK) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          uuid = data['data']['uuid'];
+          interest = data['data']['interest'];
+          description = data['data']['description'];
+          interestController.text = interest;
+          descriptionController.text = description;
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
@@ -83,24 +101,19 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
             errorText = data['error'];
           });
         }
-      }).catchError((error) {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = error.toString();
-        });
-        Helper().showSnackBar(
-          context,
-          error.toString(),
-          Colors.red,
-        );
-      });
-    } else {
+      }
+    }).catchError((error) {
       setState(() {
         isLoading = false;
-        isError = false;
+        isError = true;
+        errorText = error.toString();
       });
-    }
+      Helper().showSnackBar(
+        context,
+        error.toString(),
+        Colors.red,
+      );
+    });
   }
 
   createInterest() {
@@ -108,21 +121,26 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
       'interest': interest,
       'description': description,
     };
-    APIService()
-        .sendPostRequest(
-      tokens['access'],
-      data,
-      '${URLS.kInterestUrl}${widget.resumeId}/create/',
-    )
-        .then((value) {
-      if (value['status'] == 201) {
+    final String url = '${URLS.kInterestUrl}${widget.resumeId}/create/';
+
+    APIService().sendPostRequest(accessToken, data, url).then((value) {
+      if (value['status'] == Constants.HTTP_CREATED) {
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = value['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = value['error'];
+          });
+        }
       }
     }).catchError((error) {
       setState(() {
@@ -143,21 +161,26 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
       'interest': interest,
       'description': description,
     };
-    APIService()
-        .sendPatchRequest(
-      tokens['access'],
-      data,
-      '${URLS.kInterestUrl}${widget.interestId}/update/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kInterestUrl}${widget.interestId}/update/';
+
+    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+        }
       }
     });
   }

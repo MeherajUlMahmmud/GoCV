@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/experience.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:provider/provider.dart';
 
 class AddEditWorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -24,9 +26,9 @@ class AddEditWorkExperiencePage extends StatefulWidget {
 }
 
 class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+
   List<String> types = [
     'Full Time',
     'Part Time',
@@ -71,7 +73,23 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+    if (widget.experienceId != null) {
+      fetchWorkExperience(widget.experienceId!);
+    } else {
+      experienceData['resume'] = widget.resumeId;
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
   @override
@@ -85,21 +103,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     companyWebsiteController.dispose();
 
     super.dispose();
-  }
-
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    if (widget.experienceId != null) {
-      fetchWorkExperience(tokens['access'], widget.experienceId!);
-    } else {
-      experienceData['resume'] = widget.resumeId;
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
   }
 
   initiateControllers() {
@@ -126,8 +129,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     });
   }
 
-  fetchWorkExperience(String accessToken, String experienceId) {
-    if (experienceId == '') {
+  fetchWorkExperience(String experienceId) {
+    if (experienceId == '' || experienceId.isEmpty) {
       setState(() {
         isLoading = false;
         isError = true;
@@ -140,10 +143,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
       );
       return;
     }
-    String url = '${URLS.kExperienceUrl}$experienceId/details/';
+
+    final String url = '${URLS.kExperienceUrl}$experienceId/details/';
+
     APIService().sendGetRequest(accessToken, url).then((data) {
       print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           experience = Experience.fromJson(data['data']);
           isError = false;
@@ -151,16 +156,21 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
 
         initiateControllers();
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['data']['detail'];
-        });
-        Helper().showSnackBar(
-          context,
-          errorText,
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['data']['detail'];
+          });
+          Helper().showSnackBar(context, errorText, Colors.red);
+        }
       }
     }).catchError((error) {
       setState(() {
@@ -176,11 +186,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     });
   }
 
-  createExperience(String accessToken) {
-    String url = '${URLS.kExperienceUrl}create/';
+  createExperience() {
+    const String url = '${URLS.kExperienceUrl}create/';
+
     APIService().sendPostRequest(accessToken, experienceData, url).then((data) {
       print(data);
-      if (data['status'] == 201) {
+      if (data['status'] == Constants.HTTP_CREATED) {
         Helper().showSnackBar(
           context,
           'Experience created successfully',
@@ -192,15 +203,24 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         });
         Navigator.pop(context);
       } else {
-        Helper().showSnackBar(
-          context,
-          'Error creating experience',
-          Colors.red,
-        );
-        setState(() {
-          isLoading = false;
-          isError = true;
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          Helper().showSnackBar(
+            context,
+            'Error creating experience',
+            Colors.red,
+          );
+          setState(() {
+            isLoading = false;
+            isError = true;
+          });
+        }
       }
     }).catchError((error) {
       setState(() {
@@ -215,53 +235,69 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     });
   }
 
-  updateExperience(String accessToken, String experienceId) {
-    String url = '${URLS.kExperienceUrl}$experienceId/update/';
+  updateExperience(String experienceId) {
+    final String url = '${URLS.kExperienceUrl}$experienceId/update/';
     APIService()
-        .sendPatchRequest(
-      accessToken,
-      experienceData,
-      url,
-    )
+        .sendPatchRequest(accessToken, experienceData, url)
         .then((data) async {
-      print(data);
-      setState(() {
-        isLoading = false;
-        isError = false;
-        errorText = '';
-      });
-      Helper().showSnackBar(
-        context,
-        'Experience updated successfully',
-        Colors.green,
-      );
-      // Navigator.pop(context);
-    }).catchError((error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = error.toString();
-      });
-      Helper().showSnackBar(
-        context,
-        'Error updating experience',
-        Colors.red,
-      );
+      if (data['status'] == Constants.HTTP_OK) {
+        print(data);
+        setState(() {
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+        Helper().showSnackBar(
+          context,
+          'Experience updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Error updating experience',
+            Colors.red,
+          );
+        }
+      }
     });
   }
 
-  deleteExperience(String accessToken, String experienceId) {
-    String url = '${URLS.kExperienceUrl}$experienceId/delete/';
+  deleteExperience(String experienceId) {
+    final String url = '${URLS.kExperienceUrl}$experienceId/delete/';
+
     APIService().sendDeleteRequest(accessToken, url).then((data) async {
       print(data);
       if (data['status'] == 204) {
         Navigator.pop(context);
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+          });
+        }
       }
     });
   }
@@ -271,12 +307,9 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
       isLoading = true;
     });
     if (widget.experienceId != null) {
-      updateExperience(
-        tokens['access'],
-        widget.experienceId!,
-      );
+      updateExperience(widget.experienceId!);
     } else {
-      createExperience(tokens['access']);
+      createExperience();
     }
   }
 
@@ -340,10 +373,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                deleteExperience(
-                                  tokens['access'],
-                                  widget.experienceId!,
-                                );
+                                deleteExperience(widget.experienceId!);
                               },
                               child: const Text(
                                 'Delete',

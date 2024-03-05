@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class EducationPage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class EducationPage extends StatefulWidget {
 }
 
 class _EducationPageState extends State<EducationPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<Education> educationList = [];
 
@@ -33,21 +33,22 @@ class _EducationPageState extends State<EducationPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+    fetchEducations(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchEducations(String resumeId) {
+    final String url = '${URLS.kEducationUrl}$resumeId/list/';
 
-    fetchEducations(tokens['access'], widget.resumeId);
-  }
-
-  fetchEducations(String accessToken, String resumeId) {
-    APIService()
-        .sendGetRequest(accessToken, '${URLS.kEducationUrl}$resumeId/list/')
-        .then((data) async {
-      if (data['status'] == 200) {
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           educationList = data['data']['data'].map<Education>((education) {
             return Education.fromJson(education);
@@ -60,10 +61,10 @@ class _EducationPageState extends State<EducationPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
@@ -123,10 +124,7 @@ class _EducationPageState extends State<EducationPage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchEducations(
-                          tokens['access'],
-                          widget.resumeId,
-                        );
+                        fetchEducations(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: educationList.length,

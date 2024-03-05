@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AddEditLanguagePage extends StatefulWidget {
   final String resumeId;
@@ -22,9 +24,9 @@ class AddEditLanguagePage extends StatefulWidget {
 }
 
 class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
+
   List<String> proficiencyTypes = [
     'Basic',
     'Conversational',
@@ -52,7 +54,23 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    if (widget.languageId != null) {
+      getEducationDetails(widget.languageId!);
+    } else {
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
   @override
@@ -64,55 +82,31 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  getEducationDetails(String educationId) {
+    final String url = '${URLS.kLanguageUrl}${widget.languageId}/details/';
 
-    if (widget.languageId != null) {
-      APIService()
-          .sendGetRequest(
-        tokens['access'],
-        '${URLS.kLanguageUrl}${widget.languageId}/details/',
-      )
-          .then((data) {
-        print(data);
-        if (data['status'] == 200) {
-          setState(() {
-            isLoading = false;
-            isError = false;
-            uuid = data['data']['uuid'];
-            language = data['data']['language'];
-            proficiency = data['data']['proficiency'];
-            description = data['data']['description'];
-            languageController.text = language;
-            proficiencyController.text = proficiency;
-            descriptionController.text = description;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }).catchError((error) {
+    APIService().sendGetRequest(accessToken, url).then((data) {
+      print(data);
+      if (data['status'] == Constants.HTTP_OK) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          id = data['data']['id'];
+          language = data['data']['language'];
+          proficiency = data['data']['proficiency'];
+          description = data['data']['description'];
+          languageController.text = language;
+          proficiencyController.text = proficiency;
+          descriptionController.text = description;
+        });
+      } else {
         setState(() {
           isLoading = false;
           isError = true;
-          errorText = error.toString();
+          errorText = data['error'];
         });
-        Helper().showSnackBar(
-          context,
-          error.toString(),
-          Colors.red,
-        );
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
+      }
+    });
   }
 
   createLanguage() {
@@ -121,21 +115,26 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
       'proficiency': proficiency,
       'description': description,
     };
-    APIService()
-        .sendPostRequest(
-      tokens['access'],
-      data,
-      '${URLS.kLanguageUrl}${widget.resumeId}/create/',
-    )
-        .then((value) {
-      if (value['status'] == 201) {
+    final String url = '${URLS.kLanguageUrl}${widget.resumeId}/create/';
+
+    APIService().sendPostRequest(accessToken, data, url).then((value) {
+      if (value['status'] == Constants.HTTP_CREATED) {
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = value['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = value['error'];
+          });
+        }
       }
     }).catchError((error) {
       setState(() {
@@ -157,21 +156,26 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
       'proficiency': proficiency,
       'description': description,
     };
-    APIService()
-        .sendPatchRequest(
-      tokens['access'],
-      data,
-      '${URLS.kLanguageUrl}${widget.languageId}/update/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kLanguageUrl}${widget.languageId}/update/';
+
+    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+        }
       }
     });
   }

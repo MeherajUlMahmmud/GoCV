@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class AddEditReferencePage extends StatefulWidget {
   final String resumeId;
@@ -21,9 +23,8 @@ class AddEditReferencePage extends StatefulWidget {
 }
 
 class _AddEditReferencePageState extends State<AddEditReferencePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -53,7 +54,23 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    if (widget.referenceId != null) {
+      getReferenceDetails(widget.referenceId!);
+    } else {
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
   @override
@@ -68,61 +85,48 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     super.dispose();
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  getReferenceDetails(String referenceId) {
+    final String url = '${URLS.kReferenceUrl}$referenceId/details/';
 
-    if (widget.referenceId != null) {
-      APIService()
-          .sendGetRequest(
-        tokens['access'],
-        '${URLS.kReferenceUrl}${widget.referenceId}/details/',
-      )
-          .then((data) {
-        print(data);
-        if (data['status'] == 200) {
-          setState(() {
-            isLoading = false;
-            isError = false;
-            uuid = data['data']['uuid'];
-            name = data['data']['name'];
-            email = data['data']['email'];
-            phone = data['data']['phone'];
-            companyName = data['data']['company_name'];
-            position = data['data']['position'];
-            description = data['data']['description'];
-            nameController.text = name;
-            emailController.text = email;
-            phoneController.text = phone;
-            companyNameController.text = companyName;
-            positionController.text = position;
-            descriptionController.text = description;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-        }
-      }).catchError((error) {
+    APIService().sendGetRequest(accessToken, url).then((data) {
+      print(data);
+      if (data['status'] == Constants.HTTP_OK) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          uuid = data['data']['uuid'];
+          name = data['data']['name'];
+          email = data['data']['email'];
+          phone = data['data']['phone'];
+          companyName = data['data']['company_name'];
+          position = data['data']['position'];
+          description = data['data']['description'];
+          nameController.text = name;
+          emailController.text = email;
+          phoneController.text = phone;
+          companyNameController.text = companyName;
+          positionController.text = position;
+          descriptionController.text = description;
+        });
+      } else {
         setState(() {
           isLoading = false;
           isError = true;
-          errorText = error.toString();
+          errorText = data['error'];
         });
-        Helper().showSnackBar(
-          context,
-          error.toString(),
-          Colors.red,
-        );
-      });
-    } else {
+      }
+    }).catchError((error) {
       setState(() {
         isLoading = false;
-        isError = false;
+        isError = true;
+        errorText = error.toString();
       });
-    }
+      Helper().showSnackBar(
+        context,
+        error.toString(),
+        Colors.red,
+      );
+    });
   }
 
   createReference() {
@@ -134,14 +138,10 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
       'position': position,
       'description': description,
     };
-    APIService()
-        .sendPostRequest(
-      tokens['access'],
-      data,
-      '${URLS.kReferenceUrl}${widget.resumeId}/create/',
-    )
-        .then((value) {
-      if (value['status'] == 201) {
+    final String url = '${URLS.kReferenceUrl}${widget.resumeId}/create/';
+
+    APIService().sendPostRequest(accessToken, data, url).then((value) {
+      if (value['status'] == Constants.HTTP_CREATED) {
         Navigator.pop(context);
       } else {
         setState(() {
@@ -173,14 +173,10 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
       'position': position,
       'description': description,
     };
-    APIService()
-        .sendPatchRequest(
-      tokens['access'],
-      data,
-      '${URLS.kReferenceUrl}${widget.referenceId}/update/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kReferenceUrl}${widget.referenceId}/update/';
+
+    APIService().sendPatchRequest(accessToken, data, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         Navigator.pop(context);
       } else {
         setState(() {

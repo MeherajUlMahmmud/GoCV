@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class LanguagePage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguagePageState extends State<LanguagePage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<dynamic> languageList = [];
 
@@ -33,17 +33,19 @@ class _LanguagePageState extends State<LanguagePage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchLanguages(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
-
-    fetchLanguages(tokens['access'], widget.resumeId);
-  }
-
-  fetchLanguages(String accessToken, String resumeId) {
+  fetchLanguages(String resumeId) {
     String url = '${URLS.kLanguageUrl}$resumeId/list/';
     APIService()
         .sendGetRequest(
@@ -51,7 +53,7 @@ class _LanguagePageState extends State<LanguagePage> {
       url,
     )
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           languageList = data['data']['data'];
           isLoading = false;
@@ -62,10 +64,10 @@ class _LanguagePageState extends State<LanguagePage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -124,10 +126,7 @@ class _LanguagePageState extends State<LanguagePage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchLanguages(
-                          tokens['access'],
-                          widget.resumeId,
-                        );
+                        fetchLanguages(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: languageList.length,
@@ -279,34 +278,27 @@ class _LanguagePageState extends State<LanguagePage> {
     );
   }
 
-  void _showDeleteConfirmationDialog(
-    BuildContext context,
-    String languageId,
-  ) {
+  void _showDeleteConfirmationDialog(BuildContext context, String languageId) {
     void deleteLanguage() {
-      APIService()
-          .sendDeleteRequest(
-        tokens['access'],
-        '${URLS.kLanguageUrl}${widget.resumeId}/delete/',
-      )
-          .then((data) async {
+      final String url = '${URLS.kLanguageUrl}$languageId/delete/';
+
+      APIService().sendDeleteRequest(accessToken, url).then((data) async {
         print(data);
-        if (data['status'] == 204) {
+        if (data['status'] == Constants.HTTP_DELETED) {
           Navigator.of(context).pop();
           Helper().showSnackBar(
             context,
             'Language deleted successfully',
             Colors.green,
           );
-          // fetchLanguages(tokens['access'], widget.resumeId);
         } else {
           if (Helper().isUnauthorizedAccess(data['status'])) {
             Helper().showSnackBar(
               context,
-              'Session expired',
+              Constants.SESSION_EXPIRED_MSG,
               Colors.red,
             );
-            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+            Helper().logoutUser(context);
           } else {
             print(data['error']);
             Helper().showSnackBar(

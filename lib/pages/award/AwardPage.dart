@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/award.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:gocv/utils/urls.dart';
+import 'package:provider/provider.dart';
 
 class AwardPage extends StatefulWidget {
   final String resumeId;
@@ -19,9 +20,8 @@ class AwardPage extends StatefulWidget {
 }
 
 class _AwardPageState extends State<AwardPage> {
-  final LocalStorage localStorage = LocalStorage();
-  Map<String, dynamic> user = {};
-  Map<String, dynamic> tokens = {};
+  late UserProvider userProvider;
+  late String accessToken;
 
   List<Award> awardList = [];
 
@@ -33,21 +33,24 @@ class _AwardPageState extends State<AwardPage> {
   void initState() {
     super.initState();
 
-    readTokensAndUser();
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      accessToken = userProvider.tokens['access'].toString();
+    });
+
+    fetchAwards(widget.resumeId);
   }
 
-  readTokensAndUser() async {
-    tokens = await localStorage.readData('tokens');
-    user = await localStorage.readData('user');
+  fetchAwards(String resumeId) {
+    final String url = '${URLS.kAwardUrl}$resumeId/list/';
 
-    fetchAwards(tokens['access'], widget.resumeId);
-  }
-
-  fetchAwards(String accessToken, String resumeId) {
-    String url = '${URLS.kAwardUrl}$resumeId/list/';
     APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           awardList = data['data']['data'].map<Award>((award) {
             return Award.fromJson(award);
@@ -60,10 +63,10 @@ class _AwardPageState extends State<AwardPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -123,7 +126,7 @@ class _AwardPageState extends State<AwardPage> {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        fetchAwards(tokens['access'], widget.resumeId);
+                        fetchAwards(widget.resumeId);
                       },
                       child: ListView.builder(
                         itemCount: awardList.length,
