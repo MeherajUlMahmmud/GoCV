@@ -10,7 +10,6 @@ import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/personal.dart';
 import 'package:gocv/providers/PersonalDataProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
@@ -109,8 +108,9 @@ class _PersonalPageState extends State<PersonalPage> {
 
   fetchPersonalDetails() {
     final String url = '${URLS.kPersonalUrl}${widget.resumeId}/details/';
+
     APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         Personal personal = Personal.fromJson(data['data']);
         personalDataProvider.setPersonalData(personal);
 
@@ -126,10 +126,10 @@ class _PersonalPageState extends State<PersonalPage> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
@@ -172,37 +172,33 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   handleUpdatePersonalDetails() {
-    String url = '${URLS.kPersonalUrl}$personalId/update/';
+    final String url = '${URLS.kPersonalUrl}$personalId/update/';
+
     APIService()
-        .sendPatchRequest(
-      accessToken,
-      updatedPersonalData,
-      url,
-    )
+        .sendPatchRequest(accessToken, updatedPersonalData, url)
         .then((data) async {
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         Helper().showSnackBar(
           context,
           'Personal details updated successfully',
           Colors.green,
         );
       } else {
-        Helper().showSnackBar(
-          context,
-          'Failed to update personal details',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          Helper().showSnackBar(
+            context,
+            'Failed to update personal details',
+            Colors.red,
+          );
+        }
       }
-    }).catchError((e) {
-      print(e);
-      setState(() {
-        isError = true;
-      });
-      Helper().showSnackBar(
-        context,
-        'Failed to update profile',
-        Colors.red,
-      );
     });
   }
 
