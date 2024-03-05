@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/certificate.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class CertificationPage extends StatefulWidget {
   final String resumeId;
@@ -19,8 +18,7 @@ class CertificationPage extends StatefulWidget {
 }
 
 class _CertificationPageState extends State<CertificationPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  CertificateRepository certificateRepository = CertificateRepository();
 
   List<dynamic> certificationList = [];
 
@@ -31,15 +29,6 @@ class _CertificationPageState extends State<CertificationPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchCertifications(widget.resumeId);
   }

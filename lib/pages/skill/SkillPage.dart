@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/skill/AddEditSkillPage.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -20,8 +21,7 @@ class SkillPage extends StatefulWidget {
 }
 
 class _SkillPageState extends State<SkillPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  SkillRepository skillRepository = SkillRepository();
 
   List<dynamic> skillList = [];
 
@@ -32,15 +32,6 @@ class _SkillPageState extends State<SkillPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchSkills(widget.resumeId);
   }

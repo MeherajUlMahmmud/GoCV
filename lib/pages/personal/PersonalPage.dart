@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gocv/repositories/personal.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -9,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/personal.dart';
 import 'package:gocv/providers/PersonalDataProvider.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
@@ -29,8 +29,7 @@ class PersonalPage extends StatefulWidget {
 }
 
 class _PersonalPageState extends State<PersonalPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  PersonalRepository personalRepository = PersonalRepository();
 
   late PersonalDataProvider personalDataProvider;
   late String personalId;
@@ -59,18 +58,10 @@ class _PersonalPageState extends State<PersonalPage> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
     personalDataProvider = Provider.of<PersonalDataProvider>(
       context,
       listen: false,
     );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchPersonalDetails();
   }

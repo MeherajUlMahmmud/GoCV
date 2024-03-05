@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/award.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/award.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class AwardPage extends StatefulWidget {
   final String resumeId;
@@ -20,8 +17,7 @@ class AwardPage extends StatefulWidget {
 }
 
 class _AwardPageState extends State<AwardPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  AwardRepository awardRepository = AwardRepository();
 
   List<Award> awardList = [];
 
@@ -33,55 +29,43 @@ class _AwardPageState extends State<AwardPage> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
-
     fetchAwards(widget.resumeId);
   }
 
   fetchAwards(String resumeId) {
-    final String url = '${URLS.kAwardUrl}$resumeId/list/';
+    Map<String, dynamic> response = awardRepository.getAwards(widget.resumeId);
+    print(response);
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      if (data['status'] == Constants.HTTP_OK) {
-        setState(() {
-          awardList = data['data']['data'].map<Award>((award) {
-            return Award.fromJson(award);
-          }).toList();
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
+    if (response['status'] == Constants.HTTP_OK) {
+      setState(() {
+        awardList = response['data'].map<Award>((award) {
+          return Award.fromJson(award);
+        }).toList();
+        isLoading = false;
+        isError = false;
+        errorText = '';
+      });
+    } else {
+      if (Helper().isUnauthorizedAccess(response['status'])) {
+        Helper().showSnackBar(
+          context,
+          Constants.SESSION_EXPIRED_MSG,
+          Colors.red,
+        );
+        Helper().logoutUser(context);
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          print(data['error']);
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch awards',
-            Colors.red,
-          );
-        }
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['message'];
+        });
+        Helper().showSnackBar(
+          context,
+          'Failed to fetch awards',
+          Colors.red,
+        );
       }
-    });
+    }
   }
 
   @override

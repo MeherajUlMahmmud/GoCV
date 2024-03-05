@@ -23,8 +23,7 @@ class ResumePreviewScreen extends StatefulWidget {
 }
 
 class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
@@ -57,10 +56,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
     currentResumeProvider = Provider.of<CurrentResumeProvider>(
       context,
       listen: false,

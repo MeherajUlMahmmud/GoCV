@@ -18,8 +18,7 @@ class ResumeCard extends StatefulWidget {
 }
 
 class _ResumeCardState extends State<ResumeCard> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
 
   TextEditingController titleController = TextEditingController();
 

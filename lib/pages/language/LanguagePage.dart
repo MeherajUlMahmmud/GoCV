@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class LanguagePage extends StatefulWidget {
   final String resumeId;
@@ -20,8 +18,7 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguagePageState extends State<LanguagePage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
 
   List<dynamic> languageList = [];
 
@@ -32,15 +29,6 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchLanguages(widget.resumeId);
   }

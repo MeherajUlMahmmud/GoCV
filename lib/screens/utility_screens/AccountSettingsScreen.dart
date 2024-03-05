@@ -14,8 +14,7 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
   late String userId;
 
   final _formKey = GlobalKey<FormState>();
@@ -36,11 +35,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
 
     setState(() {
       accessToken = userProvider.tokens['access'].toString();

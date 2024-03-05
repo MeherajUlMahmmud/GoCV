@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AddEditInterestPage extends StatefulWidget {
   final String resumeId;
@@ -23,8 +21,7 @@ class AddEditInterestPage extends StatefulWidget {
 }
 
 class _AddEditInterestPageState extends State<AddEditInterestPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  InterestRepository interestRepository = InterestRepository();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -43,15 +40,6 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     if (widget.interestId != null) {
       getInterest(widget.interestId!);

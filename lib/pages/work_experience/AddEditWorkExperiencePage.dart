@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/experience.dart';
+import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -26,8 +28,7 @@ class AddEditWorkExperiencePage extends StatefulWidget {
 }
 
 class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  ExperienceRepository experienceRepository = ExperienceRepository();
 
   List<String> types = [
     'Full Time',
@@ -73,14 +74,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
     if (widget.experienceId != null) {
       fetchWorkExperience(widget.experienceId!);
     } else {

@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:gocv/models/user.dart';
 
 class UserProvider with ChangeNotifier {
+  // Singleton instance
+  static final UserProvider _singleton = UserProvider._internal();
+
+  // Private constructor
+  UserProvider._internal();
+
+  // Factory method to provide access to the singleton instance
+  factory UserProvider() {
+    return _singleton;
+  }
+
   final Map<String, dynamic> _tokens = {
     'access': '',
     'refresh': '',

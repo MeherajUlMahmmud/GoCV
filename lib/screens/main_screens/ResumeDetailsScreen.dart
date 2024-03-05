@@ -32,9 +32,7 @@ class ResumeDetailsScreen extends StatefulWidget {
 
 class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     with SingleTickerProviderStateMixin {
-  late UserProvider userProvider;
-  late String accessToken;
-  late String userId;
+  UserProvider userProvider = UserProvider();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
@@ -50,19 +48,12 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
     super.initState();
     tabController = TabController(length: 10, vsync: this);
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
     currentResumeProvider = Provider.of<CurrentResumeProvider>(
       context,
       listen: false,
     );
 
     setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-      userId = userProvider.userData!.id.toString();
-
       resumeId = currentResumeProvider.currentResume.id.toString();
     });
 

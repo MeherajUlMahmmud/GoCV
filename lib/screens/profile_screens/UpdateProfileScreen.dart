@@ -24,8 +24,7 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
 
   late UserProfileProvider userProfileProvider;
   late String applicantId, firstName, lastName, phoneNumber;
@@ -53,10 +52,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
     userProfileProvider = Provider.of<UserProfileProvider>(
       context,
       listen: false,

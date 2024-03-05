@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/reference.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AddEditReferencePage extends StatefulWidget {
   final String resumeId;
@@ -23,8 +22,7 @@ class AddEditReferencePage extends StatefulWidget {
 }
 
 class _AddEditReferencePageState extends State<AddEditReferencePage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  ReferenceRepository referenceRepository = ReferenceRepository();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -53,15 +51,6 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     if (widget.referenceId != null) {
       getReferenceDetails(widget.referenceId!);

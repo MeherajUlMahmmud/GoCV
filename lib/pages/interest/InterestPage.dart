@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/interest/AddEditInterestPage.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/interest.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class InterestPage extends StatefulWidget {
   final String resumeId;
@@ -20,8 +19,7 @@ class InterestPage extends StatefulWidget {
 }
 
 class _InterestPageState extends State<InterestPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  InterestRepository interestRepository = InterestRepository();
 
   List<dynamic> interestList = [];
 
@@ -32,15 +30,6 @@ class _InterestPageState extends State<InterestPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchInterests(widget.resumeId);
   }

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/education.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class EducationPage extends StatefulWidget {
   final String resumeId;
@@ -20,8 +19,7 @@ class EducationPage extends StatefulWidget {
 }
 
 class _EducationPageState extends State<EducationPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  EducationRepository educationRepository = EducationRepository();
 
   List<Education> educationList = [];
 
@@ -33,14 +31,6 @@ class _EducationPageState extends State<EducationPage> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
     fetchEducations(widget.resumeId);
   }
 

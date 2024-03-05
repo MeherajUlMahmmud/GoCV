@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
@@ -24,8 +25,7 @@ class AddEditSkillPage extends StatefulWidget {
 }
 
 class _AddEditSkillPageState extends State<AddEditSkillPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  SkillRepository skillRepository = SkillRepository();
 
   List<String> proficiencyTypes = [
     'Beginner',
@@ -54,15 +54,6 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     if (widget.skillId != null) {
       getSkill(widget.skillId!);

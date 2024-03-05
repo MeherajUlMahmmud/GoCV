@@ -1,13 +1,12 @@
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/contact.dart';
 import 'package:gocv/providers/ContactDataProvider.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/contact.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ContactPage extends StatefulWidget {
   final String resumeId;
@@ -22,8 +21,7 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  ContactRepository contactRepository = ContactRepository();
 
   late ContactDataProvider contactDataProvider;
   late String contactId;
@@ -46,19 +44,6 @@ class _ContactPageState extends State<ContactPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-    contactDataProvider = Provider.of<ContactDataProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchContactDetails();
   }

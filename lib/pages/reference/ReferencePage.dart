@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/pages/reference/AddEditReferencePage.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/reference.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class ReferencePage extends StatefulWidget {
   final String resumeId;
@@ -20,8 +19,7 @@ class ReferencePage extends StatefulWidget {
 }
 
 class _ReferencePageState extends State<ReferencePage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  ReferenceRepository referenceRepository = ReferenceRepository();
 
   List<dynamic> referenceList = [];
 
@@ -32,15 +30,6 @@ class _ReferencePageState extends State<ReferencePage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchReferences(widget.resumeId);
   }

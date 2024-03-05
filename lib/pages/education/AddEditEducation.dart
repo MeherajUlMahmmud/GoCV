@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/education.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AddEditEducationPage extends StatefulWidget {
   final String resumeId;
@@ -24,8 +23,7 @@ class AddEditEducationPage extends StatefulWidget {
 }
 
 class _AddEditEducationPageState extends State<AddEditEducationPage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  EducationRepository educationRepository = EducationRepository();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -60,15 +58,6 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     fetchData();
   }

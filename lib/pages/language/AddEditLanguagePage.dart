@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AddEditLanguagePage extends StatefulWidget {
   final String resumeId;
@@ -24,8 +22,7 @@ class AddEditLanguagePage extends StatefulWidget {
 }
 
 class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
 
   List<String> proficiencyTypes = [
     'Basic',
@@ -53,15 +50,6 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   @override
   void initState() {
     super.initState();
-
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
-
-    setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-    });
 
     if (widget.languageId != null) {
       getEducationDetails(widget.languageId!);

@@ -24,8 +24,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late UserProvider userProvider;
-  late String accessToken;
+  UserProvider userProvider = UserProvider();
   late String userId;
 
   late ResumeListProvider resumeListProvider;
@@ -44,10 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
     resumeListProvider = Provider.of<ResumeListProvider>(
       context,
       listen: false,
