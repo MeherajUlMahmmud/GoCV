@@ -1,16 +1,13 @@
-import 'dart:developer';
-
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/resume.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
 import 'package:gocv/providers/ResumeListProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +21,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  UserProvider userProvider = UserProvider();
+  ResumeRepository resumeRepository = ResumeRepository();
+
   late String userId;
 
   late ResumeListProvider resumeListProvider;
@@ -53,32 +51,34 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     setState(() {
-      accessToken = userProvider.tokens['access'].toString();
-      userId = userProvider.userData!.id.toString();
+      userId = UserProvider().userData!.id.toString();
     });
 
     fetchResumes();
   }
 
-  fetchResumes() {
-    final String url = '${URLS.kResumeUrl}list/?user=$userId';
+  fetchResumes() async {
+    try {
+      final response = await resumeRepository.getResumes(userId);
+      print(response);
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      if (data['status'] == Constants.HTTP_OK) {
-        resumes = data['data']['data']
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Resume> fetchedResumes = (response['data'] as List)
             .map<Resume>((resume) => Resume.fromJson(resume))
             .toList();
-        resumeListProvider.setResumeList(resumes);
         setState(() {
+          resumes = fetchedResumes;
+          resumeListProvider.setResumeList(resumes);
           isLoading = false;
           isError = false;
           errorText = '';
         });
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.SESSION_EXPIRED_MSG,
+            Constants.sessionExpiredMsg,
             Colors.red,
           );
           Helper().logoutUser(context);
@@ -86,26 +86,36 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             isLoading = false;
             isError = true;
-            errorText = data['error'];
+            errorText = response['message'];
           });
           Helper().showSnackBar(
             context,
-            'Failed to fetch resumes',
+            Constants.genericErrorMsg,
             Colors.red,
           );
         }
       }
-    });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching resumes: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        'Error fetching resumes',
+        Colors.red,
+      );
+    }
   }
 
-  createResume() {
-    const String url = '${URLS.kResumeUrl}create/';
+  void createResume() async {
+    try {
+      final response = await resumeRepository.createResume(newResumeData);
+      if (response['status'] == Constants.httpCreatedCode) {
+        Resume resume = Resume.fromJson(response['data']);
+        resumeListProvider.addResume(resume);
 
-    APIService()
-        .sendPostRequest(accessToken, newResumeData, url)
-        .then((data) async {
-      if (data['status'] == Constants.HTTP_CREATED) {
-        resumeListProvider.addResume(Resume.fromJson(data['data']));
         setState(() {
           isLoading = false;
           isError = false;
@@ -113,19 +123,21 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         Navigator.pop(context);
       } else {
-        if (Helper().isUnauthorizedAccess(data['status'])) {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
           Helper().showSnackBar(
             context,
-            Constants.SESSION_EXPIRED_MSG,
+            Constants.sessionExpiredMsg,
             Colors.red,
           );
+
           Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
             isError = true;
-            errorText = data['error'];
+            errorText = response['error'];
           });
+
           Helper().showSnackBar(
             context,
             'Failed to create resume',
@@ -133,44 +145,44 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       }
-    });
+    } catch (error) {
+      // Handle error
+      Helper().showSnackBar(
+        context,
+        'Failed to create resume: $error',
+        Colors.red,
+      );
+    }
   }
 
-  deleteResume(int index) {
-    final String url =
-        '${URLS.kResumeUrl}${resumeListProvider.resumeList[index].id}/destroy/';
-
-    APIService().sendDeleteRequest(accessToken, url).then((data) async {
-      if (data['status'] == 204) {
+  void deleteResume(int index) async {
+    try {
+      String resumeId = resumeListProvider.resumeList[index].id.toString();
+      final response = await resumeRepository.deleteResume(resumeId);
+      if (response['status'] == Constants.httpDeletedCode) {
         resumeListProvider.removeResume(index);
+
         setState(() {
           isLoading = false;
           isError = false;
           errorText = '';
         });
       } else {
-        log(data.toString());
-        if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(
-            context,
-            Constants.SESSION_EXPIRED_MSG,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = data['error'];
-          });
-          Helper().showSnackBar(
-            context,
-            'Failed to delete resume',
-            Colors.red,
-          );
-        }
+        // Handle error
+        Helper().showSnackBar(
+          context,
+          response['message'] ?? 'Failed to delete resume',
+          Colors.red,
+        );
       }
-    });
+    } catch (error) {
+      // Handle error
+      Helper().showSnackBar(
+        context,
+        'Failed to delete resume: $error',
+        Colors.red,
+      );
+    }
   }
 
   @override
