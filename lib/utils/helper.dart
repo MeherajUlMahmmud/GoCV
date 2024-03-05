@@ -1,10 +1,12 @@
 import 'package:gocv/apis/auth.dart';
+import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Helper {
@@ -79,6 +81,9 @@ class Helper {
   void logoutUser(BuildContext context) {
     LocalStorage localStorage = LocalStorage();
     localStorage.clearData();
+
+    Provider.of<UserProvider>(context, listen: false).clearData();
+
     navigateAndClearStack(context, LoginScreen.routeName);
   }
 
