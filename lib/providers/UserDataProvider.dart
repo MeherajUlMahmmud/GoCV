@@ -19,9 +19,11 @@ class UserProvider with ChangeNotifier {
   };
   UserBase? _userData;
 
+  // Getters for tokens and userData
   Map<String, dynamic> get tokens => _tokens;
   UserBase? get userData => _userData;
 
+  // Methods to modify tokens and userData
   void setTokens(Map<String, dynamic> tokens) {
     _tokens['access'] = tokens['access'];
     _tokens['refresh'] = tokens['refresh'];
