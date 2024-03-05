@@ -12,8 +12,8 @@ import 'package:gocv/pages/skill/SkillPage.dart';
 import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:gocv/utils/urls.dart';
@@ -70,12 +70,10 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   }
 
   fetchResumeDetails() {
-    APIService()
-        .sendGetRequest(accessToken, '${URLS.kResumeUrl}$resumeId/details/')
-        .then((data) async {
-      print(data['data']['contact']);
-      if (data['status'] == 200) {
-        print(data['data']);
+    final String url = '${URLS.kResumeUrl}$resumeId/details/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         currentResumeProvider
             .setCurrentResume(Resume.fromJson(data['data']['data']));
 
@@ -86,20 +84,28 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
         });
       } else {
         if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(context, 'Session expired', Colors.red);
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch resumes',
+            Colors.red,
+          );
         }
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-        Helper().showSnackBar(context, 'Failed to fetch resumes', Colors.red);
       }
     });
   }
 
-  // fetchPersonalDetails
   @override
   Widget build(BuildContext context) {
     return Scaffold(

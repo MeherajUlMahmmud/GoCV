@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/education.dart';
+import 'package:gocv/models/experience.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:provider/provider.dart';
-// import 'package:pdf/pdf.dart';
-// import 'package:pdf/widgets.dart' as pw;
-// import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class ResumePreviewScreen extends StatefulWidget {
   static const String routeName = '/resume-preview';
@@ -23,7 +25,6 @@ class ResumePreviewScreen extends StatefulWidget {
 class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   late UserProvider userProvider;
   late String accessToken;
-  late String userId;
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
@@ -42,12 +43,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   bool isError = false;
   String errorText = '';
 
-  // Map<String, PdfPageFormat> pageFormats = {
-  // 'A4': PdfPageFormat.a4,
-  // 'A5': PdfPageFormat.a5,
-  // 'Letter': PdfPageFormat.letter,
-  // 'Legal': PdfPageFormat.legal,
-  // };
+  Map<String, PdfPageFormat> pageFormats = {
+    'A4': PdfPageFormat.a4,
+    'A5': PdfPageFormat.a5,
+    'Letter': PdfPageFormat.letter,
+    'Legal': PdfPageFormat.legal,
+  };
 
   late ByteData image;
   late Uint8List imageData;
@@ -67,7 +68,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
 
     setState(() {
       accessToken = userProvider.tokens['access'].toString();
-      userId = userProvider.userData!.id.toString();
 
       resumeId = currentResumeProvider.currentResume.id.toString();
     });
@@ -82,13 +82,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchResumeDetails() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kResumeUrl}$resumeId/details/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kResumeUrl}$resumeId/details/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           resumeDetails = data['data'];
         });
@@ -96,99 +93,107 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         fetchEducations();
       } else {
         if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(context, 'Session expired', Colors.red);
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch resumes',
+            Colors.red,
+          );
         }
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-        Helper().showSnackBar(context, 'Failed to fetch resumes', Colors.red);
       }
     });
   }
 
   fetchEducations() {
-    // EducationService()
-    //     .getEducationList(accessToken, resumeId)
-    //     .then((data) async {
-    //   print(data);
-    //   if (data['status'] == 200) {
-    //     setState(() {
-    //       educationList = data['data'];
-    //     });
+    final String url = '${URLS.kEducationUrl}$resumeId/list/';
 
-    //     fetchWorkExperiences();
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Session expired',
-    //         Colors.red,
-    //       );
-    //       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    //     } else {
-    //       print(data['error']);
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch educations',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
+        setState(() {
+          educationList = data['data']['data'].map<Education>((education) {
+            return Education.fromJson(education);
+          }).toList();
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch educations',
+            Colors.red,
+          );
+        }
+      }
+    });
   }
 
   fetchWorkExperiences() {
-    // ExpreienceService()
-    //     .getExperienceList(accessToken, resumeId)
-    //     .then((data) async {
-    //   print(data);
-    //   if (data['status'] == 200) {
-    //     setState(() {
-    //       experienceList = data['data'];
-    //     });
+    final String url = '${URLS.kExperienceUrl}$resumeId/list/';
 
-    //     fetchSkills();
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Session expired',
-    //         Colors.red,
-    //       );
-    //       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    //     } else {
-    //       print(data['error']);
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch work experiences',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
+        setState(() {
+          experienceList = data['data']['data']
+              .map<Experience>((experience) => Experience.fromJson(experience))
+              .toList();
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch work experiences',
+            Colors.red,
+          );
+        }
+      }
+    });
   }
 
   fetchSkills() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kSkillUrl}$resumeId/list/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kSkillUrl}$resumeId/list/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           skillList = data['data'];
         });
@@ -198,10 +203,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -220,13 +225,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchInterests() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kInterestUrl}$resumeId/list/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kInterestUrl}$resumeId/list/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           interestList = data['data'];
         });
@@ -236,10 +238,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -258,13 +260,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchLanguages() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kLanguageUrl}$resumeId/list/',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kLanguageUrl}$resumeId/list/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           languageList = data['data'];
         });
@@ -274,10 +273,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -296,14 +295,11 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchReferences() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kReferenceUrl}$resumeId/list/',
-    )
-        .then((data) async {
+    final String url = '${URLS.kReferenceUrl}$resumeId/list/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
       print(data);
-      if (data['status'] == 200) {
+      if (data['status'] == Constants.HTTP_OK) {
         setState(() {
           referenceList = data['data'];
           isLoading = false;
@@ -314,10 +310,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         if (Helper().isUnauthorizedAccess(data['status'])) {
           Helper().showSnackBar(
             context,
-            'Session expired',
+            Constants.SESSION_EXPIRED_MSG,
             Colors.red,
           );
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Helper().logoutUser(context);
         } else {
           print(data['error']);
           setState(() {
@@ -358,160 +354,164 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
           ),
         ],
       ),
-      body: const Center(child: Text('Resume Preview')),
-      // body: isLoading
-      //     ? const Center(
-      //         child: CircularProgressIndicator(),
-      //       )
-      //     : PdfPreview(
-      //         dynamicLayout: true,
-      //         allowPrinting: true,
-      //         allowSharing: true,
-      //         canChangeOrientation: false,
-      //         canChangePageFormat: false,
-      //         pageFormats: pageFormats,
-      //         pdfFileName: resumeDetails['name'] + '.pdf',
-      //         build: (format) => _generatePdf(format, 'Purchase Order', width),
-      //       ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          // : const Center(child: Text('Resume Preview')),
+          : PdfPreview(
+              dynamicLayout: true,
+              allowPrinting: true,
+              allowSharing: true,
+              canChangeOrientation: false,
+              canChangePageFormat: false,
+              pageFormats: pageFormats,
+              pdfFileName: resumeDetails['name'] + '.pdf',
+              build: (format) => _generatePdf(
+                format,
+                resumeDetails['name'],
+                width,
+              ),
+            ),
     );
   }
 
-  // Future<Uint8List> _generatePdf(
-  //   PdfPageFormat format,
-  //   String title,
-  //   double width,
-  // ) {
-  //   final pdf = pw.Document(
-  //     version: PdfVersion.pdf_1_5,
-  //     compress: true,
-  //     title: title,
-  //     author: 'Meheraj',
-  //     creator: 'Meheraj',
-  //     producer: 'Meheraj',
-  //     subject: 'Resume',
-  //     keywords: 'Resume',
-  //     pageMode: PdfPageMode.fullscreen,
-  //   );
+  Future<Uint8List> _generatePdf(
+    PdfPageFormat format,
+    String title,
+    double width,
+  ) {
+    final pdf = pw.Document(
+      version: PdfVersion.pdf_1_5,
+      compress: true,
+      title: title,
+      author: 'Meheraj',
+      creator: 'Meheraj',
+      producer: 'Meheraj',
+      subject: 'Resume',
+      keywords: 'Resume',
+      pageMode: PdfPageMode.fullscreen,
+    );
 
-  //   pdf.addPage(
-  //     pw.MultiPage(
-  //       pageFormat: format,
-  //       footer: (context) {
-  //         return pw.Row(
-  //           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             pw.Text(
-  //               resumeDetails['personal']['first_name'] +
-  //                   ' ' +
-  //                   resumeDetails['personal']['last_name'],
-  //               style: const pw.TextStyle(
-  //                 fontSize: 10,
-  //               ),
-  //             ),
-  //             pw.Text(
-  //               'Page ${context.pageNumber} of ${context.pagesCount}',
-  //               style: const pw.TextStyle(
-  //                 fontSize: 10,
-  //               ),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //       build: (context) {
-  //         return [
-  //           pw.Column(
-  //             crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //             children: [
-  //               pw.Row(
-  //                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   pw.Column(
-  //                     crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //                     children: [
-  //                       pw.Container(
-  //                         alignment: pw.Alignment.centerLeft,
-  //                         child: pw.Text(
-  //                           resumeDetails['personal']['first_name'] +
-  //                               ' ' +
-  //                               resumeDetails['personal']['last_name'],
-  //                           style: pw.TextStyle(
-  //                             fontWeight: pw.FontWeight.bold,
-  //                             fontSize: 18,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                       pw.Container(
-  //                         alignment: pw.Alignment.centerLeft,
-  //                         child: pw.Text(
-  //                           resumeDetails['contact']['address'] ?? '',
-  //                         ),
-  //                       ),
-  //                       pw.Container(
-  //                         alignment: pw.Alignment.centerLeft,
-  //                         child: pw.Text(
-  //                           resumeDetails['contact']['phone_number'] ?? '',
-  //                         ),
-  //                       ),
-  //                       pw.Container(
-  //                         alignment: pw.Alignment.centerLeft,
-  //                         child: pw.Text(
-  //                           resumeDetails['contact']['email'] ?? '',
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   pw.Image(
-  //                     pw.MemoryImage(imageData),
-  //                     height: 80,
-  //                     width: 80,
-  //                   ),
-  //                 ],
-  //               ),
-  //               sectionHeader('OBJECTIVE'),
-  //               pw.Container(
-  //                 alignment: pw.Alignment.centerLeft,
-  //                 child: pw.Text(
-  //                   resumeDetails['personal']['about_me'] ?? '',
-  //                   textAlign: pw.TextAlign.justify,
-  //                 ),
-  //               ),
-  //               educationList.isNotEmpty
-  //                   ? sectionHeader('EDUCATION')
-  //                   : pw.SizedBox(),
-  //               for (var item in educationList) educationItem(item),
-  //               experienceList.isNotEmpty
-  //                   ? sectionHeader('EXPERIENCE')
-  //                   : pw.SizedBox(),
-  //               for (var item in experienceList) experienceItem(item),
-  //               skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
-  //               for (var item in skillList) skillItem(item),
-  //               awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
-  //               for (var item in awardList) skillItem(item),
-  //               certificationList.isNotEmpty
-  //                   ? sectionHeader('CERTIFICATIONS')
-  //                   : pw.SizedBox(),
-  //               for (var item in certificationList) skillItem(item),
-  //               interestList.isNotEmpty
-  //                   ? sectionHeader('INTERESTS')
-  //                   : pw.SizedBox(),
-  //               for (var item in interestList) interestItem(item),
-  //               languageList.isNotEmpty
-  //                   ? sectionHeader('LANGUAGES')
-  //                   : pw.SizedBox(),
-  //               for (var item in languageList) languageItem(item),
-  //               referenceList.isNotEmpty
-  //                   ? sectionHeader('REFERENCES')
-  //                   : pw.SizedBox(),
-  //               for (var item in referenceList) referenceItem(item),
-  //             ],
-  //           )
-  //         ];
-  //       },
-  //     ),
-  //   );
+    //   pdf.addPage(
+    //     pw.MultiPage(
+    //       pageFormat: format,
+    //       footer: (context) {
+    //         return pw.Row(
+    //           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    //           children: [
+    //             pw.Text(
+    //               resumeDetails['personal']['first_name'] +
+    //                   ' ' +
+    //                   resumeDetails['personal']['last_name'],
+    //               style: const pw.TextStyle(
+    //                 fontSize: 10,
+    //               ),
+    //             ),
+    //             pw.Text(
+    //               'Page ${context.pageNumber} of ${context.pagesCount}',
+    //               style: const pw.TextStyle(
+    //                 fontSize: 10,
+    //               ),
+    //             ),
+    //           ],
+    //         );
+    //       },
+    //       build: (context) {
+    //         return [
+    //           pw.Column(
+    //             crossAxisAlignment: pw.CrossAxisAlignment.start,
+    //             children: [
+    //               pw.Row(
+    //                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    //                 children: [
+    //                   pw.Column(
+    //                     crossAxisAlignment: pw.CrossAxisAlignment.start,
+    //                     children: [
+    //                       pw.Container(
+    //                         alignment: pw.Alignment.centerLeft,
+    //                         child: pw.Text(
+    //                           resumeDetails['personal']['first_name'] +
+    //                               ' ' +
+    //                               resumeDetails['personal']['last_name'],
+    //                           style: pw.TextStyle(
+    //                             fontWeight: pw.FontWeight.bold,
+    //                             fontSize: 18,
+    //                           ),
+    //                         ),
+    //                       ),
+    //                       pw.Container(
+    //                         alignment: pw.Alignment.centerLeft,
+    //                         child: pw.Text(
+    //                           resumeDetails['contact']['address'] ?? '',
+    //                         ),
+    //                       ),
+    //                       pw.Container(
+    //                         alignment: pw.Alignment.centerLeft,
+    //                         child: pw.Text(
+    //                           resumeDetails['contact']['phone_number'] ?? '',
+    //                         ),
+    //                       ),
+    //                       pw.Container(
+    //                         alignment: pw.Alignment.centerLeft,
+    //                         child: pw.Text(
+    //                           resumeDetails['contact']['email'] ?? '',
+    //                         ),
+    //                       ),
+    //                     ],
+    //                   ),
+    //                   pw.Image(
+    //                     pw.MemoryImage(imageData),
+    //                     height: 80,
+    //                     width: 80,
+    //                   ),
+    //                 ],
+    //               ),
+    //               sectionHeader('OBJECTIVE'),
+    //               pw.Container(
+    //                 alignment: pw.Alignment.centerLeft,
+    //                 child: pw.Text(
+    //                   resumeDetails['personal']['about_me'] ?? '',
+    //                   textAlign: pw.TextAlign.justify,
+    //                 ),
+    //               ),
+    //               educationList.isNotEmpty
+    //                   ? sectionHeader('EDUCATION')
+    //                   : pw.SizedBox(),
+    //               for (var item in educationList) educationItem(item),
+    //               experienceList.isNotEmpty
+    //                   ? sectionHeader('EXPERIENCE')
+    //                   : pw.SizedBox(),
+    //               for (var item in experienceList) experienceItem(item),
+    //               skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
+    //               for (var item in skillList) skillItem(item),
+    //               awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
+    //               for (var item in awardList) skillItem(item),
+    //               certificationList.isNotEmpty
+    //                   ? sectionHeader('CERTIFICATIONS')
+    //                   : pw.SizedBox(),
+    //               for (var item in certificationList) skillItem(item),
+    //               interestList.isNotEmpty
+    //                   ? sectionHeader('INTERESTS')
+    //                   : pw.SizedBox(),
+    //               for (var item in interestList) interestItem(item),
+    //               languageList.isNotEmpty
+    //                   ? sectionHeader('LANGUAGES')
+    //                   : pw.SizedBox(),
+    //               for (var item in languageList) languageItem(item),
+    //               referenceList.isNotEmpty
+    //                   ? sectionHeader('REFERENCES')
+    //                   : pw.SizedBox(),
+    //               for (var item in referenceList) referenceItem(item),
+    //             ],
+    //           )
+    //         ];
+    //       },
+    //     ),
+    //   );
 
-  //   return pdf.save();
-  // }
+    return pdf.save();
+  }
 
   // pw.Container sectionHeader(String text) {
   //   return pw.Container(
