@@ -5,7 +5,6 @@ import 'package:gocv/models/resume.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
 import 'package:gocv/providers/ResumeListProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
@@ -67,13 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   fetchResumes() {
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      '${URLS.kResumeUrl}list/?user=$userId',
-    )
-        .then((data) async {
-      if (data['status'] == 200) {
+    final String url = '${URLS.kResumeUrl}list/?user=$userId';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         resumes = data['data']['data']
             .map<Resume>((resume) => Resume.fromJson(resume))
             .toList();
@@ -85,11 +81,12 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         if (Helper().isUnauthorizedAccess(data['status'])) {
-          Helper().showSnackBar(context, 'Session expired', Colors.red);
-          Navigator.pushReplacementNamed(
+          Helper().showSnackBar(
             context,
-            LoginScreen.routeName,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
           );
+          Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;
@@ -107,14 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   createResume() {
+    const String url = '${URLS.kResumeUrl}create/';
+
     APIService()
-        .sendPostRequest(
-      accessToken,
-      newResumeData,
-      '${URLS.kResumeUrl}create/',
-    )
+        .sendPostRequest(accessToken, newResumeData, url)
         .then((data) async {
-      if (data['status'] == 201) {
+      if (data['status'] == Constants.HTTP_CREATED) {
         resumeListProvider.addResume(Resume.fromJson(data['data']));
         setState(() {
           isLoading = false;
@@ -123,27 +118,34 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-        Helper().showSnackBar(
-          context,
-          'Failed to create resume',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to create resume',
+            Colors.red,
+          );
+        }
       }
     });
   }
 
   deleteResume(int index) {
-    APIService()
-        .sendDeleteRequest(
-      accessToken,
-      '${URLS.kResumeUrl}${resumeListProvider.resumeList[index].id}/destroy/',
-    )
-        .then((data) async {
+    final String url =
+        '${URLS.kResumeUrl}${resumeListProvider.resumeList[index].id}/destroy/';
+
+    APIService().sendDeleteRequest(accessToken, url).then((data) async {
       if (data['status'] == 204) {
         resumeListProvider.removeResume(index);
         setState(() {
@@ -153,16 +155,25 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         log(data.toString());
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = data['error'];
-        });
-        Helper().showSnackBar(
-          context,
-          'Failed to delete resume',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = data['error'];
+          });
+          Helper().showSnackBar(
+            context,
+            'Failed to delete resume',
+            Colors.red,
+          );
+        }
       }
     });
   }
@@ -298,12 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         TextButton(
                           child: const Text('Logout'),
                           onPressed: () {
-                            // localStorage
-                            //     .clearData()
-                            //     .then((value) => Navigator.pushNamed(
-                            //           context,
-                            //           LoginScreen.routeName,
-                            //         ));
+                            Helper().logoutUser(context);
                           },
                         ),
                       ],
