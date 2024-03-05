@@ -6,6 +6,8 @@ import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
+import 'package:gocv/utils/constants.dart';
+import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:provider/provider.dart';
 
@@ -52,15 +54,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoading = true;
     });
-    String url = '${URLS.kUserUrl}profile/';
-    APIService()
-        .sendGetRequest(
-      accessToken,
-      url,
-    )
-        .then((data) async {
-      print(data['data']);
-      if (data['status'] == 200) {
+    const String url = '${URLS.kUserUrl}profile/';
+
+    APIService().sendGetRequest(accessToken, url).then((data) async {
+      if (data['status'] == Constants.HTTP_OK) {
         final UserBase userBase = UserBase.fromJson(data['data']['user_data']);
         final Applicant applicant =
             Applicant.fromJson(data['data']['applicant_data']);
@@ -74,16 +71,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           isLoading = false;
         });
       } else {
-        setState(() {
-          isError = true;
-          errorText = data['error'];
-        });
+        if (Helper().isUnauthorizedAccess(data['status'])) {
+          Helper().showSnackBar(
+            context,
+            Constants.SESSION_EXPIRED_MSG,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isError = true;
+            errorText = data['error'];
+          });
+        }
       }
-    }).catchError((error) {
-      setState(() {
-        isError = true;
-        errorText = error.toString();
-      });
     });
   }
 
