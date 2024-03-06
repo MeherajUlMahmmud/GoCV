@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
 import 'package:gocv/repositories/education.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 
 class EducationPage extends StatefulWidget {
   final String resumeId;
@@ -34,41 +32,55 @@ class _EducationPageState extends State<EducationPage> {
     fetchEducations(widget.resumeId);
   }
 
-  fetchEducations(String resumeId) {
-    // final String url = '${URLS.kEducationUrl}$resumeId/list/';
+  fetchEducations(String resumeId) async {
+    try {
+      final response = await educationRepository.getEducations(widget.resumeId);
 
-    // APIService().sendGetRequest(accessToken, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       educationList = data['data']['data'].map<Education>((education) {
-    //         return Education.fromJson(education);
-    //       }).toList();
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch educations',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          educationList = response['data'].map<Education>((education) {
+            return Education.fromJson(education);
+          }).toList();
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching education list: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching education listr',
+        Colors.red,
+      );
+    }
   }
 
   @override

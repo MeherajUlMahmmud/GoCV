@@ -73,8 +73,9 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   fetchContactDetails() {
-    Map<String, dynamic> response =
-        contactRepository.getContactDetails(widget.resumeId);
+    Map<String, dynamic> response = contactRepository.getContactDetails(
+      widget.resumeId,
+    );
     print(response);
 
     if (response['status'] == Constants.httpOkCode) {
@@ -111,8 +112,10 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   handleUpdateContactDetails() {
-    Map<String, dynamic> response =
-        contactRepository.updateContactDetails(contactId, updatedContactData);
+    Map<String, dynamic> response = contactRepository.updateContactDetails(
+      contactId,
+      updatedContactData,
+    );
     print(response);
 
     if (response['status'] == Constants.httpOkCode) {

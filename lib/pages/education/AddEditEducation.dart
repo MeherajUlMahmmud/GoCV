@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/repositories/education.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -78,7 +76,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
 
   fetchData() async {
     if (widget.educationId != null) {
-      fetchEducation(widget.educationId!);
+      fetchEducationDetails(widget.educationId!);
     } else {
       educationData['resume'] = widget.resumeId;
       setState(() {
@@ -112,120 +110,190 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     });
   }
 
-  fetchEducation(String educationId) {
-    // String url = '${URLS.kEducationUrl}$educationId/details/';
-    // APIService()
-    //     .sendGetRequest(
-    //   accessToken,
-    //   url,
-    // )
-    //     .then((data) {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       education = Education.fromJson(data['data']);
-    //       isError = false;
-    //     });
+  fetchEducationDetails(String educationId) async {
+    try {
+      final response = await educationRepository.getEducationDetails(
+        educationId,
+      );
 
-    //     initiateControllers();
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['data']['detail'];
-    //     });
-    //     Helper().showSnackBar(
-    //       context,
-    //       errorText,
-    //       Colors.red,
-    //     );
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          education = Education.fromJson(response['data']);
+          isError = false;
+        });
+
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch education details',
+            Colors.red,
+          );
+          Navigator.pop(context);
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching education details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching education details',
+        Colors.red,
+      );
+    }
   }
 
-  createEducation() {
-    // EducationService()
-    //     .createEducation(
-    //   tokens['access'],
-    //   widget.resumeId,
-    //   schoolName,
-    //   degree,
-    //   department,
-    //   gradeScale,
-    //   grade,
-    //   startDate,
-    //   endDate,
-    //   description,
-    //   isCurrentlyEnrolled,
-    // )
-    //     .then((value) {
-    //   if (value['status'] == Constants.HTTP_CREATED) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = value['error'];
-    //     });
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     error.toString(),
-    //     Colors.red,
-    //   );
-    // });
+  createEducation() async {
+    try {
+      final response = await educationRepository.createEducation(educationData);
+
+      if (response['status'] == Constants.httpCreatedCode) {
+        setState(() {
+          education = Education.fromJson(response['data']);
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Education details added',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['error'];
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Failed to add education details',
+          Colors.red,
+        );
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error adding education details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        'Error adding education details',
+        Colors.red,
+      );
+    }
   }
 
   updateEducation(String educationId) {
-    // String url = '${URLS.kEducationUrl}$educationId/update/';
-    // APIService()
-    //     .sendPatchRequest(
-    //   accessToken,
-    //   educationData,
-    //   url,
-    // )
-    //     .then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       education = Education.fromJson(data['data']);
-    //       isLoading = false;
-    //       isError = false;
-    //     });
+    try {
+      final response = educationRepository.updateEducation(
+        educationId,
+        educationData,
+      );
 
-    //     Helper().showSnackBar(
-    //       context,
-    //       'Education details updated',
-    //       Colors.green,
-    //     );
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['data']['detail'];
-    //     });
-    //     Helper().showSnackBar(
-    //       context,
-    //       errorText,
-    //       Colors.red,
-    //     );
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     'Error updating education',
-    //     Colors.red,
-    //   );
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          education = Education.fromJson(response['data']);
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Education details updated',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['error'];
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Failed to update education details',
+          Colors.red,
+        );
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error updating education details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        'Error updating education details',
+        Colors.red,
+      );
+    }
+  }
+
+  deleteEducation(String educationId) {
+    try {
+      final response = educationRepository.deleteEducation(educationId);
+
+      if (response['status'] == Constants.httpDeletedCode) {
+        setState(() {
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Education details deleted',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          isLoading = false;
+          isError = true;
+          errorText = response['error'];
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Failed to delete education details',
+          Colors.red,
+        );
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error deleting education details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        'Error deleting education details',
+        Colors.red,
+      );
+    }
   }
 
   handleSubmit() {
@@ -299,10 +367,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // deleteExperience(
-                                //   tokens['access'],
-                                //   widget.experienceId!,
-                                // );
+                                deleteEducation(widget.educationId!);
                               },
                               child: const Text(
                                 'Delete',
@@ -333,12 +398,6 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
         ],
       ),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,

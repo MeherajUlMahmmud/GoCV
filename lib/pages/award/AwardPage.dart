@@ -34,7 +34,6 @@ class _AwardPageState extends State<AwardPage> {
 
   fetchAwards(String resumeId) {
     Map<String, dynamic> response = awardRepository.getAwards(widget.resumeId);
-    print(response);
 
     if (response['status'] == Constants.httpOkCode) {
       setState(() {

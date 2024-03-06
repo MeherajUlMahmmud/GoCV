@@ -95,10 +95,35 @@ class _PersonalPageState extends State<PersonalPage> {
     });
   }
 
+  Future<File> getFromGallery() async {
+    final XFile? image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    File file = File(image!.path);
+    return file;
+  }
+
+  Future<File> cropImage({required File imageFile}) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+    );
+    return File(croppedFile!.path);
+  }
+
   fetchPersonalDetails() async {
     try {
-      final response =
-          await personalRepository.getPersonalDetails(widget.resumeId);
+      final response = await personalRepository.getPersonalDetails(
+        widget.resumeId,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         Personal personal = Personal.fromJson(response['data']);
@@ -151,59 +176,56 @@ class _PersonalPageState extends State<PersonalPage> {
     }
   }
 
-  Future<File> getFromGallery() async {
-    final XFile? image = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1800,
-      maxHeight: 1800,
-    );
-    File file = File(image!.path);
-    return file;
-  }
-
-  Future<File> cropImage({required File imageFile}) async {
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: imageFile.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.ratio3x2,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9
-      ],
-    );
-    return File(croppedFile!.path);
-  }
-
-  handleUpdatePersonalDetails() {
-    // final String url = '${URLS.kPersonalUrl}$personalId/update/';
-
-    // APIService()
-    //     .sendPatchRequest(accessToken, updatedPersonalData, url)
-    //     .then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     Helper().showSnackBar(
-    //       context,
-    //       'Personal details updated successfully',
-    //       Colors.green,
-    //     );
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to update personal details',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+  handleUpdatePersonalDetails() async {
+    try {
+      final response = await personalRepository.updatePersonalDetails(
+        personalId,
+        updatedPersonalData,
+      );
+      if (response['status'] == Constants.httpOkCode) {
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Personal details updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to update personal data',
+            Colors.red,
+          );
+          Navigator.pop(context);
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error updating personal details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error updating personal details',
+        Colors.red,
+      );
+    }
   }
 
   @override

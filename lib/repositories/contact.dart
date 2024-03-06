@@ -39,7 +39,9 @@ class ContactRepository {
   }
 
   Map<String, dynamic> updateContactDetails(
-      String contactId, Map<String, dynamic> contactData) {
+    String contactId,
+    Map<String, dynamic> contactData,
+  ) {
     final String accessToken = getAccessToken();
     final String url = '${URLS.kContactUrl}$contactId/update/';
 

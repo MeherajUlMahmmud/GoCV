@@ -23,4 +23,20 @@ class PersonalRepository {
       };
     }
   }
+
+  Future<Map<String, dynamic>> updatePersonalDetails(String personalId, Map<String, dynamic> updatedData,) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kPersonalUrl}$personalId/update/';
+
+      final data = await APIService().sendPatchRequest(accessToken, updatedData, url);
+      return data;
+    } catch (error) {
+      print('Error updating personal details: $error');
+      return {
+        'status': 500,
+        'message': 'Error updating personal details: $error',
+      };
+    }
+  }
 }
