@@ -37,10 +37,12 @@ class _EducationPageState extends State<EducationPage> {
       final response = await educationRepository.getEducations(widget.resumeId);
 
       if (response['status'] == Constants.httpOkCode) {
+        final List<Education> fetchedEducationList =
+            (response['data']['data'] as List).map<Education>((education) {
+          return Education.fromJson(education);
+        }).toList();
         setState(() {
-          educationList = response['data'].map<Education>((education) {
-            return Education.fromJson(education);
-          }).toList();
+          educationList = fetchedEducationList;
           isLoading = false;
           isError = false;
           errorText = '';
