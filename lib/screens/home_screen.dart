@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             isError = true;
             errorText = response['message'];
           });
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
             Constants.genericErrorMsg,
