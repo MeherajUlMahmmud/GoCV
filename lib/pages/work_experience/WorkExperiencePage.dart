@@ -1,11 +1,9 @@
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/experience.dart';
 import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
 import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:gocv/utils/urls.dart';
 
 class WorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -34,41 +32,57 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
     fetchWorkExperiences(widget.resumeId);
   }
 
-  fetchWorkExperiences(String resumeId) {
-    final String url = '${URLS.kExperienceUrl}$resumeId/list/';
+  fetchWorkExperiences(String resumeId) async {
+    try {
+      final response = await experienceRepository.getExperiences(resumeId);
 
-    // APIService().sendGetRequest(accessToken, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       experienceList = data['data']['data']
-    //           .map<Experience>((experience) => Experience.fromJson(experience))
-    //           .toList();
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch work experiences',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Experience> fetchedExperiences = (response['data']['data']
+                as List)
+            .map<Experience>((experience) => Experience.fromJson(experience))
+            .toList();
+        setState(() {
+          experienceList = fetchedExperiences;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch work experiences',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching work experiences: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Failed to fetch work experiences',
+        Colors.red,
+      );
+    }
   }
 
   @override
@@ -91,7 +105,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
         },
       ),
       body: isLoading
-          ? const CircularProgressIndicator()
+          ? const Center(child: CircularProgressIndicator())
           : isError
               ? Center(
                   child: Text(
