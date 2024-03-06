@@ -158,7 +158,6 @@ class _PersonalPageState extends State<PersonalPage> {
             'Failed to fetch personal data',
             Colors.red,
           );
-          Navigator.pop(context);
         }
       }
     } catch (error) {
