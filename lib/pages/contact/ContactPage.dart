@@ -5,8 +5,11 @@ import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ContactPage extends StatefulWidget {
+  static const String routeName = '/contact';
+
   final String resumeId;
 
   const ContactPage({
@@ -43,6 +46,11 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
 
+    contactDataProvider = Provider.of<ContactDataProvider>(
+      context,
+      listen: false,
+    );
+
     fetchContactDetails();
   }
 
@@ -72,53 +80,73 @@ class _ContactPageState extends State<ContactPage> {
     });
   }
 
-  fetchContactDetails() {
-    Map<String, dynamic> response = contactRepository.getContactDetails(
-      widget.resumeId,
-    );
-    print(response);
+  fetchContactDetails() async {
+    try {
+      final response = await contactRepository.getContactDetails(
+        widget.resumeId,
+      );
+      print(response);
 
-    if (response['status'] == Constants.httpOkCode) {
-      Contact contact = Contact.fromJson(response['data']);
-      contactDataProvider.setContactData(contact);
+      if (response['status'] == Constants.httpOkCode) {
+        Contact contact = Contact.fromJson(response['data']);
+        contactDataProvider.setContactData(contact);
 
-      setState(() {
-        contactId = contact.id.toString();
-        isLoading = false;
-        isError = false;
-        errorText = '';
-      });
-    } else {
-      if (Helper().isUnauthorizedAccess(response['status'])) {
-        Helper().showSnackBar(
-          context,
-          Constants.sessionExpiredMsg,
-          Colors.red,
-        );
-        Helper().logoutUser(context);
-      } else {
         setState(() {
+          contactId = contact.id.toString();
           isLoading = false;
-          isError = true;
-          errorText = response['message'];
+          isError = false;
+          errorText = '';
         });
-        Helper().showSnackBar(
-          context,
-          Constants.genericErrorMsg,
-          Colors.red,
-        );
+
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
       }
+    } catch (error) {
+      print('Error fetching contact details: $error');
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching contact details';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
     }
   }
 
-  handleUpdateContactDetails() {
-    Map<String, dynamic> response = contactRepository.updateContactDetails(
+  handleUpdateContactDetails() async {
+    final response = await contactRepository.updateContactDetails(
       contactId,
       updatedContactData,
     );
     print(response);
 
     if (response['status'] == Constants.httpOkCode) {
+      if (!mounted) return;
       Helper().showSnackBar(
         context,
         Constants.dataUpdatedMsg,
@@ -126,6 +154,7 @@ class _ContactPageState extends State<ContactPage> {
       );
     } else {
       if (Helper().isUnauthorizedAccess(response['status'])) {
+        if (!mounted) return;
         Helper().showSnackBar(
           context,
           Constants.sessionExpiredMsg,
@@ -138,6 +167,7 @@ class _ContactPageState extends State<ContactPage> {
           isError = true;
           errorText = response['message'];
         });
+        if (!mounted) return;
         Helper().showSnackBar(
           context,
           Constants.genericErrorMsg,
