@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/experience.dart';
-import 'package:gocv/pages/work_experience/WorkExperiencePage.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
@@ -10,7 +7,6 @@ import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:provider/provider.dart';
 
 class AddEditWorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -54,7 +50,14 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController companyWebsiteController = TextEditingController();
 
-  Experience experience = Experience();
+  Experience experience = Experience(
+    id: 0,
+    resume: 0,
+    companyName: '',
+    position: '',
+    type: '',
+    startDate: '',
+  );
 
   Map<String, dynamic> experienceData = {
     'resume': '',
@@ -75,7 +78,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     super.initState();
 
     if (widget.experienceId != null) {
-      fetchWorkExperience(widget.experienceId!);
+      fetchWorkExperienceDetails(widget.experienceId!);
     } else {
       experienceData['resume'] = widget.resumeId;
       setState(() {
@@ -99,19 +102,19 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   }
 
   initiateControllers() {
-    companyNameController.text = experience.companyName ?? '';
-    positionController.text = experience.position ?? '';
-    typeController.text = experience.type ?? '';
-    startDateController.text = experience.startDate ?? '';
+    companyNameController.text = experience.companyName;
+    positionController.text = experience.position;
+    typeController.text = experience.type;
+    startDateController.text = experience.startDate;
     endDateController.text = experience.endDate ?? '';
     descriptionController.text = experience.description ?? '';
     companyWebsiteController.text = experience.companyWebsite ?? '';
 
     experienceData['resume'] = experience.resume;
-    experienceData['company_name'] = experience.companyName ?? '';
-    experienceData['position'] = experience.position ?? '';
-    experienceData['type'] = experience.type ?? '';
-    experienceData['start_date'] = experience.startDate ?? '';
+    experienceData['company_name'] = experience.companyName;
+    experienceData['position'] = experience.position;
+    experienceData['type'] = experience.type;
+    experienceData['start_date'] = experience.startDate;
     experienceData['is_current'] = experience.isCurrent ?? false;
     experienceData['end_date'] = experience.endDate;
     experienceData['description'] = experience.description ?? '';
@@ -122,61 +125,57 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     });
   }
 
-  fetchWorkExperience(String experienceId) {
-    if (experienceId == '' || experienceId.isEmpty) {
+  fetchWorkExperienceDetails(String experienceId) async {
+    try {
+      final response = await experienceRepository.getExperienceDetails(
+        experienceId,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        final Experience fetchedExperience =
+            Experience.fromJson(response['data']);
+        setState(() {
+          experience = fetchedExperience;
+          isError = false;
+          errorText = '';
+        });
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
       setState(() {
         isLoading = false;
         isError = true;
-        errorText = 'Experience ID is empty';
+        errorText = 'Error fetching experience: $error';
       });
+      if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Experience ID is empty',
+        'Error fetching experience',
         Colors.red,
       );
-      return;
     }
-
-    final String url = '${URLS.kExperienceUrl}$experienceId/details/';
-
-    // APIService().sendGetRequest(accessToken, url).then((data) {
-    //   print(data);
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       experience = Experience.fromJson(data['data']);
-    //       isError = false;
-    //     });
-
-    //     initiateControllers();
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['data']['detail'];
-    //       });
-    //       Helper().showSnackBar(context, errorText, Colors.red);
-    //     }
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     'Error fetching experience',
-    //     Colors.red,
-    //   );
-    // });
   }
 
   createExperience() {

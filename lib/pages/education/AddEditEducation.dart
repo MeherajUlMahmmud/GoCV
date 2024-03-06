@@ -38,7 +38,12 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   TextEditingController endDateController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  Education education = Education();
+  Education education = Education(
+    id: 0,
+    resume: 0,
+    schoolName: '',
+    startDate: '',
+  );
 
   Map<String, dynamic> educationData = {
     'resume': '',
@@ -88,14 +93,14 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
 
   initiateControllers() {
     schoolNameController.text =
-        educationData['school_name'] = education.schoolName ?? '';
+        educationData['school_name'] = education.schoolName;
     degreeController.text = educationData['degree'] = education.degree ?? '';
     departmentController.text =
         educationData['department'] = education.department ?? '';
     gradeScaleController.text =
         educationData['grade_scale'] = education.gradeScale ?? '';
     gradeController.text = educationData['grade'] = education.grade ?? '';
-    startDateController.text = education.startDate ?? '';
+    startDateController.text = education.startDate;
     endDateController.text = education.endDate ?? '';
     descriptionController.text =
         educationData['description'] = education.description ?? '';

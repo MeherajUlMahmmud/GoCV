@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/award.dart';
+import 'package:gocv/models/certificate.dart';
+import 'package:gocv/models/contact.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/models/experience.dart';
+import 'package:gocv/models/language.dart';
+import 'package:gocv/models/personal.dart';
+import 'package:gocv/models/reference.dart';
+import 'package:gocv/models/resume.dart';
+import 'package:gocv/models/skill.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/contact.dart';
+import 'package:gocv/repositories/education.dart';
+import 'package:gocv/repositories/experience.dart';
+import 'package:gocv/repositories/personal.dart';
+import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -23,14 +33,23 @@ class ResumePreviewScreen extends StatefulWidget {
 }
 
 class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
-  UserProvider userProvider = UserProvider();
+  ResumeRepository resumeRepository = ResumeRepository();
+  PersonalRepository personalRepository = PersonalRepository();
+  ContactRepository contactRepository = ContactRepository();
+  EducationRepository educationRepository = EducationRepository();
+  ExperienceRepository experienceRepository = ExperienceRepository();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
 
-  late Map<String, dynamic> resumeDetails = {};
-  List<dynamic> educationList = [];
-  List<dynamic> experienceList = [];
+  Resume resume = Resume(name: '');
+  Personal personal = Personal();
+  Contact contact = Contact(
+    id: 0,
+    email: '',
+  );
+  List<Education> educationList = [];
+  List<Experience> experienceList = [];
   List<dynamic> skillList = [];
   List<dynamic> awardList = [];
   List<dynamic> certificationList = [];
@@ -61,14 +80,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       listen: false,
     );
 
-    // setState(() {
-    //   accessToken = userProvider.tokens['access'].toString();
-
-    //   resumeId = currentResumeProvider.currentResume.id.toString();
-    // });
+    setState(() {
+      resumeId = currentResumeProvider.currentResume.id.toString();
+    });
 
     loadImage();
-    // fetchResumeDetails();
+    fetchResumeDetails();
   }
 
   loadImage() async {
@@ -76,113 +93,266 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     imageData = (image).buffer.asUint8List();
   }
 
-  // fetchResumeDetails() {
-  //   final String url = '${URLS.kResumeUrl}$resumeId/details/';
+  fetchResumeDetails() async {
+    try {
+      final response = await resumeRepository.getResumeDetails(resumeId);
 
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         resumeDetails = data['data'];
-  //       });
+      if (response['status'] == Constants.httpOkCode) {
+        final Resume fetchedResume = Resume.fromJson(response['data']['data']);
+        currentResumeProvider.setCurrentResume(fetchedResume);
 
-  //       fetchEducations();
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch resumes',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
+        setState(() {
+          resume = fetchedResume;
+        });
 
-  // fetchEducations() {
-  //   final String url = '${URLS.kEducationUrl}$resumeId/list/';
+        fetchPersonalDetails();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      print(error);
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching resume details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching resume details',
+        Colors.red,
+      );
+    }
+  }
 
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         educationList = data['data']['data'].map<Education>((education) {
-  //           return Education.fromJson(education);
-  //         }).toList();
-  //         isLoading = false;
-  //         isError = false;
-  //         errorText = '';
-  //       });
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch educations',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
+  fetchPersonalDetails() async {
+    try {
+      final response = await personalRepository.getPersonalDetails(resumeId);
 
-  // fetchWorkExperiences() {
-  //   final String url = '${URLS.kExperienceUrl}$resumeId/list/';
+      if (response['status'] == Constants.httpOkCode) {
+        Personal fetchedPersonalDetails = Personal.fromJson(response['data']);
 
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         experienceList = data['data']['data']
-  //             .map<Experience>((experience) => Experience.fromJson(experience))
-  //             .toList();
-  //         isLoading = false;
-  //         isError = false;
-  //         errorText = '';
-  //       });
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch work experiences',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
+        setState(() {
+          personal = fetchedPersonalDetails;
+        });
+
+        fetchContactDetails();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch personal data',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching personal details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching personal details',
+        Colors.red,
+      );
+    }
+  }
+
+  fetchContactDetails() async {
+    try {
+      final response = await contactRepository.getContactDetails(resumeId);
+      print(response);
+
+      if (response['status'] == Constants.httpOkCode) {
+        Contact fetchedContact = Contact.fromJson(response['data']);
+
+        setState(() {
+          contact = fetchedContact;
+        });
+
+        fetchEducations();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      print('Error fetching contact details: $error');
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching contact details';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  fetchEducations() async {
+    try {
+      final response = await educationRepository.getEducations(resumeId);
+
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Education> fetchedEducationList =
+            (response['data']['data'] as List).map<Education>((education) {
+          return Education.fromJson(education);
+        }).toList();
+        setState(() {
+          educationList = fetchedEducationList;
+        });
+
+        fetchWorkExperiences();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching education list: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error fetching education listr',
+        Colors.red,
+      );
+    }
+  }
+
+  fetchWorkExperiences() async {
+    try {
+      final response = await experienceRepository.getExperiences(resumeId);
+
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Experience> fetchedExperiences = (response['data']['data']
+                as List)
+            .map<Experience>((experience) => Experience.fromJson(experience))
+            .toList();
+        setState(() {
+          experienceList = fetchedExperiences;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+
+        // fetchSkills();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch work experiences',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching work experiences: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Failed to fetch work experiences',
+        Colors.red,
+      );
+    }
+  }
 
   // fetchSkills() {
   //   final String url = '${URLS.kSkillUrl}$resumeId/list/';
@@ -333,27 +503,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resume Preview'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Printing.layoutPdf(
-              //   onLayout: (format) => _generatePdf(format, 'Resume', width),
-              // );
-
-              // Printing.sharePdf(
-              //   bytes: _generatePdf(PdfPageFormat.a4, 'Resume', width),
-              //   filename: resumeDetails['name'] + '.pdf',
-              // );
-            },
-            icon: const Icon(Icons.save),
-          ),
-        ],
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          // : const Center(child: Text('Resume Preview')),
           : PdfPreview(
               dynamicLayout: true,
               allowPrinting: true,
@@ -361,10 +516,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
               canChangeOrientation: false,
               canChangePageFormat: false,
               pageFormats: pageFormats,
-              pdfFileName: resumeDetails['name'] + '.pdf',
+              pdfFileName: '${resume.name}.pdf',
               build: (format) => _generatePdf(
                 format,
-                resumeDetails['name'],
+                resume.name,
                 width,
               ),
             ),
@@ -388,227 +543,293 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       pageMode: PdfPageMode.fullscreen,
     );
 
-    //   pdf.addPage(
-    //     pw.MultiPage(
-    //       pageFormat: format,
-    //       footer: (context) {
-    //         return pw.Row(
-    //           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-    //           children: [
-    //             pw.Text(
-    //               resumeDetails['personal']['first_name'] +
-    //                   ' ' +
-    //                   resumeDetails['personal']['last_name'],
-    //               style: const pw.TextStyle(
-    //                 fontSize: 10,
-    //               ),
-    //             ),
-    //             pw.Text(
-    //               'Page ${context.pageNumber} of ${context.pagesCount}',
-    //               style: const pw.TextStyle(
-    //                 fontSize: 10,
-    //               ),
-    //             ),
-    //           ],
-    //         );
-    //       },
-    //       build: (context) {
-    //         return [
-    //           pw.Column(
-    //             crossAxisAlignment: pw.CrossAxisAlignment.start,
-    //             children: [
-    //               pw.Row(
-    //                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-    //                 children: [
-    //                   pw.Column(
-    //                     crossAxisAlignment: pw.CrossAxisAlignment.start,
-    //                     children: [
-    //                       pw.Container(
-    //                         alignment: pw.Alignment.centerLeft,
-    //                         child: pw.Text(
-    //                           resumeDetails['personal']['first_name'] +
-    //                               ' ' +
-    //                               resumeDetails['personal']['last_name'],
-    //                           style: pw.TextStyle(
-    //                             fontWeight: pw.FontWeight.bold,
-    //                             fontSize: 18,
-    //                           ),
-    //                         ),
-    //                       ),
-    //                       pw.Container(
-    //                         alignment: pw.Alignment.centerLeft,
-    //                         child: pw.Text(
-    //                           resumeDetails['contact']['address'] ?? '',
-    //                         ),
-    //                       ),
-    //                       pw.Container(
-    //                         alignment: pw.Alignment.centerLeft,
-    //                         child: pw.Text(
-    //                           resumeDetails['contact']['phone_number'] ?? '',
-    //                         ),
-    //                       ),
-    //                       pw.Container(
-    //                         alignment: pw.Alignment.centerLeft,
-    //                         child: pw.Text(
-    //                           resumeDetails['contact']['email'] ?? '',
-    //                         ),
-    //                       ),
-    //                     ],
-    //                   ),
-    //                   pw.Image(
-    //                     pw.MemoryImage(imageData),
-    //                     height: 80,
-    //                     width: 80,
-    //                   ),
-    //                 ],
-    //               ),
-    //               sectionHeader('OBJECTIVE'),
-    //               pw.Container(
-    //                 alignment: pw.Alignment.centerLeft,
-    //                 child: pw.Text(
-    //                   resumeDetails['personal']['about_me'] ?? '',
-    //                   textAlign: pw.TextAlign.justify,
-    //                 ),
-    //               ),
-    //               educationList.isNotEmpty
-    //                   ? sectionHeader('EDUCATION')
-    //                   : pw.SizedBox(),
-    //               for (var item in educationList) educationItem(item),
-    //               experienceList.isNotEmpty
-    //                   ? sectionHeader('EXPERIENCE')
-    //                   : pw.SizedBox(),
-    //               for (var item in experienceList) experienceItem(item),
-    //               skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
-    //               for (var item in skillList) skillItem(item),
-    //               awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
-    //               for (var item in awardList) skillItem(item),
-    //               certificationList.isNotEmpty
-    //                   ? sectionHeader('CERTIFICATIONS')
-    //                   : pw.SizedBox(),
-    //               for (var item in certificationList) skillItem(item),
-    //               interestList.isNotEmpty
-    //                   ? sectionHeader('INTERESTS')
-    //                   : pw.SizedBox(),
-    //               for (var item in interestList) interestItem(item),
-    //               languageList.isNotEmpty
-    //                   ? sectionHeader('LANGUAGES')
-    //                   : pw.SizedBox(),
-    //               for (var item in languageList) languageItem(item),
-    //               referenceList.isNotEmpty
-    //                   ? sectionHeader('REFERENCES')
-    //                   : pw.SizedBox(),
-    //               for (var item in referenceList) referenceItem(item),
-    //             ],
-    //           )
-    //         ];
-    //       },
-    //     ),
-    //   );
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: format,
+        footer: (context) {
+          return pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                '${personal.firstName} ${personal.lastName}',
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+              pw.Text(
+                'Page ${context.pageNumber} of ${context.pagesCount}',
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          );
+        },
+        build: (context) {
+          return [
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Container(
+                  color: PdfColors.grey300,
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Container(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Text(
+                              '${personal.firstName} ${personal.lastName}',
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          pw.SizedBox(height: 3),
+                          pw.Container(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Text(
+                              contact.address ?? '',
+                            ),
+                          ),
+                          pw.SizedBox(height: 3),
+                          pw.Row(
+                            children: [
+                              pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Container(
+                                    alignment: pw.Alignment.centerLeft,
+                                    child: pw.Text(
+                                      contact.phoneNumber ?? '',
+                                    ),
+                                  ),
+                                  // Put this inside hyperlink
+                                  // 'https: //www.linkedin.com/in/${contact.linkedin}'
+                                  pw.Container(
+                                    alignment: pw.Alignment.centerLeft,
+                                    child: pw.Text(
+                                      contact.linkedin != null ||
+                                              contact.linkedin != ''
+                                          ? 'LinkedIn'
+                                          : '',
+                                      style: contact.linkedin != null ||
+                                              contact.linkedin != ''
+                                          ? const pw.TextStyle(
+                                              decoration:
+                                                  pw.TextDecoration.underline,
+                                              color: PdfColors.blue900,
+                                            )
+                                          : const pw.TextStyle(
+                                              color: PdfColors.black,
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              pw.SizedBox(width: 30),
+                              pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Container(
+                                    alignment: pw.Alignment.centerLeft,
+                                    child: pw.Text(contact.email,
+                                        style: const pw.TextStyle(
+                                          decoration:
+                                              pw.TextDecoration.underline,
+                                          color: PdfColors.blue900,
+                                        )),
+                                  ),
+                                  pw.Container(
+                                    alignment: pw.Alignment.centerLeft,
+                                    child: pw.Text(
+                                      contact.github != null ||
+                                              contact.github != ''
+                                          ? 'GitHub'
+                                          : '',
+                                      style: contact.github != null ||
+                                              contact.github != ''
+                                          ? const pw.TextStyle(
+                                              decoration:
+                                                  pw.TextDecoration.underline,
+                                              color: PdfColors.blue900,
+                                            )
+                                          : const pw.TextStyle(
+                                              color: PdfColors.black,
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              pw.SizedBox(width: 30),
+                            ],
+                          ),
+                        ],
+                      ),
+                      pw.Image(
+                        pw.MemoryImage(imageData),
+                        height: 70,
+                        width: 70,
+                      ),
+                    ],
+                  ),
+                ),
+                sectionHeader('OBJECTIVE'),
+                pw.Container(
+                  alignment: pw.Alignment.centerLeft,
+                  child: pw.Text(
+                    personal.aboutMe ?? '',
+                    textAlign: pw.TextAlign.justify,
+                  ),
+                ),
+
+                educationList.isNotEmpty
+                    ? sectionHeader('EDUCATION')
+                    : pw.SizedBox(),
+                for (var education in educationList) educationItem(education),
+
+                experienceList.isNotEmpty
+                    ? sectionHeader('EXPERIENCE')
+                    : pw.SizedBox(),
+                for (var experience in experienceList)
+                  experienceItem(experience),
+
+                skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
+                // for (var item in skillList) skillItem(item),
+
+                awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
+                // for (var item in awardList) skillItem(item),
+
+                certificationList.isNotEmpty
+                    ? sectionHeader('CERTIFICATIONS')
+                    : pw.SizedBox(),
+                // for (var item in certificationList) skillItem(item),
+
+                interestList.isNotEmpty
+                    ? sectionHeader('INTERESTS')
+                    : pw.SizedBox(),
+                // for (var item in interestList) interestItem(item),
+
+                languageList.isNotEmpty
+                    ? sectionHeader('LANGUAGES')
+                    : pw.SizedBox(),
+                // for (var item in languageList) languageItem(item),
+                referenceList.isNotEmpty
+                    ? sectionHeader('REFERENCES')
+                    : pw.SizedBox(),
+                // for (var item in referenceList) referenceItem(item),
+              ],
+            )
+          ];
+        },
+      ),
+    );
 
     return pdf.save();
   }
 
-  // pw.Container sectionHeader(String text) {
-  //   return pw.Container(
-  //     alignment: pw.Alignment.centerLeft,
-  //     margin: const pw.EdgeInsets.only(top: 10, bottom: 5),
-  //     child: pw.Text(
-  //       text,
-  //       style: pw.TextStyle(
-  //         fontSize: 12,
-  //         fontWeight: pw.FontWeight.bold,
-  //         decoration: pw.TextDecoration.underline,
-  //       ),
-  //     ),
-  //   );
-  // }
+  pw.Container sectionHeader(String text) {
+    return pw.Container(
+      alignment: pw.Alignment.centerLeft,
+      margin: const pw.EdgeInsets.only(top: 10, bottom: 5),
+      padding: const pw.EdgeInsets.symmetric(vertical: 3),
+      color: PdfColors.grey200,
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          fontSize: 12,
+          fontWeight: pw.FontWeight.bold,
+          // decoration: pw.TextDecoration.underline,
+        ),
+      ),
+    );
+  }
 
-  // pw.Container educationItem(Map<String, dynamic> education) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Row(
-  //           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             pw.Text(
-  //               education['degree'] + ', ' + education['school_name'],
-  //               style: pw.TextStyle(
-  //                 fontWeight: pw.FontWeight.bold,
-  //               ),
-  //             ),
-  //             education['start_date'] != null && education['end_date'] == null
-  //                 ? pw.Text(
-  //                     '${Helper().formatMonthYear(education['start_date'])} - Present',
-  //                     style: pw.TextStyle(
-  //                       fontWeight: pw.FontWeight.bold,
-  //                     ),
-  //                   )
-  //                 : education['start_date'] == null &&
-  //                         education['end_date'] != null
-  //                     ? pw.Text(
-  //                         Helper().formatMonthYear(education['end_date']),
-  //                         style: pw.TextStyle(
-  //                           fontWeight: pw.FontWeight.bold,
-  //                         ),
-  //                       )
-  //                     : pw.SizedBox(),
-  //           ],
-  //         ),
-  //         pw.Text('Department: ${education['department']}'),
-  //         pw.Text(
-  //             'CGPA: ${education['grade']} out of ${education['grade_scale']}'),
-  //         pw.Text(
-  //           education['description'] == null || education['description'] == ''
-  //               ? ''
-  //               : education['description'],
-  //           textAlign: pw.TextAlign.justify,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Container educationItem(Education education) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                '${education.degree}, ${education.schoolName}',
+                style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.Text(
+                education.endDate == null
+                    ? '${Helper().formatMonthYear(education.startDate)} - Present'
+                    : '${Helper().formatMonthYear(education.startDate)} - ${Helper().formatMonthYear(education.endDate ?? '')}',
+                style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          pw.Container(
+            margin: const pw.EdgeInsets.only(left: 20),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Department: ${education.department}'),
+                pw.Text(
+                    'CGPA: ${education.grade} out of ${education.gradeScale}'),
+                pw.Text(
+                  education.description ?? '',
+                  textAlign: pw.TextAlign.justify,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  // pw.Container experienceItem(Map<String, dynamic> experience) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Row(
-  //           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             pw.Text(
-  //               experience['position'] + ', ' + experience['company_name'],
-  //               style: pw.TextStyle(
-  //                 fontWeight: pw.FontWeight.bold,
-  //               ),
-  //             ),
-  //             pw.Text(
-  //               experience['end_date'] == null
-  //                   ? '${Helper().formatMonthYear(experience['start_date'])} - Present'
-  //                   : '${Helper().formatMonthYear(experience['start_date'])} - ${Helper().formatMonthYear(experience['end_date'])}',
-  //               style: pw.TextStyle(
-  //                 fontWeight: pw.FontWeight.bold,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         pw.Container(
-  //           margin: const pw.EdgeInsets.only(left: 20),
-  //           child: pw.Text(
-  //             experience['description'] == null ||
-  //                     experience['description'] == ''
-  //                 ? ''
-  //                 : experience['description'],
-  //             textAlign: pw.TextAlign.justify,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Container experienceItem(Experience experience) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                '${experience.position}, ${experience.companyName}',
+                style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.Text(
+                experience.endDate == null
+                    ? '${Helper().formatMonthYear(experience.startDate)} - Present'
+                    : '${Helper().formatMonthYear(experience.startDate)} - ${Helper().formatMonthYear(experience.endDate ?? '')}',
+                style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          pw.Container(
+            margin: const pw.EdgeInsets.only(left: 20),
+            child: pw.Text(
+              experience.description ?? '',
+              textAlign: pw.TextAlign.justify,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   // pw.Container skillItem(Map<String, dynamic> skill) {
   //   return pw.Container(
@@ -658,17 +879,17 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   //   );
   // }
 
-  // pw.Container languageItem(Map<String, dynamic> language) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Text(language['language'] + ' (${language['proficiency']})'),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Container languageItem(Map<String, dynamic> language) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(language['language'] + ' (${language['proficiency']})'),
+        ],
+      ),
+    );
+  }
 
   // pw.Container referenceItem(Map<String, dynamic> reference) {
   //   return pw.Container(

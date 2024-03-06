@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gocv/models/contact.dart';
 
 class ContactDataProvider extends ChangeNotifier {
-  final Contact _contactData = Contact();
+  final Contact _contactData = Contact(
+    id: 0,
+    email: '',
+  );
 
   Contact get contactData => _contactData;
 

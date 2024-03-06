@@ -3,12 +3,12 @@ import 'dart:ffi';
 import 'package:gocv/models/user.dart';
 
 class Experience {
-  int? id;
-  int? resume;
-  String? companyName;
-  String? position;
-  String? type;
-  String? startDate;
+  int id = 0;
+  int resume = 0;
+  String companyName = '';
+  String position = '';
+  String type = '';
+  String startDate = '';
   bool? isCurrent;
   String? endDate;
   String? description;
@@ -20,12 +20,12 @@ class Experience {
   String? updatedAt;
 
   Experience({
-    this.id,
-    this.resume,
-    this.companyName,
-    this.position,
-    this.type,
-    this.startDate,
+    required this.id,
+    required this.resume,
+    required this.companyName,
+    required this.position,
+    required this.type,
+    required this.startDate,
     this.isCurrent,
     this.endDate,
     this.description,

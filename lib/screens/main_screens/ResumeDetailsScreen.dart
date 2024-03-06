@@ -61,7 +61,6 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   fetchResumeDetails() async {
     try {
       final response = await resumeRepository.getResumeDetails(resumeId);
-      print(response);
 
       if (response['status'] == Constants.httpOkCode) {
         final Resume fetchedResume = Resume.fromJson(response['data']['data']);
@@ -87,6 +86,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
             isError = true;
             errorText = response['message'];
           });
+          if (!mounted) return;
           Helper().showSnackBar(
             context,
             Constants.genericErrorMsg,
@@ -101,6 +101,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
         isError = true;
         errorText = 'Error fetching resume details: $error';
       });
+      if (!mounted) return;
       Helper().showSnackBar(
         context,
         'Error fetching resume details',

@@ -1,9 +1,9 @@
 import 'package:gocv/models/user.dart';
 
 class Contact {
-  int? id;
+  int id = 0;
   String? phoneNumber;
-  String? email;
+  String email = '';
   String? address;
   String? zipCode;
   String? facebook;
@@ -17,9 +17,9 @@ class Contact {
   String? updatedAt;
 
   Contact({
-    this.id,
+    required this.id,
     this.phoneNumber,
-    this.email,
+    required this.email,
     this.address,
     this.zipCode,
     this.facebook,

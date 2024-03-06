@@ -502,6 +502,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget okButton = TextButton(
       child: const Text('Create'),
       onPressed: () async {
+        if (titleController.text.isEmpty) {
+          Helper().showSnackBar(
+            context,
+            'Please enter a title',
+            Colors.red,
+          );
+          return;
+        }
         setState(() {
           newResumeData['name'] = titleController.text;
           newResumeData['user'] = userId;

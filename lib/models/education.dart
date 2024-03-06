@@ -1,34 +1,34 @@
 import 'package:gocv/models/user.dart';
 
 class Education {
-  int? resume;
-  String? schoolName;
+  int id = 0;
+  int resume = 0;
+  String schoolName = '';
   String? degree;
   String? department;
   String? gradeScale;
   String? grade;
-  String? startDate;
+  String startDate = '';
   bool? isCurrent;
   String? endDate;
   String? description;
-  int? id;
   UserBase? createdBy;
   String? createdAt;
   UserBase? updatedBy;
   String? updatedAt;
 
   Education({
-    this.resume,
-    this.schoolName,
+    required this.id,
+    required this.resume,
+    required this.schoolName,
     this.degree,
     this.department,
     this.gradeScale,
     this.grade,
-    this.startDate,
+    required this.startDate,
     this.isCurrent,
     this.endDate,
     this.description,
-    this.id,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
