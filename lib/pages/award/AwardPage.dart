@@ -32,38 +32,58 @@ class _AwardPageState extends State<AwardPage> {
     fetchAwards(widget.resumeId);
   }
 
-  fetchAwards(String resumeId) {
-    Map<String, dynamic> response = awardRepository.getAwards(widget.resumeId);
+  fetchAwards(String resumeId) async {
+    try {
+      final response = await awardRepository.getAwards(widget.resumeId);
+      print(response);
 
-    if (response['status'] == Constants.httpOkCode) {
-      setState(() {
-        awardList = response['data'].map<Award>((award) {
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Award> fetchedAwardList =
+            (response['data']['data'] as List).map<Award>((award) {
           return Award.fromJson(award);
         }).toList();
-        isLoading = false;
-        isError = false;
-        errorText = '';
-      });
-    } else {
-      if (Helper().isUnauthorizedAccess(response['status'])) {
-        Helper().showSnackBar(
-          context,
-          Constants.sessionExpiredMsg,
-          Colors.red,
-        );
-        Helper().logoutUser(context);
-      } else {
+
         setState(() {
+          awardList = fetchedAwardList;
           isLoading = false;
-          isError = true;
-          errorText = response['message'];
+          isError = false;
+          errorText = '';
         });
-        Helper().showSnackBar(
-          context,
-          Constants.genericErrorMsg,
-          Colors.red,
-        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
       }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching skill list: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
     }
   }
 

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/skill.dart';
 import 'package:gocv/pages/skill/AddEditSkillPage.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
-import 'package:provider/provider.dart';
 
 class SkillPage extends StatefulWidget {
   final String resumeId;
@@ -23,7 +20,7 @@ class SkillPage extends StatefulWidget {
 class _SkillPageState extends State<SkillPage> {
   SkillRepository skillRepository = SkillRepository();
 
-  List<dynamic> skillList = [];
+  List<Skill> skillList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -36,40 +33,58 @@ class _SkillPageState extends State<SkillPage> {
     fetchSkills(widget.resumeId);
   }
 
-  fetchSkills(String resumeId) {
-    // final String url = '${URLS.kSkillUrl}$resumeId/list/';
+  fetchSkills(String resumeId) async {
+    try {
+      final response = await skillRepository.getSkills(widget.resumeId);
 
-    // APIService().sendGetRequest(accessToken, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       skillList = data['data']['data'];
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       print(data['error']);
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch skills',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Skill> fetchedSkillList =
+            (response['data']['data'] as List).map<Skill>((skill) {
+          return Skill.fromJson(skill);
+        }).toList();
+
+        setState(() {
+          skillList = fetchedSkillList;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching skill list: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
   }
 
   @override
@@ -122,7 +137,7 @@ class _SkillPageState extends State<SkillPage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                skillList[index]['uuid'],
+                                skillList[index].id,
                               );
                             },
                             child: Container(
@@ -158,9 +173,7 @@ class _SkillPageState extends State<SkillPage> {
                                       SizedBox(
                                         width: width * 0.7,
                                         child: Text(
-                                          skillList[index]['skill'] +
-                                              ' - ' +
-                                              skillList[index]['proficiency'],
+                                          '${skillList[index].name} - ${skillList[index].proficiency!}',
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -170,8 +183,8 @@ class _SkillPageState extends State<SkillPage> {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  skillList[index]['description'] == null ||
-                                          skillList[index]['description'] == ''
+                                  skillList[index].description == null ||
+                                          skillList[index].description == ''
                                       ? const SizedBox()
                                       : Row(
                                           children: [
@@ -183,7 +196,8 @@ class _SkillPageState extends State<SkillPage> {
                                             SizedBox(
                                               width: width * 0.7,
                                               child: Text(
-                                                skillList[index]['description'],
+                                                skillList[index].description ??
+                                                    '',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -202,7 +216,7 @@ class _SkillPageState extends State<SkillPage> {
     );
   }
 
-  void _showBottomSheet(BuildContext context, String skillId) {
+  void _showBottomSheet(BuildContext context, int skillId) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -226,7 +240,7 @@ class _SkillPageState extends State<SkillPage> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return AddEditSkillPage(
                       resumeId: widget.resumeId,
-                      skillId: skillId,
+                      skillId: skillId.toString(),
                     );
                   }));
                 },

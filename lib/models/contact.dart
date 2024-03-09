@@ -11,9 +11,9 @@ class Contact {
   String? github;
   String? website;
   int? resume;
-  UserBase? createdBy;
+  int? createdBy;
   String? createdAt;
-  UserBase? updatedBy;
+  int? updatedBy;
   String? updatedAt;
 
   Contact({
@@ -44,13 +44,9 @@ class Contact {
     website = json['website'];
     id = json['id'];
     resume = json['resume'];
-    createdBy = json['created_by'] != null
-        ? UserBase.fromJson(json['created_by'])
-        : null;
+    createdBy = json['created_by'];
     createdAt = json['created_at'];
-    updatedBy = json['updated_by'] != null
-        ? UserBase.fromJson(json['updated_by'])
-        : null;
+    updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
 

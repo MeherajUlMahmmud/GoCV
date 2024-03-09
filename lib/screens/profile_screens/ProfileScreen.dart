@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/models/applicant.dart';
-import 'package:gocv/models/user.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {

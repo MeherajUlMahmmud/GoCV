@@ -1,12 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';

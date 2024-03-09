@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/skill.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
@@ -45,24 +46,24 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   TextEditingController proficiencyController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  int id = 0;
-  String uuid = '';
-  String skill = '';
-  String proficiency = '';
-  String description = '';
+  Skill skill = Skill(
+    id: 0,
+    resume: 0,
+    name: '',
+  );
+
+  Map<String, dynamic> skillData = {
+    'resume': '',
+    'skill': '',
+    'proficiency': '',
+    'description': '',
+  };
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.skillId != null) {
-      getSkill(widget.skillId!);
-    } else {
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
+    fetchData();
   }
 
   @override
@@ -74,7 +75,25 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
     super.dispose();
   }
 
-  getSkill(String skillId) {
+  fetchData() async {
+    if (widget.skillId != null) {
+      fetchSkillDetails(widget.skillId!);
+    } else {
+      skillData['resume'] = widget.resumeId;
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
+  }
+
+  initiateControllers() {
+    skillController.text = skillData['skill'];
+    proficiencyController.text = skillData['proficiency'];
+    descriptionController.text = skillData['description'];
+  }
+
+  fetchSkillDetails(String skillId) {
     final String url = '${URLS.kSkillUrl}$skillId/details/';
 
     // APIService().sendGetRequest(accessToken, url).then((data) {
@@ -301,7 +320,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                     onSuggestionSelected: (suggestion) {
                       setState(() {
                         proficiencyController.text = suggestion.toString();
-                        proficiency = suggestion.toString();
+                        skillData['proficiency'] = suggestion.toString();
                       });
                     },
                   ),
@@ -318,7 +337,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      description = value!;
+                      skillData['description'] = value;
                     });
                   },
                 ),

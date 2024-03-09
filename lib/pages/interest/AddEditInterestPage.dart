@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/repositories/interest.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 

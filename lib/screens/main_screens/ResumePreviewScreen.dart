@@ -11,11 +11,13 @@ import 'package:gocv/models/reference.dart';
 import 'package:gocv/models/resume.dart';
 import 'package:gocv/models/skill.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
+import 'package:gocv/repositories/award.dart';
 import 'package:gocv/repositories/contact.dart';
 import 'package:gocv/repositories/education.dart';
 import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/repositories/personal.dart';
 import 'package:gocv/repositories/resume.dart';
+import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +40,8 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   ContactRepository contactRepository = ContactRepository();
   EducationRepository educationRepository = EducationRepository();
   ExperienceRepository experienceRepository = ExperienceRepository();
+  SkillRepository skillRepository = SkillRepository();
+  AwardRepository awardRepository = AwardRepository();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
@@ -50,12 +54,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   );
   List<Education> educationList = [];
   List<Experience> experienceList = [];
-  List<dynamic> skillList = [];
-  List<dynamic> awardList = [];
-  List<dynamic> certificationList = [];
+  List<Skill> skillList = [];
+  List<Award> awardList = [];
+  List<Certificate> certificationList = [];
   List<dynamic> interestList = [];
-  List<dynamic> languageList = [];
-  List<dynamic> referenceList = [];
+  List<Language> languageList = [];
+  List<Reference> referenceList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -310,12 +314,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
             .toList();
         setState(() {
           experienceList = fetchedExperiences;
-          isLoading = false;
-          isError = false;
-          errorText = '';
         });
 
-        // fetchSkills();
+        fetchSkills();
       } else {
         if (Helper().isUnauthorizedAccess(response['status'])) {
           if (!mounted) return;
@@ -354,40 +355,112 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     }
   }
 
-  // fetchSkills() {
-  //   final String url = '${URLS.kSkillUrl}$resumeId/list/';
+  fetchSkills() async {
+    try {
+      final response = await skillRepository.getSkills(resumeId);
 
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         skillList = data['data'];
-  //       });
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Skill> fetchedSkillList =
+            (response['data']['data'] as List).map<Skill>((skill) {
+          return Skill.fromJson(skill);
+        }).toList();
 
-  //       fetchInterests();
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         print(data['error']);
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch skills',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
+        setState(() {
+          skillList = fetchedSkillList;
+        });
+
+        fetchAwards();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch skills',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching skills: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Failed to fetch skills',
+        Colors.red,
+      );
+    }
+  }
+
+  fetchAwards() async {
+    try {
+      final response = await awardRepository.getAwards(resumeId);
+
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Award> fetchedAwardList =
+            (response['data']['data'] as List).map<Award>((award) {
+          return Award.fromJson(award);
+        }).toList();
+
+        setState(() {
+          awardList = fetchedAwardList;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Failed to fetch award list',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching award list: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Failed to fetch award list',
+        Colors.red,
+      );
+    }
+  }
 
   // fetchInterests() {
   //   final String url = '${URLS.kInterestUrl}$resumeId/list/';
@@ -567,8 +640,8 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         },
         build: (context) {
           return [
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
+            pw.Wrap(
+              // crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Container(
                   color: PdfColors.grey300,
@@ -678,19 +751,15 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                     ],
                   ),
                 ),
-                sectionHeader('OBJECTIVE'),
-                pw.Container(
-                  alignment: pw.Alignment.centerLeft,
-                  child: pw.Text(
-                    personal.aboutMe ?? '',
-                    textAlign: pw.TextAlign.justify,
-                  ),
-                ),
 
-                educationList.isNotEmpty
-                    ? sectionHeader('EDUCATION')
-                    : pw.SizedBox(),
-                for (var education in educationList) educationItem(education),
+                // sectionHeader('OBJECTIVE'),
+                // pw.Container(
+                //   alignment: pw.Alignment.centerLeft,
+                //   child: pw.Text(
+                //     personal.aboutMe ?? '',
+                //     textAlign: pw.TextAlign.justify,
+                //   ),
+                // ),
 
                 experienceList.isNotEmpty
                     ? sectionHeader('EXPERIENCE')
@@ -698,29 +767,37 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                 for (var experience in experienceList)
                   experienceItem(experience),
 
+                educationList.isNotEmpty
+                    ? sectionHeader('EDUCATION')
+                    : pw.SizedBox(),
+                for (var education in educationList) educationItem(education),
+
                 skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
-                // for (var item in skillList) skillItem(item),
+                skillListView(skillList),
+
+                // skillListGrid(skillList),
 
                 awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
                 // for (var item in awardList) skillItem(item),
 
-                certificationList.isNotEmpty
-                    ? sectionHeader('CERTIFICATIONS')
-                    : pw.SizedBox(),
+                // certificationList.isNotEmpty
+                //     ? sectionHeader('CERTIFICATIONS')
+                //     : pw.SizedBox(),
                 // for (var item in certificationList) skillItem(item),
 
-                interestList.isNotEmpty
-                    ? sectionHeader('INTERESTS')
-                    : pw.SizedBox(),
+                // interestList.isNotEmpty
+                //     ? sectionHeader('INTERESTS')
+                //     : pw.SizedBox(),
                 // for (var item in interestList) interestItem(item),
 
-                languageList.isNotEmpty
-                    ? sectionHeader('LANGUAGES')
-                    : pw.SizedBox(),
+                // languageList.isNotEmpty
+                //     ? sectionHeader('LANGUAGES')
+                //     : pw.SizedBox(),
                 // for (var item in languageList) languageItem(item),
-                referenceList.isNotEmpty
-                    ? sectionHeader('REFERENCES')
-                    : pw.SizedBox(),
+
+                // referenceList.isNotEmpty
+                //     ? sectionHeader('REFERENCES')
+                //     : pw.SizedBox(),
                 // for (var item in referenceList) referenceItem(item),
               ],
             )
@@ -831,30 +908,122 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     );
   }
 
-  // pw.Container skillItem(Map<String, dynamic> skill) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Text(
-  //           skill['proficiency'] != null && skill['proficiency'] != ''
-  //               ? skill['skill'] + ' (${skill['proficiency']})'
-  //               : skill['skill'],
-  //           style: pw.TextStyle(
-  //             fontWeight: pw.FontWeight.bold,
-  //           ),
-  //         ),
-  //         pw.Text(
-  //           skill['description'] == null || skill['description'] == ''
-  //               ? ''
-  //               : skill['description'],
-  //           textAlign: pw.TextAlign.justify,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Container skillListView(List<Skill> skillList) {
+    return pw.Container(
+      child: pw.Wrap(
+        spacing: 30, // Adjust the spacing between columns as needed
+        runSpacing: 15, // Adjust the spacing between rows as needed
+        crossAxisAlignment: pw.WrapCrossAlignment.start,
+        children: [
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              for (var skill in skillList)
+                pw.Container(
+                  margin: const pw.EdgeInsets.only(bottom: 2),
+                  child: pw.Text(
+                    skill.name,
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              for (var skill in skillList)
+                pw.Container(
+                  margin: const pw.EdgeInsets.only(bottom: 2),
+                  child: pw.Text(
+                    skill.description ?? '',
+                    style: const pw.TextStyle(
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Container skillListGrid(List<Skill> skillList) {
+    // Calculate the number of rows needed based on the number of skills and 4 items per row
+    int numRows = (skillList.length / 6).ceil();
+
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(top: 20),
+      height: numRows * 50.0, // Set a fixed height for the grid
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          sectionHeader('SKILLS'),
+          pw.Wrap(
+            spacing: 3, // Adjust the spacing between items as needed
+            runSpacing: 2,
+            children: List.generate(numRows, (rowIndex) {
+              // Generate widgets for each row
+              return pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: List.generate(4, (columnIndex) {
+                  // Calculate the index of the skill in the flat list
+                  int index = rowIndex * 4 + columnIndex;
+                  if (index < skillList.length) {
+                    return skillGridItem(skillList[index]);
+                  } else {
+                    // Return an empty container if there are no more skills to display
+                    return pw.Container();
+                  }
+                }),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Container skillGridItem(Skill skill) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.grey200,
+        borderRadius: pw.BorderRadius.circular(5),
+      ),
+      padding: const pw.EdgeInsets.all(3),
+      child: pw.Row(
+        children: [
+          pw.Text(
+            skill.name,
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.SizedBox(width: 5),
+          pw.Text(
+            skill.proficiency != null && skill.proficiency != ''
+                ? skill.proficiency == 'Beginner'
+                    ? '(⭐)'
+                    : skill.proficiency == 'Intermediate'
+                        ? '(⭐ ⭐)'
+                        : skill.proficiency == 'Advanced'
+                            ? '(⭐ ⭐ ⭐)'
+                            : skill.proficiency == 'Expert'
+                                ? '(⭐ ⭐ ⭐ ⭐)'
+                                : '' // if proficiency is not set, do not show any stars
+                : '',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   // pw.Container interestItem(Map<String, dynamic> interest) {
   //   return pw.Container(

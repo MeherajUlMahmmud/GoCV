@@ -1,5 +1,3 @@
-import 'package:gocv/models/user.dart';
-
 class Education {
   int id = 0;
   int resume = 0;
@@ -12,9 +10,9 @@ class Education {
   bool? isCurrent;
   String? endDate;
   String? description;
-  UserBase? createdBy;
+  int? createdBy;
   String? createdAt;
-  UserBase? updatedBy;
+  int? updatedBy;
   String? updatedAt;
 
   Education({
@@ -47,13 +45,9 @@ class Education {
     endDate = json['end_date'];
     description = json['description'];
     id = json['id'];
-    createdBy = json['created_by'] != null
-        ? UserBase.fromJson(json['created_by'])
-        : null;
+    createdBy = json['created_by'];
     createdAt = json['created_at'];
-    updatedBy = json['updated_by'] != null
-        ? UserBase.fromJson(json['updated_by'])
-        : null;
+    updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
 
@@ -70,14 +64,7 @@ class Education {
     data['end_date'] = endDate;
     data['description'] = description;
     data['id'] = id;
-    if (createdBy != null) {
-      data['created_by'] = createdBy!.toJson();
-    }
-    data['created_at'] = createdAt;
-    if (updatedBy != null) {
-      data['updated_by'] = updatedBy!.toJson();
-    }
-    data['updated_at'] = updatedAt;
+
     return data;
   }
 }

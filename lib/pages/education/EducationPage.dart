@@ -79,7 +79,7 @@ class _EducationPageState extends State<EducationPage> {
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching education listr',
+        'Error fetching education list',
         Colors.red,
       );
     }
@@ -177,7 +177,7 @@ class _EducationPageState extends State<EducationPage> {
                                       SizedBox(
                                         width: width * 0.8,
                                         child: Text(
-                                          educationList[index].schoolName!,
+                                          educationList[index].schoolName,
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
@@ -242,13 +242,13 @@ class _EducationPageState extends State<EducationPage> {
                                                           educationList[index]
                                                               .endDate)
                                                   ? Text(
-                                                      '${Helper().formatMonthYear(educationList[index].startDate ?? '')} - Present',
+                                                      '${Helper().formatMonthYear(educationList[index].startDate)} - Present',
                                                       style: const TextStyle(
                                                         fontSize: 16,
                                                       ),
                                                     )
                                                   : Text(
-                                                      '${Helper().formatMonthYear(educationList[index].startDate ?? '')} - ${Helper().formatMonthYear(educationList[index].endDate ?? '')}',
+                                                      '${Helper().formatMonthYear(educationList[index].startDate)} - ${Helper().formatMonthYear(educationList[index].endDate ?? '')}',
                                                       style: const TextStyle(
                                                         fontSize: 16,
                                                       ),

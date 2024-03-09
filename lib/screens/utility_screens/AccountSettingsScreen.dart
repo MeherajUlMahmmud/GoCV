@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   static const routeName = '/account-settings';
@@ -14,7 +13,6 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  UserProvider userProvider = UserProvider();
   late String userId;
 
   final _formKey = GlobalKey<FormState>();
@@ -38,9 +36,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
     setState(() {
       // accessToken = userProvider.tokens['access'].toString();
-      userId = userProvider.userData!.id.toString();
+      userId = UserProvider().userData!.id.toString();
 
-      email = userProvider.userData!.email!;
+      email = UserProvider().userData!.email!;
       emailController.text = email;
     });
   }

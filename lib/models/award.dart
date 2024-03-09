@@ -1,14 +1,12 @@
-import 'package:gocv/models/user.dart';
-
 class Award {
   int? resume;
   String? title;
   String? description;
   String? link;
   int? id;
-  UserBase? createdBy;
+  int? createdBy;
   String? createdAt;
-  UserBase? updatedBy;
+  int? updatedBy;
   String? updatedAt;
 
   Award(
@@ -28,13 +26,9 @@ class Award {
     description = json['description'];
     link = json['link'];
     id = json['id'];
-    createdBy = json['created_by'] != null
-        ? UserBase.fromJson(json['created_by'])
-        : null;
+    createdBy = json['created_by'];
     createdAt = json['created_at'];
-    updatedBy = json['updated_by'] != null
-        ? UserBase.fromJson(json['updated_by'])
-        : null;
+    updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
 
@@ -45,14 +39,6 @@ class Award {
     data['description'] = description;
     data['link'] = link;
     data['id'] = id;
-    if (createdBy != null) {
-      data['created_by'] = createdBy!.toJson();
-    }
-    data['created_at'] = createdAt;
-    if (updatedBy != null) {
-      data['updated_by'] = updatedBy!.toJson();
-    }
-    data['updated_at'] = updatedAt;
     return data;
   }
 }

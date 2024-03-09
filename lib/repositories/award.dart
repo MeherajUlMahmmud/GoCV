@@ -9,29 +9,22 @@ class AwardRepository {
     return userProvider.tokens['access'];
   }
 
-  Map<String, dynamic> getAwards(String resumeId) {
-    final String accessToken = getAccessToken();
-    final String url = '${URLS.kAwardUrl}$resumeId/list/';
+  getAwards(String resumeId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kAwardUrl}$resumeId/list/';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      return {
-        'status': data['status'] ?? 500,
-        'message': data['message'] ?? '',
-        'data': data['data']['data'] ?? [],
-      };
-    }).catchError((error) {
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
+      return data;
+    } catch (error) {
+      print('Error getting award list: $error');
       return {
         'status': 500,
-        'message': 'Internal Server Error',
-        'data': [],
+        'message': 'Error getting award list: $error',
       };
-    });
-
-    return {
-      'status': 500,
-      'message': 'Internal Server Error',
-      'data': [],
-    };
+    }
   }
 }

@@ -69,7 +69,7 @@ class _ContactPageState extends State<ContactPage> {
   initiateControllers() {
     phoneNumberController.text =
         contactDataProvider.contactData.phoneNumber ?? '';
-    emailController.text = contactDataProvider.contactData.email ?? '';
+    emailController.text = contactDataProvider.contactData.email;
     addressController.text = contactDataProvider.contactData.address ?? '';
     linkedinController.text = contactDataProvider.contactData.linkedin ?? '';
     facebookController.text = contactDataProvider.contactData.facebook ?? '';
@@ -85,7 +85,6 @@ class _ContactPageState extends State<ContactPage> {
       final response = await contactRepository.getContactDetails(
         widget.resumeId,
       );
-      print(response);
 
       if (response['status'] == Constants.httpOkCode) {
         Contact contact = Contact.fromJson(response['data']);

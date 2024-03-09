@@ -205,7 +205,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                               width: width * 0.7,
                                               child: Text(
                                                 experienceList[index]
-                                                    .companyName!,
+                                                    .companyName,
                                                 style: const TextStyle(
                                                   fontSize: 18,
                                                 ),
@@ -251,13 +251,13 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                           experienceList[index].endDate,
                                         )
                                             ? Text(
-                                                '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - Present',
+                                                '${Helper().formatMonthYear(experienceList[index].startDate)} - Present',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
                                               )
                                             : Text(
-                                                '${Helper().formatMonthYear(experienceList[index].startDate ?? '')} - ${Helper().formatMonthYear(experienceList[index].endDate ?? '')}',
+                                                '${Helper().formatMonthYear(experienceList[index].startDate)} - ${Helper().formatMonthYear(experienceList[index].endDate ?? '')}',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -285,7 +285,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
-                                                textAlign: TextAlign.justify,
                                               ),
                                             ),
                                           ],

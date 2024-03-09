@@ -1,7 +1,3 @@
-import 'dart:ffi';
-
-import 'package:gocv/models/user.dart';
-
 class Experience {
   int id = 0;
   int resume = 0;
@@ -12,11 +8,11 @@ class Experience {
   bool? isCurrent;
   String? endDate;
   String? description;
-  Double? salary;
+  double? salary;
   String? companyWebsite;
-  UserBase? createdBy;
+  int? createdBy;
   String? createdAt;
-  UserBase? updatedBy;
+  int? updatedBy;
   String? updatedAt;
 
   Experience({
@@ -49,13 +45,9 @@ class Experience {
     salary = json['salary'];
     companyWebsite = json['company_website'];
     id = json['id'];
-    createdBy = json['created_by'] != null
-        ? UserBase.fromJson(json['created_by'])
-        : null;
+    createdBy = json['created_by'];
     createdAt = json['created_at'];
-    updatedBy = json['updated_by'] != null
-        ? UserBase.fromJson(json['updated_by'])
-        : null;
+    updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
 
