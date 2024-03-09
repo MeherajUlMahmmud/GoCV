@@ -53,7 +53,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     'grade_scale': '',
     'grade': '',
     'start_date': '',
-    'end_date': '',
+    'end_date': null,
     'description': '',
     'is_current': false,
   };
@@ -170,10 +170,12 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   createEducation() async {
     try {
       final response = await educationRepository.createEducation(educationData);
+      print(response);
 
       if (response['status'] == Constants.httpCreatedCode) {
         setState(() {
           education = Education.fromJson(response['data']);
+          isLoading = false;
           isError = false;
         });
 
@@ -211,9 +213,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     }
   }
 
-  updateEducation(String educationId) {
+  updateEducation(String educationId) async {
     try {
-      final response = educationRepository.updateEducation(
+      final response = await educationRepository.updateEducation(
         educationId,
         educationData,
       );
@@ -258,9 +260,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     }
   }
 
-  deleteEducation(String educationId) {
+  deleteEducation(String educationId) async {
     try {
-      final response = educationRepository.deleteEducation(
+      final response = await educationRepository.deleteEducation(
         educationId,
       );
 
@@ -303,14 +305,15 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     }
   }
 
-  handleSubmit() {
+  handleSubmit() async {
     setState(() {
       isLoading = true;
     });
     if (widget.educationId != null) {
-      updateEducation(widget.educationId!);
+      await updateEducation(widget.educationId!);
     } else {
-      createEducation();
+      print(educationData);
+      await createEducation();
     }
   }
 
@@ -429,8 +432,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
               widget.educationId == null ? 'Add Education' : 'Update Education',
           isLoading: isLoading,
           isDisabled: isLoading,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) handleSubmit();
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) await handleSubmit();
           },
         ),
       ),

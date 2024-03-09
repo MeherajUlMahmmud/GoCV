@@ -231,51 +231,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         Colors.red,
       );
     }
-
-    // APIService().sendPostRequest(accessToken, experienceData, url).then((data) {
-    //   print(data);
-    //   if (data['status'] == Constants.HTTP_CREATED) {
-    //     Helper().showSnackBar(
-    //       context,
-    //       'Experience created successfully',
-    //       Colors.green,
-    //     );
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //     });
-    //     Navigator.pop(context);
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Error creating experience',
-    //         Colors.red,
-    //       );
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //       });
-    //     }
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     'Error creating experience',
-    //     Colors.red,
-    //   );
-    // });
   }
 
   updateExperience(String experienceId) async {
@@ -381,29 +336,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         Colors.red,
       );
     }
-    // final String url = '${URLS.kExperienceUrl}$experienceId/delete/';
-
-    // APIService().sendDeleteRequest(accessToken, url).then((data) async {
-    //   print(data);
-    //   if (data['status'] == 204) {
-    //     Navigator.pop(context);
-    //     Navigator.pop(context);
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //       });
-    //     }
-    //   }
-    // });
   }
 
   handleSubmit() {
