@@ -19,8 +19,69 @@ This Flutter project aims to enable the people to build resumes easily. It is de
 
 ## Features
 
--   [List key features of your project]
--   [Provide a brief overview of what your app can do]
+### Feature List
+
+-   [x] **Resume Management**:
+    -   [x] Create, update, and delete resumes.
+-   [x] **Personal Information**:
+    -   [x] Update personal details like name, address, etc.
+-   [x] **Contact Information**:
+    -   [x] Update contact details such as email, phone number, etc.
+-   [x] **Work Experience**:
+    -   [x] Add new Work Experience
+    -   [x] Update Work Experience
+    -   [x] Delete Work Experience
+-   [x] **Education**:
+    -   [ ] Add new Education
+    -   [ ] Update Education
+    -   [ ] Delete Education
+-   [ ] **Skills**:
+    -   [ ] Add new Skills
+    -   [ ] Update Skills
+    -   [ ] Delete Skills
+-   [ ] **Projects**:
+    -   [ ] Add new Projects
+    -   [ ] Update Projects
+    -   [ ] Delete Projects
+-   [ ] **Certifications**:
+    -   [ ] Add new Certifications
+    -   [ ] Update Certifications
+    -   [ ] Delete Certifications
+-   [ ] **Awards**:
+    -   [ ] Add new Awards
+    -   [ ] Update Awards
+    -   [ ] Delete Awards
+-   [ ] **Publications**:
+    -   [ ] Add new Publications
+    -   [ ] Update Publications
+    -   [ ] Delete Publications
+-   [ ] **References**:
+    -   [ ] Add new References
+    -   [ ] Update References
+    -   [ ] Delete References
+-   [ ] **Languages**
+    -   [ ] Add new Languages
+    -   [ ] Update Languages
+    -   [ ] Delete Languages:
+-   [ ] **Interests**:
+    -   [ ] Add new Interests
+    -   [ ] Update Interests
+    -   [ ] Delete Interests
+-   [x] **Preview Resume**:
+    -   [x] View a preview of the resume layout.
+-   [x] **Export Resume as PDF**:
+    -   [x] Generate and export the resume as a PDF file.
+
+### Additional Features
+
+-   [ ] **Customizable Templates**:
+    -   [ ] Provide different resume templates for users to choose from.
+-   [ ] **Integration with LinkedIn/GitHub**:
+    -   [ ] Allow users to import data from their LinkedIn or GitHub profiles.
+-   [ ] **Collaboration**:
+    -   [ ] Enable collaboration features for multiple users to work on a resume together.
+-   [ ] **Version Control**:
+    -   [ ] Implement version control to track changes made to resumes over time.
 
 ## Installation
 
