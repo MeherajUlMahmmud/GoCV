@@ -8,15 +8,13 @@ class SkillRepository {
     return UserProvider().tokens['access'];
   }
 
-  getSkills(String resumeId) async {
+  getSkills(String resumeId, Map<String, dynamic> params) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kSkillUrl}$resumeId/list/';
+      String queryString = Uri(queryParameters: params).query;
+      final String url = '${URLS.kSkillUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(
-        accessToken,
-        url,
-      );
+      final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
       print('Error getting skill list: $error');

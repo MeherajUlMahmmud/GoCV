@@ -8,15 +8,13 @@ class EducationRepository {
     return UserProvider().tokens['access'];
   }
 
-  getEducations(String resumeId) async {
+  getEducations(String resumeId, Map<String, dynamic> params) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kEducationUrl}$resumeId/list/';
+      String queryString = Uri(queryParameters: params).query;
+      final String url = '${URLS.kEducationUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(
-        accessToken,
-        url,
-      );
+      final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
       print('Error getting education list: $error');
@@ -32,10 +30,7 @@ class EducationRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kEducationUrl}$educationId/details/';
 
-      final data = await APIService().sendGetRequest(
-        accessToken,
-        url,
-      );
+      final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
       print('Error getting education details: $error');

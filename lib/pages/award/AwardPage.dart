@@ -33,9 +33,14 @@ class _AwardPageState extends State<AwardPage> {
   }
 
   fetchAwards(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
     try {
-      final response = await awardRepository.getAwards(widget.resumeId);
-      print(response);
+      final response = await awardRepository.getAwards(
+        widget.resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Award> fetchedAwardList =
@@ -146,7 +151,9 @@ class _AwardPageState extends State<AwardPage> {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: awardList[index].isActive!
+                                    ? Colors.white
+                                    : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(

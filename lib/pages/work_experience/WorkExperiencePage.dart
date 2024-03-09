@@ -33,8 +33,14 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   }
 
   fetchWorkExperiences(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
     try {
-      final response = await experienceRepository.getExperiences(resumeId);
+      final response = await experienceRepository.getExperiences(
+        resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Experience> fetchedExperiences = (response['data']['data']
@@ -157,7 +163,9 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: experienceList[index].isActive!
+                                    ? Colors.white
+                                    : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: Colors.grey.shade200,

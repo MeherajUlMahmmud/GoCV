@@ -178,8 +178,59 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     }
   }
 
-  createExperience() {
-    const String url = '${URLS.kExperienceUrl}create/';
+  createExperience() async {
+    try {
+      final response = await experienceRepository.createExperience(
+        widget.resumeId,
+        experienceData,
+      );
+
+      if (response['status'] == Constants.httpCreatedCode) {
+        setState(() {
+          isLoading = false;
+          isError = true;
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Experience created successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Error creating experience',
+            Colors.red,
+          );
+          setState(() {
+            isLoading = false;
+            isError = true;
+          });
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error creating experience',
+        Colors.red,
+      );
+    }
 
     // APIService().sendPostRequest(accessToken, experienceData, url).then((data) {
     //   print(data);
@@ -227,48 +278,109 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     // });
   }
 
-  updateExperience(String experienceId) {
-    // final String url = '${URLS.kExperienceUrl}$experienceId/update/';
-    // APIService()
-    //     .sendPatchRequest(accessToken, experienceData, url)
-    //     .then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     print(data);
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //     Helper().showSnackBar(
-    //       context,
-    //       'Experience updated successfully',
-    //       Colors.green,
-    //     );
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Error updating experience',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+  updateExperience(String experienceId) async {
+    try {
+      final response = await experienceRepository.updateExperience(
+        widget.resumeId,
+        experienceId,
+        experienceData,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Experience updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Error updating experience',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error updating experience: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error updating experience',
+        Colors.red,
+      );
+    }
   }
 
-  deleteExperience(String experienceId) {
+  deleteExperience(String experienceId) async {
+    try {
+      final response =
+          await experienceRepository.deleteExperience(experienceId);
+
+      if (response['status'] == Constants.httpNoContentCode) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            'Error deleting experience',
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error deleting experience: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        'Error deleting experience',
+        Colors.red,
+      );
+    }
     // final String url = '${URLS.kExperienceUrl}$experienceId/delete/';
 
     // APIService().sendDeleteRequest(accessToken, url).then((data) async {
@@ -364,8 +476,8 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                               child: const Text('Cancel'),
                             ),
                             TextButton(
-                              onPressed: () {
-                                deleteExperience(widget.experienceId!);
+                              onPressed: () async {
+                                await deleteExperience(widget.experienceId!);
                               },
                               child: const Text(
                                 'Delete',

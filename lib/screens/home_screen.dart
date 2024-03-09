@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   fetchResumes() async {
     try {
-      final response = await resumeRepository.getResumes(userId);
+      final response = await resumeRepository.getResumes(userId, {});
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Resume> fetchedResumes = (response['data'] as List)
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void createResume() async {
+  createResume() async {
     try {
       final response = await resumeRepository.createResume(newResumeData);
       if (response['status'] == Constants.httpCreatedCode) {
@@ -158,11 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void deleteResume(int index) async {
+  deleteResume(int index) async {
     try {
       String resumeId = resumeListProvider.resumeList[index].id.toString();
       final response = await resumeRepository.deleteResume(resumeId);
-      if (response['status'] == Constants.httpDeletedCode) {
+
+      if (response['status'] == Constants.httpNoContentCode) {
         resumeListProvider.removeResume(index);
 
         setState(() {
@@ -170,6 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
           isError = false;
           errorText = '';
         });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          response['message'] ?? 'Resume deleted successfully',
+          Colors.green,
+        );
       } else {
         if (!mounted) return;
         // Handle error
@@ -337,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: () async {
-                fetchResumes();
+                await fetchResumes();
               },
               child: isError
                   ? Center(

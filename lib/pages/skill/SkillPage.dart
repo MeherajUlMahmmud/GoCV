@@ -34,8 +34,15 @@ class _SkillPageState extends State<SkillPage> {
   }
 
   fetchSkills(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume': resumeId,
+    };
+
     try {
-      final response = await skillRepository.getSkills(widget.resumeId);
+      final response = await skillRepository.getSkills(
+        widget.resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Skill> fetchedSkillList =
@@ -150,7 +157,9 @@ class _SkillPageState extends State<SkillPage> {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: skillList[index].isActive == true
+                                    ? Colors.white
+                                    : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(

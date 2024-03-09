@@ -33,8 +33,15 @@ class _EducationPageState extends State<EducationPage> {
   }
 
   fetchEducations(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
+
     try {
-      final response = await educationRepository.getEducations(widget.resumeId);
+      final response = await educationRepository.getEducations(
+        widget.resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Education> fetchedEducationList =
@@ -158,7 +165,9 @@ class _EducationPageState extends State<EducationPage> {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: educationList[index].isActive!
+                                    ? Colors.white
+                                    : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: Colors.grey.shade200,

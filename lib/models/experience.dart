@@ -10,6 +10,8 @@ class Experience {
   String? description;
   double? salary;
   String? companyWebsite;
+  bool? isActive;
+  bool? isDeleted;
   int? createdBy;
   String? createdAt;
   int? updatedBy;
@@ -27,6 +29,8 @@ class Experience {
     this.description,
     this.salary,
     this.companyWebsite,
+    this.isActive,
+    this.isDeleted,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
@@ -45,6 +49,8 @@ class Experience {
     salary = json['salary'];
     companyWebsite = json['company_website'];
     id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
     createdBy = json['created_by'];
     createdAt = json['created_at'];
     updatedBy = json['updated_by'];

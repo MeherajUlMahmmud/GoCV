@@ -19,7 +19,7 @@ class CertificationPage extends StatefulWidget {
 class _CertificationPageState extends State<CertificationPage> {
   CertificateRepository certificateRepository = CertificateRepository();
 
-  List<dynamic> certificationList = [];
+  List<Certificate> certificationList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -32,40 +32,55 @@ class _CertificationPageState extends State<CertificationPage> {
     fetchCertifications(widget.resumeId);
   }
 
-  fetchCertifications(String resumeId) {
-    Map<String, dynamic> response =
-        certificateRepository.getCertificates(widget.resumeId);
-    print(response);
+  fetchCertifications(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
+    try {
+      final response = await certificateRepository.getCertificates(
+        widget.resumeId,
+        params,
+      );
 
-    if (response['status'] == Constants.httpOkCode) {
-      setState(() {
-        certificationList = response['data'].map<Certificate>((award) {
-          return Certificate.fromJson(award);
-        }).toList();
-        isLoading = false;
-        isError = false;
-        errorText = '';
-      });
-    } else {
-      if (Helper().isUnauthorizedAccess(response['status'])) {
-        Helper().showSnackBar(
-          context,
-          Constants.sessionExpiredMsg,
-          Colors.red,
-        );
-        Helper().logoutUser(context);
-      } else {
+      if (response['status'] == Constants.httpOkCode) {
         setState(() {
+          certificationList = response['data'].map<Certificate>((award) {
+            return Certificate.fromJson(award);
+          }).toList();
           isLoading = false;
-          isError = true;
-          errorText = response['message'];
+          isError = false;
+          errorText = '';
         });
-        Helper().showSnackBar(
-          context,
-          Constants.genericErrorMsg,
-          Colors.red,
-        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
       }
+    } catch (error) {
+      print('Error fetching certifications: $error');
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching certifications: $error';
+      });
     }
   }
 

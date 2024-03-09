@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
+import 'package:gocv/repositories/user.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
-import 'package:gocv/utils/urls.dart';
+import 'package:gocv/utils/constants.dart';
+import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -21,10 +23,10 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  UserProvider userProvider = UserProvider();
+  UserRepository userRepository = UserRepository();
 
   late UserProfileProvider userProfileProvider;
-  late String applicantId, firstName, lastName, phoneNumber;
+  late String userId, applicantId, firstName, lastName, phoneNumber;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -53,13 +55,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       context,
       listen: false,
     );
+    applicantId = userProfileProvider.userProfile.applicantData!.id.toString();
     firstName = userProfileProvider.userProfile.applicantData?.firstName ?? '';
     lastName = userProfileProvider.userProfile.applicantData?.lastName ?? '';
     phoneNumber =
         userProfileProvider.userProfile.applicantData?.phoneNumber ?? '';
 
+    userId = UserProvider().userData!.id.toString();
+
     setState(() {
-      // accessToken = userProvider.tokens['access'].toString();
       applicantId =
           userProfileProvider.userProfile.applicantData!.id.toString();
 
@@ -108,43 +112,53 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return File(croppedFile!.path);
   }
 
-  handleSubmit() {
+  handleSubmit() async {
     setState(() {
       isSubmitting = true;
     });
 
-    final String url = '${URLS.kApplicantUrl}$applicantId/update/';
+    try {
+      final response = await userRepository.updateUserProfile(
+        userId,
+        updatedProfileData,
+      );
+      print(response);
 
-    // APIService()
-    //     .sendPatchRequest(accessToken, updatedProfileData, url)
-    //     .then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       isSubmitting = false;
-    //     });
-    //     Navigator.of(context).pop(true);
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       print(data);
-    //       setState(() {
-    //         isSubmitting = false;
-    //         isError = true;
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to update profile',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isSubmitting = false;
+        });
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Profile updated successfully',
+          Colors.green,
+        );
+        Navigator.of(context).pop(true);
+      } else {
+        if (response['status'] == Constants.httpUnauthorizedCode) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isSubmitting = false;
+            isError = true;
+          });
+        }
+      }
+    } catch (error) {
+      print('Error updating user profile: $error');
+      if (!mounted) return;
+      setState(() {
+        isSubmitting = false;
+        isError = true;
+      });
+    }
   }
 
   @override

@@ -8,13 +8,19 @@ class ResumeRepository {
     return UserProvider().tokens['access'];
   }
 
-  // Method to fetch resumes
-  Future<Map<String, dynamic>> getResumes(String userId) async {
+  getResumes(
+    String userId,
+    Map<String, dynamic> params,
+  ) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kResumeUrl}list/?user=$userId';
+      String queryString = Uri(queryParameters: params).query;
+      final String url = '${URLS.kResumeUrl}list/?user=$userId&$queryString';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
 
       // Check if the data contains the expected keys
       if (data.containsKey('status') && data.containsKey('data')) {
@@ -40,12 +46,15 @@ class ResumeRepository {
     }
   }
 
-  Future<Map<String, dynamic>> getResumeDetails(String resumeId) async {
+  getResumeDetails(String resumeId) async {
     try {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kResumeUrl}$resumeId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
       print('Error getting resume details: $error');
@@ -56,13 +65,15 @@ class ResumeRepository {
     }
   }
 
-  Future<Map<String, dynamic>> createResume(
-      Map<String, dynamic> resumeData) async {
+  createResume(Map<String, dynamic> resumeData) async {
     try {
       final String accessToken = getAccessToken();
       const String url = '${URLS.kResumeUrl}create/';
-      final data =
-          await APIService().sendPostRequest(accessToken, resumeData, url);
+      final data = await APIService().sendPostRequest(
+        accessToken,
+        resumeData,
+        url,
+      );
       return data;
     } catch (error) {
       print('Error creating resume: $error');
@@ -73,10 +84,31 @@ class ResumeRepository {
     }
   }
 
-  Future<Map<String, dynamic>> deleteResume(String resumeId) async {
+  updateResume(String resumeId, Map<String, dynamic> resumeData) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kResumeUrl}$resumeId/update/';
+
+      final data = await APIService().sendPatchRequest(
+        accessToken,
+        resumeData,
+        url,
+      );
+      return data;
+    } catch (error) {
+      print('Error updating resume: $error');
+      return {
+        'status': 500,
+        'message': 'Error updating resume: $error',
+      };
+    }
+  }
+
+  deleteResume(String resumeId) async {
     try {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kResumeUrl}$resumeId/destroy/';
+
       final data = await APIService().sendDeleteRequest(accessToken, url);
       return data;
     } catch (error) {

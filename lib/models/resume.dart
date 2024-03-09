@@ -12,7 +12,11 @@ class Resume {
   bool? isReferenceVisible;
   bool? isAwardVisible;
   bool? isCertificationVisible;
+  bool? isActive;
+  bool? isDeleted;
+  int? createdBy;
   String? createdAt;
+  int? updatedBy;
   String? updatedAt;
 
   Resume({
@@ -27,7 +31,11 @@ class Resume {
     this.isReferenceVisible,
     this.isAwardVisible,
     this.isCertificationVisible,
+    this.isActive,
+    this.isDeleted,
+    this.createdBy,
     this.createdAt,
+    this.updatedBy,
     this.updatedAt,
   });
 
@@ -43,7 +51,11 @@ class Resume {
     isReferenceVisible = json['is_reference_visible'];
     isAwardVisible = json['is_award_visible'];
     isCertificationVisible = json['is_certification_visible'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
+    createdBy = json['created_by'];
     createdAt = json['created_at'];
+    updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
 

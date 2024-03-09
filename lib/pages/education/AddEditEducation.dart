@@ -260,9 +260,11 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
 
   deleteEducation(String educationId) {
     try {
-      final response = educationRepository.deleteEducation(educationId);
+      final response = educationRepository.deleteEducation(
+        educationId,
+      );
 
-      if (response['status'] == Constants.httpDeletedCode) {
+      if (response['status'] == Constants.httpNoContentCode) {
         setState(() {
           isError = false;
         });
@@ -371,8 +373,8 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
                               child: const Text('Cancel'),
                             ),
                             TextButton(
-                              onPressed: () {
-                                deleteEducation(widget.educationId!);
+                              onPressed: () async {
+                                await deleteEducation(widget.educationId!);
                               },
                               child: const Text(
                                 'Delete',

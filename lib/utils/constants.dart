@@ -9,7 +9,7 @@ class Constants {
 
   static const int httpOkCode = 200;
   static const int httpCreatedCode = 201;
-  static const int httpDeletedCode = 204;
+  static const int httpNoContentCode = 204;
   static const int httpBadRequestCode = 400;
   static const int httpUnauthorizedCode = 401;
   static const int httpForbiddenCode = 403;

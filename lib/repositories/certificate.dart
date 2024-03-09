@@ -3,35 +3,84 @@ import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/urls.dart';
 
 class CertificateRepository {
-  UserProvider userProvider = UserProvider();
-
+  // Method to get the access token from UserProvider
   String getAccessToken() {
-    return userProvider.tokens['access'];
+    return UserProvider().tokens['access'];
   }
 
-  Map<String, dynamic> getCertificates(String resumeId) {
-    String accessToken = getAccessToken();
-    String url = '${URLS.kCertificationUrl}$resumeId/list/';
+  getCertificates(String resumeId, Map<String, dynamic> params) async {
+    try {
+      final String accessToken = getAccessToken();
+      String queryString = Uri(queryParameters: params).query;
+      final String url =
+          '${URLS.kCertificationUrl}$resumeId/list/?$queryString';
 
-    APIService().sendGetRequest(accessToken, url).then((data) async {
-      print(data);
-      return {
-        'status': data['status'] ?? 500,
-        'message': data['message'] ?? '',
-        'data': data['data']['data'] ?? [],
-      };
-    }).catchError((error) {
+      final data = await APIService().sendGetRequest(accessToken, url);
+      return data;
+    } catch (error) {
+      print('Error getting certificate list: $error');
       return {
         'status': 500,
-        'message': 'Internal Server Error',
-        'data': [],
+        'message': 'Error getting certificate list: $error',
       };
-    });
+    }
+  }
 
-    return {
-      'status': 500,
-      'message': 'Internal Server Error',
-      'data': [],
-    };
+  getCertificateDetails(String certificateId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kCertificationUrl}$certificateId/details/';
+
+      final data = await APIService().sendGetRequest(accessToken, url);
+      return data;
+    } catch (error) {
+      print('Error getting certificate details: $error');
+      return {
+        'status': 500,
+        'message': 'Error getting certificate details: $error',
+      };
+    }
+  }
+
+  createCertificate(String resumeId, Map<String, dynamic> data) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kCertificationUrl}$resumeId/create/';
+
+      final response = await APIService().sendPostRequest(
+        accessToken,
+        data,
+        url,
+      );
+      return response;
+    } catch (error) {
+      print('Error creating certificate: $error');
+      return {
+        'status': 500,
+        'message': 'Error creating certificate: $error',
+      };
+    }
+  }
+
+  updateCertificate(
+      String resumeId, int certificateId, Map<String, dynamic> data) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url =
+          '${URLS.kCertificationUrl}$resumeId/update/$certificateId/';
+
+      final response = await APIService().sendPatchRequest(
+        accessToken,
+        data,
+        url,
+      );
+      return response;
+    } catch (error) {
+      print('Error updating certificate: $error');
+      return {
+        'status': 500,
+        'message': 'Error updating certificate: $error',
+      };
+    }
   }
 }

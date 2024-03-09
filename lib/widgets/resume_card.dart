@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/models/resume.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/repositories/resume.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 
 class ResumeCard extends StatefulWidget {
@@ -18,11 +19,64 @@ class ResumeCard extends StatefulWidget {
 }
 
 class _ResumeCardState extends State<ResumeCard> {
-  UserProvider userProvider = UserProvider();
+  ResumeRepository resumeRepository = ResumeRepository();
 
   TextEditingController titleController = TextEditingController();
 
+  bool isLoading = false;
   late String title;
+
+  updateResumeTitle() async {
+    try {
+      final response = await resumeRepository.updateResume(
+        widget.resume.id.toString(),
+        {
+          'name': titleController.text,
+        },
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          widget.resume.name = titleController.text;
+        });
+        if (!mounted) return;
+        Navigator.pop(context);
+        Helper().showSnackBar(
+          context,
+          'Resume title updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      print('Error updating resume title: $error');
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,28 +93,30 @@ class _ResumeCardState extends State<ResumeCard> {
           CircleAvatar(
             radius: 30.0,
             backgroundColor: Colors.grey[200],
-            backgroundImage: const AssetImage('assets/avatars/rdj.png'),
+            backgroundImage: const AssetImage(Constants.defultAvatarPath),
           ),
           const SizedBox(width: 10.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.resume.name,
-                style: const TextStyle(
-                  fontSize: 20.0,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.resume.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 5.0),
-              Text(
-                Helper().formatDate(widget.resume.createdAt!),
-                style: const TextStyle(
-                  color: Colors.grey,
+                const SizedBox(height: 5.0),
+                Text(
+                  Helper().formatDateTime(widget.resume.createdAt!),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Spacer(),
           PopupMenuButton(
             itemBuilder: (BuildContext context) {
               return [
@@ -100,7 +156,18 @@ class _ResumeCardState extends State<ResumeCard> {
     Widget okButton = TextButton(
       child: const Text('Update'),
       onPressed: () async {
-        Navigator.pop(context);
+        if (titleController.text.isEmpty) {
+          Helper().showSnackBar(
+            context,
+            'Title cannot be empty',
+            Colors.red,
+          );
+          return;
+        }
+        setState(() {
+          isLoading = true;
+        });
+        await updateResumeTitle();
       },
     );
 
@@ -142,7 +209,7 @@ class _ResumeCardState extends State<ResumeCard> {
     );
 
     Widget okButton = TextButton(
-      child: const Text('Delete'),
+      child: const Text('Delete', style: TextStyle(color: Colors.red)),
       onPressed: () {
         widget.onDeleteAction();
         Navigator.pop(context);
@@ -152,7 +219,9 @@ class _ResumeCardState extends State<ResumeCard> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text('Deleting ${resume.name}'),
-      content: const Text('Are you sure about deleting this resume?'),
+      content: const Text(
+        'Are you sure about deleting this resume?\nAll the data within this resume will be lost.',
+      ),
       actions: [
         cancelButton,
         okButton,

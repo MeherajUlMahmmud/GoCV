@@ -4,6 +4,8 @@ class Award {
   String? description;
   String? link;
   int? id;
+  bool? isActive;
+  bool? isDeleted;
   int? createdBy;
   String? createdAt;
   int? updatedBy;
@@ -26,6 +28,8 @@ class Award {
     description = json['description'];
     link = json['link'];
     id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
     createdBy = json['created_by'];
     createdAt = json['created_at'];
     updatedBy = json['updated_by'];

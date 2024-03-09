@@ -1,5 +1,3 @@
-import 'package:gocv/models/user.dart';
-
 class Personal {
   int? id;
   String? firstName;
@@ -12,6 +10,8 @@ class Personal {
   String? country;
   int? resume;
   String? resumePicture;
+  bool? isActive;
+  bool? isDeleted;
   int? createdBy;
   String? createdAt;
   int? updatedBy;
@@ -29,6 +29,8 @@ class Personal {
     this.country,
     this.resume,
     this.resumePicture,
+    this.isActive,
+    this.isDeleted,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
@@ -45,6 +47,8 @@ class Personal {
     state = json['state'];
     country = json['country'];
     id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
     resume = json['resume'];
     resumePicture = json['resume_picture'];
     createdBy = json['created_by'];

@@ -202,7 +202,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   fetchContactDetails() async {
     try {
       final response = await contactRepository.getContactDetails(resumeId);
-      print(response);
 
       if (response['status'] == Constants.httpOkCode) {
         Contact fetchedContact = Contact.fromJson(response['data']);
@@ -252,8 +251,17 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchEducations() async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+      'is_active': 'true',
+      'is_deleted': 'false',
+    };
+
     try {
-      final response = await educationRepository.getEducations(resumeId);
+      final response = await educationRepository.getEducations(
+        resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Education> fetchedEducationList =
@@ -304,8 +312,17 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchWorkExperiences() async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+      'is_active': 'true',
+      'is_deleted': 'false',
+    };
+
     try {
-      final response = await experienceRepository.getExperiences(resumeId);
+      final response = await experienceRepository.getExperiences(
+        resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Experience> fetchedExperiences = (response['data']['data']
@@ -356,8 +373,17 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchSkills() async {
+    Map<String, dynamic> params = {
+      'resume': resumeId,
+      'is_active': 'true',
+      'is_deleted': 'false',
+    };
+
     try {
-      final response = await skillRepository.getSkills(resumeId);
+      final response = await skillRepository.getSkills(
+        resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Skill> fetchedSkillList =
@@ -409,8 +435,17 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   fetchAwards() async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+      'is_active': 'true',
+      'is_deleted': 'false',
+    };
+
     try {
-      final response = await awardRepository.getAwards(resumeId);
+      final response = await awardRepository.getAwards(
+        resumeId,
+        params,
+      );
 
       if (response['status'] == Constants.httpOkCode) {
         final List<Award> fetchedAwardList =

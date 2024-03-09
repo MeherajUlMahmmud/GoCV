@@ -1,5 +1,3 @@
-import 'package:gocv/models/user.dart';
-
 class Contact {
   int id = 0;
   String? phoneNumber;
@@ -11,6 +9,8 @@ class Contact {
   String? github;
   String? website;
   int? resume;
+  bool? isActive;
+  bool? isDeleted;
   int? createdBy;
   String? createdAt;
   int? updatedBy;
@@ -27,6 +27,8 @@ class Contact {
     this.github,
     this.website,
     this.resume,
+    this.isActive,
+    this.isDeleted,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
@@ -43,6 +45,8 @@ class Contact {
     github = json['github'];
     website = json['website'];
     id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
     resume = json['resume'];
     createdBy = json['created_by'];
     createdAt = json['created_at'];

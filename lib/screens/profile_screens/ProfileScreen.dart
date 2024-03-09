@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gocv/models/applicant.dart';
+import 'package:gocv/models/user.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
+import 'package:gocv/repositories/user.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
+import 'package:gocv/utils/constants.dart';
+import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,8 +19,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  UserRepository userRepository = UserRepository();
   UserProvider userProvider = UserProvider();
-  late String userId;
 
   late UserProfileProvider userProfileProvider;
 
@@ -32,55 +37,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
       listen: false,
     );
 
-    // setState(() {
-    //   accessToken = userProvider.tokens['access'].toString();
-    //   userId = userProvider.userData!.id.toString();
-    // });
     fetchUserProfile();
   }
 
-  fetchUserProfile() {
-    // setState(() {
-    //   isLoading = true;
-    // });
-    // const String url = '${URLS.kUserUrl}profile/';
+  fetchUserProfile() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final response = await userRepository.getUserProfile();
 
-    // APIService().sendGetRequest(accessToken, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     final UserBase userBase = UserBase.fromJson(data['data']['user_data']);
-    //     final Applicant applicant =
-    //         Applicant.fromJson(data['data']['applicant_data']);
-    //     final UserProfile userProfile = UserProfile(
-    //       userData: userBase,
-    //       applicantData: applicant,
-    //     );
-    //     userProfileProvider.setUserProfile(userProfile);
-    //     // await localStorage.writeData('user', data['data']['user_data']);
-    //     setState(() {
-    //       isLoading = false;
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        final UserBase userBase =
+            UserBase.fromJson(response['data']['user_data']);
+        final Applicant applicant =
+            Applicant.fromJson(response['data']['applicant_data']);
+        final UserProfile userProfile = UserProfile(
+          userData: userBase,
+          applicantData: applicant,
+        );
+        userProfileProvider.setUserProfile(userProfile);
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isError = true;
+            errorText = response['error'];
+          });
+        }
+      }
+    } catch (error) {
+      print('Error getting user profile: $error');
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error getting user profile: $error';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -146,8 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 150,
                       child: ImageFullScreenWrapperWidget(
                         dark: true,
-                        child: Image.asset('assets/avatars/rdj.png'),
-                        // child: Image.asset(imageFile!.path),
+                        child: Image.asset(Constants.defultAvatarPath),
                       ),
                     ),
                     const SizedBox(height: 10.0),
@@ -174,9 +181,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Text(
-                          userProvider.userData!.email ?? 'N/A',
-                          style: const TextStyle(fontSize: 18),
+                        Expanded(
+                          child: Text(
+                            userProvider.userData!.email ?? 'N/A',
+                            style: const TextStyle(fontSize: 18),
+                          ),
                         )
                       ],
                     ),
@@ -196,11 +205,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         const SizedBox(width: 15),
-                        Text(
-                          userProfileProvider
-                                  .userProfile.applicantData?.phoneNumber ??
-                              'N/A',
-                          style: const TextStyle(fontSize: 18),
+                        Expanded(
+                          child: Text(
+                            userProfileProvider
+                                    .userProfile.applicantData?.phoneNumber ??
+                                'N/A',
+                            style: const TextStyle(fontSize: 18),
+                          ),
                         )
                       ],
                     ),

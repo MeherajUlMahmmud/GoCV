@@ -10,6 +10,8 @@ class Education {
   bool? isCurrent;
   String? endDate;
   String? description;
+  bool? isActive;
+  bool? isDeleted;
   int? createdBy;
   String? createdAt;
   int? updatedBy;
@@ -27,6 +29,8 @@ class Education {
     this.isCurrent,
     this.endDate,
     this.description,
+    this.isActive,
+    this.isDeleted,
     this.createdBy,
     this.createdAt,
     this.updatedBy,
@@ -45,6 +49,8 @@ class Education {
     endDate = json['end_date'];
     description = json['description'];
     id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
     createdBy = json['created_by'];
     createdAt = json['created_at'];
     updatedBy = json['updated_by'];
@@ -65,43 +71,6 @@ class Education {
     data['description'] = description;
     data['id'] = id;
 
-    return data;
-  }
-}
-
-class CreatedBy {
-  String? email;
-  bool? isApplicant;
-  bool? isOrganization;
-  bool? isVerified;
-  bool? isStaff;
-  bool? isSuperuser;
-
-  CreatedBy(
-      {this.email,
-      this.isApplicant,
-      this.isOrganization,
-      this.isVerified,
-      this.isStaff,
-      this.isSuperuser});
-
-  CreatedBy.fromJson(Map<String, dynamic> json) {
-    email = json['email'];
-    isApplicant = json['is_applicant'];
-    isOrganization = json['is_organization'];
-    isVerified = json['is_verified'];
-    isStaff = json['is_staff'];
-    isSuperuser = json['is_superuser'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['email'] = email;
-    data['is_applicant'] = isApplicant;
-    data['is_organization'] = isOrganization;
-    data['is_verified'] = isVerified;
-    data['is_staff'] = isStaff;
-    data['is_superuser'] = isSuperuser;
     return data;
   }
 }
