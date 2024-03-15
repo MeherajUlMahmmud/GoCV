@@ -149,13 +149,12 @@ class _PersonalPageState extends State<PersonalPage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['error'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Failed to fetch personal data',
+            errorText,
             Colors.red,
           );
         }
@@ -163,13 +162,12 @@ class _PersonalPageState extends State<PersonalPage> {
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error fetching personal details: $error';
       });
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching personal details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -200,13 +198,12 @@ class _PersonalPageState extends State<PersonalPage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['error'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Failed to update personal data',
+            errorText,
             Colors.red,
           );
           Navigator.pop(context);
@@ -215,13 +212,12 @@ class _PersonalPageState extends State<PersonalPage> {
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error updating personal details: $error';
       });
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error updating personal details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }

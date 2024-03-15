@@ -41,10 +41,10 @@ class AwardRepository {
     }
   }
 
-  createAward(String resumeId, Map<String, dynamic> data) async {
+  createAward(String awardId, Map<String, dynamic> data) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kAwardUrl}$resumeId/create/';
+      final String url = '${URLS.kAwardUrl}$awardId/create/';
 
       final response = await APIService().sendPostRequest(
         accessToken,
@@ -61,10 +61,10 @@ class AwardRepository {
     }
   }
 
-  updateAward(String resumeId, int awardId, Map<String, dynamic> data) async {
+  updateAward(String awardId, Map<String, dynamic> data) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kAwardUrl}$resumeId/update/$awardId/';
+      final String url = '${URLS.kAwardUrl}$awardId/update/';
 
       final response = await APIService().sendPatchRequest(
         accessToken,
@@ -77,6 +77,22 @@ class AwardRepository {
       return {
         'status': 500,
         'message': 'Error updating award: $error',
+      };
+    }
+  }
+
+  deleteAward(String awardId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kAwardUrl}$awardId/destroy/';
+
+      final response = await APIService().sendDeleteRequest(accessToken, url);
+      return response;
+    } catch (error) {
+      print('Error deleting award: $error');
+      return {
+        'status': 500,
+        'message': 'Error deleting award: $error',
       };
     }
   }

@@ -56,21 +56,4 @@ class Education {
     updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['resume'] = resume;
-    data['school_name'] = schoolName;
-    data['degree'] = degree;
-    data['department'] = department;
-    data['grade_scale'] = gradeScale;
-    data['grade'] = grade;
-    data['start_date'] = startDate;
-    data['is_current'] = isCurrent;
-    data['end_date'] = endDate;
-    data['description'] = description;
-    data['id'] = id;
-
-    return data;
-  }
 }

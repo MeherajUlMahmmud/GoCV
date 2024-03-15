@@ -65,6 +65,25 @@ class ResumeRepository {
     }
   }
 
+  getResumePreview(String resumeId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kResumeUrl}$resumeId/preview/';
+
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
+      return data;
+    } catch (error) {
+      print('Error getting resume preview: $error');
+      return {
+        'status': 500,
+        'message': 'Error getting resume preview: $error',
+      };
+    }
+  }
+
   createResume(Map<String, dynamic> resumeData) async {
     try {
       final String accessToken = getAccessToken();

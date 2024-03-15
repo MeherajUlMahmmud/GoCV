@@ -66,13 +66,12 @@ class _AwardPageState extends State<AwardPage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['message'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.genericErrorMsg,
+            errorText,
             Colors.red,
           );
         }
@@ -81,9 +80,51 @@ class _AwardPageState extends State<AwardPage> {
       if (!mounted) return;
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error fetching skill list: $error';
       });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  deleteAward(int awardId) async {
+    try {
+      final response = await awardRepository.deleteAward(awardId.toString());
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          awardList.removeWhere((award) => award.id == awardId);
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Award deleted successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            response['message'],
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
       Helper().showSnackBar(
         context,
         Constants.genericErrorMsg,
@@ -101,14 +142,14 @@ class _AwardPageState extends State<AwardPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return Container();
-              },
-            ),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) {
+          //       return Container();
+          //     },
+          //   ),
+          // );
         },
       ),
       body: isLoading
@@ -241,6 +282,99 @@ class _AwardPageState extends State<AwardPage> {
                         },
                       ),
                     ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context, int skillId) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 12.0,
+            horizontal: 16.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  //   return AddEditSkillPage(
+                  //     resumeId: widget.resumeId,
+                  //     skillId: skillId.toString(),
+                  //   );
+                  // }));
+                },
+                child: const Row(
+                  children: [
+                    Icon(Icons.edit),
+                    SizedBox(width: 8.0),
+                    Text('Update'),
+                  ],
+                ),
+              ),
+              const Divider(),
+              TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Delete Education'),
+                        content: const Text(
+                          'Are you sure you want to delete this education?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await deleteAward(skillId);
+                            },
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:gocv/models/experience.dart';
 import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -172,7 +171,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching experience',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -207,27 +206,27 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
           );
           Helper().logoutUser(context);
         } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Error creating experience',
+            errorText,
             Colors.red,
           );
-          setState(() {
-            isLoading = false;
-            isError = true;
-          });
         }
       }
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
+        errorText = 'Error creating experience: $error';
       });
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error creating experience',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -236,7 +235,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
   updateExperience(String experienceId) async {
     try {
       final response = await experienceRepository.updateExperience(
-        widget.resumeId,
         experienceId,
         experienceData,
       );
@@ -265,13 +263,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['message'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Error updating experience',
+            errorText,
             Colors.red,
           );
         }
@@ -279,13 +276,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error updating experience: $error';
       });
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error updating experience',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -293,8 +289,9 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
 
   deleteExperience(String experienceId) async {
     try {
-      final response =
-          await experienceRepository.deleteExperience(experienceId);
+      final response = await experienceRepository.deleteExperience(
+        experienceId,
+      );
 
       if (response['status'] == Constants.httpNoContentCode) {
         if (!mounted) return;
@@ -312,13 +309,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['message'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Error deleting experience',
+            errorText,
             Colors.red,
           );
         }
@@ -326,13 +322,12 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error deleting experience: $error';
       });
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error deleting experience',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }

@@ -48,6 +48,7 @@ class _EducationPageState extends State<EducationPage> {
             (response['data']['data'] as List).map<Education>((education) {
           return Education.fromJson(education);
         }).toList();
+
         setState(() {
           educationList = fetchedEducationList;
           isLoading = false;
@@ -72,7 +73,7 @@ class _EducationPageState extends State<EducationPage> {
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.genericErrorMsg,
+            errorText,
             Colors.red,
           );
         }
@@ -86,7 +87,63 @@ class _EducationPageState extends State<EducationPage> {
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching education list',
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  deleteEducation(String educationId) async {
+    try {
+      final response = await educationRepository.deleteEducation(
+        educationId,
+      );
+
+      if (response['status'] == Constants.httpNoContentCode) {
+        setState(() {
+          educationList.removeWhere(
+            (education) => education.id.toString() == educationId,
+          );
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Education deleted successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error deleting education details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -140,161 +197,238 @@ class _EducationPageState extends State<EducationPage> {
                       child: ListView.builder(
                         itemCount: educationList.length,
                         itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return AddEditEducationPage(
-                                      resumeId: widget.resumeId,
-                                      educationId:
-                                          educationList[index].id.toString(),
-                                    );
-                                  },
-                                ),
+                          return EducationItem(
+                            widget: widget,
+                            educationList: educationList,
+                            index: index,
+                            width: width,
+                            onDelete: () {
+                              deleteEducation(
+                                educationList[index].id.toString(),
                               );
                             },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: educationList[index].isActive!
-                                    ? Colors.white
-                                    : Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.grey.shade200,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.business,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.8,
-                                        child: Text(
-                                          educationList[index].schoolName,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.business,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.8,
-                                        child: Text(
-                                          '${educationList[index].degree!} in ${educationList[index].department!}',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.money,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.8,
-                                        child: Text(
-                                          '${educationList[index].grade!} out of ${educationList[index].gradeScale!}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Helper().isNullEmptyOrFalse(
-                                          educationList[index].startDate)
-                                      ? const SizedBox()
-                                      : Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.date_range,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            SizedBox(
-                                              width: width * 0.8,
-                                              child: Helper()
-                                                      .isNullEmptyOrFalse(
-                                                          educationList[index]
-                                                              .endDate)
-                                                  ? Text(
-                                                      '${Helper().formatMonthYear(educationList[index].startDate)} - Present',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                      ),
-                                                    )
-                                                  : Text(
-                                                      '${Helper().formatMonthYear(educationList[index].startDate)} - ${Helper().formatMonthYear(educationList[index].endDate ?? '')}',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                            ),
-                                          ],
-                                        ),
-                                  const SizedBox(height: 10),
-                                  Helper().isNullEmptyOrFalse(
-                                          educationList[index].description)
-                                      ? const SizedBox()
-                                      : Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.description,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            SizedBox(
-                                              width: width * 0.7,
-                                              child: Text(
-                                                educationList[index]
-                                                    .description!,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ],
-                              ),
-                            ),
                           );
                         },
                       ),
                     ),
+    );
+  }
+}
+
+class EducationItem extends StatelessWidget {
+  const EducationItem({
+    super.key,
+    required this.widget,
+    required this.educationList,
+    required this.index,
+    required this.width,
+    required this.onDelete,
+  });
+
+  final EducationPage widget;
+  final List<Education> educationList;
+  final int index;
+  final double width;
+  final Function onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: educationList[index].isActive!
+            ? Colors.white
+            : Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.grey.shade200,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.business,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  educationList[index].schoolName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return AddEditEducationPage(
+                                resumeId: widget.resumeId,
+                                educationId: educationList[index].id.toString(),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      value: 'update',
+                      child: const Text('Update'),
+                    ),
+                    PopupMenuItem(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Delete Education'),
+                              content: const Text(
+                                'Are you sure you want to delete this education?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    onDelete();
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      value: 'delete',
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ];
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(
+                Icons.business,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.8,
+                child: Text(
+                  '${educationList[index].degree!} in ${educationList[index].department!}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(
+                Icons.money,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.8,
+                child: Text(
+                  '${educationList[index].grade!} out of ${educationList[index].gradeScale!}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Helper().isNullEmptyOrFalse(educationList[index].startDate)
+              ? const SizedBox()
+              : Row(
+                  children: [
+                    const Icon(
+                      Icons.date_range,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: width * 0.8,
+                      child: Helper()
+                              .isNullEmptyOrFalse(educationList[index].endDate)
+                          ? Text(
+                              '${Helper().formatMonthYear(educationList[index].startDate)} - Present',
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            )
+                          : Text(
+                              '${Helper().formatMonthYear(educationList[index].startDate)} - ${Helper().formatMonthYear(educationList[index].endDate ?? '')}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+          const SizedBox(height: 10),
+          Helper().isNullEmptyOrFalse(educationList[index].description)
+              ? const SizedBox()
+              : Row(
+                  children: [
+                    const Icon(
+                      Icons.description,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: width * 0.7,
+                      child: Text(
+                        educationList[index].description!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ],
+      ),
     );
   }
 }

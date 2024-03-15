@@ -64,8 +64,8 @@ class ExperienceRepository {
     }
   }
 
-  updateExperience(String resumeId, String experienceId,
-      Map<String, dynamic> experienceData) async {
+  updateExperience(
+      String experienceId, Map<String, dynamic> experienceData) async {
     try {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kExperienceUrl}$experienceId/update/';

@@ -84,7 +84,7 @@ class EducationRepository {
   deleteEducation(String educationId) async {
     try {
       final String accessToken = getAccessToken();
-      final String url = '${URLS.kEducationUrl}$educationId/delete/';
+      final String url = '${URLS.kEducationUrl}$educationId/destroy/';
 
       final data = await APIService().sendDeleteRequest(
         accessToken,

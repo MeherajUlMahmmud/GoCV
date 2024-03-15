@@ -81,4 +81,20 @@ class InterestRepository {
       };
     }
   }
+
+  deleteInterest(String resumeId, String interestId) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kInterestUrl}$resumeId/$interestId/destroy/';
+
+      final data = await APIService().sendDeleteRequest(accessToken, url);
+      return data;
+    } catch (error) {
+      print('Error deleting interest: $error');
+      return {
+        'status': 500,
+        'message': 'Error deleting interest: $error',
+      };
+    }
+  }
 }

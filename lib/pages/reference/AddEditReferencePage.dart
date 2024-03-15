@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/reference.dart';
 import 'package:gocv/repositories/reference.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -29,6 +28,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   bool isLoading = true;
   bool isError = false;
   String errorText = '';
+  String typeError = '';
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -37,29 +37,31 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
   TextEditingController positionController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  int id = 0;
-  String uuid = '';
-  String name = '';
-  String email = '';
-  String phone = '';
-  String companyName = '';
-  String position = '';
-  String description = '';
+  Reference reference = Reference(
+    id: 0,
+    resume: 0,
+    name: '',
+    email: '',
+    phone: '',
+    companyName: '',
+    position: '',
+    description: '',
+  );
 
-  String typeError = '';
+  Map<String, dynamic> referenceData = {
+    'name': '',
+    'email': '',
+    'phone': '',
+    'company_name': '',
+    'position': '',
+    'description': '',
+  };
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.referenceId != null) {
-      getReferenceDetails(widget.referenceId!);
-    } else {
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
+    fetchData();
   }
 
   @override
@@ -74,117 +76,211 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
     super.dispose();
   }
 
-  getReferenceDetails(String referenceId) {
-    // final String url = '${URLS.kReferenceUrl}$referenceId/details/';
+  fetchData() async {
+    if (widget.referenceId != null) {
+      getReferenceDetails(widget.referenceId!);
+    } else {
+      referenceData['resume'] = widget.resumeId;
 
-    // APIService().sendGetRequest(accessToken, url).then((data) {
-    //   print(data);
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = false;
-    //       uuid = data['data']['uuid'];
-    //       name = data['data']['name'];
-    //       email = data['data']['email'];
-    //       phone = data['data']['phone'];
-    //       companyName = data['data']['company_name'];
-    //       position = data['data']['position'];
-    //       description = data['data']['description'];
-    //       nameController.text = name;
-    //       emailController.text = email;
-    //       phoneController.text = phone;
-    //       companyNameController.text = companyName;
-    //       positionController.text = position;
-    //       descriptionController.text = description;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['error'];
-    //     });
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     error.toString(),
-    //     Colors.red,
-    //   );
-    // });
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
-  createReference() {
-    Map<String, dynamic> data = {
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'company_name': companyName,
-      'position': position,
-      'description': description,
-    };
-    final String url = '${URLS.kReferenceUrl}${widget.resumeId}/create/';
+  initiateControllers() {
+    nameController.text = referenceData['name'] = reference.name;
+    emailController.text = referenceData['email'] = reference.email;
+    phoneController.text = referenceData['phone'] = reference.phone ?? '';
+    companyNameController.text =
+        referenceData['company_name'] = reference.companyName ?? '';
+    positionController.text =
+        referenceData['position'] = reference.position ?? '';
+    descriptionController.text =
+        referenceData['description'] = reference.description ?? '';
 
-    // APIService().sendPostRequest(accessToken, data, url).then((value) {
-    //   if (value['status'] == Constants.HTTP_CREATED) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = value['error'];
-    //     });
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     error.toString(),
-    //     Colors.red,
-    //   );
-    // });
+    referenceData['resume'] = widget.resumeId;
+
+    setState(() {
+      isLoading = false;
+      isError = false;
+    });
   }
 
-  updateReference() {
-    // Map<String, dynamic> data = {
-    //   'name': name,
-    //   'email': email,
-    //   'phone': phone,
-    //   'company_name': companyName,
-    //   'position': position,
-    //   'description': description,
-    // };
-    // final String url = '${URLS.kReferenceUrl}${widget.referenceId}/update/';
+  getReferenceDetails(String referenceId) async {
+    try {
+      final response = await referenceRepository.getReferenceDetails(
+        referenceId,
+      );
 
-    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['error'];
-    //     });
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          reference = Reference.fromJson(response['data']);
+          isError = false;
+        });
+
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+          Navigator.pop(context);
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching reference details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+      Navigator.pop(context);
+    }
   }
 
-  handleSubmit() {
+  createReference() async {
+    try {
+      print(referenceData);
+      final response = await referenceRepository.createReference(referenceData);
+      print(response);
+
+      if (response['status'] == Constants.httpCreatedCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Reference added successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error adding reference details: $error';
+      });
+      print('Error adding reference details: $error');
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  updateReference(String referenceId) async {
+    try {
+      final response = await referenceRepository.updateReference(
+        referenceId,
+        referenceData,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Reference updated successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error updating reference details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  handleSubmit() async {
     setState(() {
       isLoading = true;
     });
     if (widget.referenceId != null) {
-      updateReference();
+      await updateReference(widget.referenceId!);
     } else {
-      createReference();
+      await createReference();
     }
   }
 
@@ -194,17 +290,38 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: widget.referenceId == null
-            ? const Text('Add Work Experience')
-            : const Text('Update Work Experience'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          widget.referenceId == null ? 'Add Reference' : 'Update Reference',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -229,8 +346,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
               widget.referenceId == null ? 'Add Reference' : 'Update Reference',
           isLoading: isLoading,
           isDisabled: isLoading,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) handleSubmit();
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) await handleSubmit();
           },
         ),
       ),
@@ -253,7 +370,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   keyboardType: TextInputType.name,
                   onChanged: (value) {
                     setState(() {
-                      name = value!;
+                      referenceData['name'] = value!;
                     });
                   },
                   validator: (value) {
@@ -275,7 +392,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
                     setState(() {
-                      email = value!;
+                      referenceData['email'] = value!;
                     });
                   },
                   validator: (value) {
@@ -299,7 +416,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      phone = value!;
+                      referenceData['phone'] = value!;
                     });
                   },
                   validator: (value) {
@@ -321,7 +438,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      companyName = value!;
+                      referenceData['company_name'] = value!;
                     });
                   },
                   validator: (value) {
@@ -343,7 +460,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      position = value!;
+                      referenceData['position'] = value;
                     });
                   },
                   validator: (value) {
@@ -365,7 +482,7 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      description = value!;
+                      referenceData['description'] = value;
                     });
                   },
                 ),

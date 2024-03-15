@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/api.dart';
 import 'package:gocv/models/skill.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:provider/provider.dart';
 
 class AddEditSkillPage extends StatefulWidget {
   final String resumeId;
@@ -54,7 +50,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
 
   Map<String, dynamic> skillData = {
     'resume': '',
-    'skill': '',
+    'name': '',
     'proficiency': '',
     'description': '',
   };
@@ -88,108 +84,188 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
   }
 
   initiateControllers() {
-    skillController.text = skillData['skill'];
-    proficiencyController.text = skillData['proficiency'];
-    descriptionController.text = skillData['description'];
+    skillController.text = skillData['name'] = skill.name;
+    proficiencyController.text =
+        skillData['proficiency'] = skill.proficiency ?? '';
+    descriptionController.text =
+        skillData['description'] = skill.description ?? '';
+
+    skillData['resume'] = skill.resume.toString();
+
+    setState(() {
+      isLoading = false;
+      isError = false;
+    });
   }
 
-  fetchSkillDetails(String skillId) {
-    final String url = '${URLS.kSkillUrl}$skillId/details/';
+  fetchSkillDetails(String skillId) async {
+    try {
+      final response = await skillRepository.getSkillDetails(skillId);
 
-    // APIService().sendGetRequest(accessToken, url).then((data) {
-    //   print(data);
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = false;
-    //       uuid = data['data']['uuid'];
-    //       skill = data['data']['skill'];
-    //       proficiency = data['data']['proficiency'];
-    //       description = data['data']['description'];
-    //       skillController.text = skill;
-    //       proficiencyController.text = proficiency;
-    //       descriptionController.text = description;
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          skill = Skill.fromJson(response['data']);
+          isError = false;
+        });
+
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+          Navigator.pop(context);
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching skill details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+      Navigator.pop(context);
+    }
   }
 
-  createSkill() {
-    // Map<String, dynamic> data = {
-    //   'skill': skill,
-    //   'proficiency': proficiency,
-    //   'description': description,
-    // };
-    // final String url = '${URLS.kSkillUrl}${widget.resumeId}/create/';
+  createSkill() async {
+    try {
+      final response = await skillRepository.createSkill(skillData);
 
-    // APIService().sendPostRequest(accessToken, data, url).then((value) {
-    //   if (value['status'] == Constants.HTTP_CREATED) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = value['error'];
-    //     });
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     error.toString(),
-    //     Colors.red,
-    //   );
-    // });
+      if (response['status'] == Constants.httpCreatedCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Skill created successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error adding education details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
   }
 
-  updateSkill() {
-    // Map<String, dynamic> data = {
-    //   'skill': skill,
-    //   'proficiency': proficiency,
-    //   'description': description,
-    // };
-    // final String url = '${URLS.kSkillUrl}${widget.skillId}/update/';
+  updateSkill(String skillId) async {
+    try {
+      final response = await skillRepository.updateSkill(
+        skillId,
+        skillData,
+      );
 
-    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['error'];
-    //     });
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Skill details updated',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error updating skill details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
   }
 
-  handleSubmit() {
+  handleSubmit() async {
     setState(() {
       isLoading = true;
     });
     if (widget.skillId != null) {
-      updateSkill();
+      await updateSkill(widget.skillId!);
     } else {
-      createSkill();
+      await createSkill();
     }
   }
 
@@ -199,17 +275,38 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: widget.skillId == null
-            ? const Text('Add Skill')
-            : const Text('Update Skill'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          widget.skillId == null ? 'Create New Skill' : 'Update Skill',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -233,8 +330,8 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
           text: widget.skillId == null ? 'Add Skill' : 'Update Skill',
           isLoading: isLoading,
           isDisabled: isLoading,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) handleSubmit();
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) await handleSubmit();
           },
         ),
       ),
@@ -257,7 +354,7 @@ class _AddEditSkillPageState extends State<AddEditSkillPage> {
                   keyboardType: TextInputType.name,
                   onChanged: (value) {
                     setState(() {
-                      skill = value!;
+                      skillData['name'] = value!;
                     });
                   },
                   validator: (value) {

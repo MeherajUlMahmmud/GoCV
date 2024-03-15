@@ -74,7 +74,7 @@ class _SkillPageState extends State<SkillPage> {
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.genericErrorMsg,
+            errorText,
             Colors.red,
           );
         }
@@ -94,6 +94,62 @@ class _SkillPageState extends State<SkillPage> {
     }
   }
 
+  deleteSkill(String skillId) async {
+    try {
+      final response = await skillRepository.deleteSkill(skillId);
+
+      if (response['status'] == Constants.httpNoContentCode) {
+        setState(() {
+          skillList.removeWhere(
+            (skill) => skill.id.toString() == skillId,
+          );
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Skill deleted successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error deleting education details: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -103,13 +159,16 @@ class _SkillPageState extends State<SkillPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return AddEditSkillPage(
-                resumeId: widget.resumeId,
-              );
-            },
-          ));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return AddEditSkillPage(
+                  resumeId: widget.resumeId,
+                );
+              },
+            ),
+          );
         },
       ),
       body: isLoading
@@ -264,13 +323,50 @@ class _SkillPageState extends State<SkillPage> {
               const Divider(),
               TextButton(
                 onPressed: () {
-                  // _showDeleteConfirmationDialog(context, experienceId);
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Delete Education'),
+                        content: const Text(
+                          'Are you sure you want to delete this education?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await deleteSkill(skillId.toString());
+                            },
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 child: const Row(
                   children: [
-                    Icon(Icons.delete),
+                    Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
                     SizedBox(width: 8.0),
-                    Text('Delete'),
+                    Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
                   ],
                 ),
               ),

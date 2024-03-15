@@ -5,19 +5,15 @@ import 'package:gocv/models/certificate.dart';
 import 'package:gocv/models/contact.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/models/experience.dart';
+import 'package:gocv/models/interest.dart';
 import 'package:gocv/models/language.dart';
 import 'package:gocv/models/personal.dart';
 import 'package:gocv/models/reference.dart';
-import 'package:gocv/models/resume.dart';
+import 'package:gocv/models/resume_preview.dart';
 import 'package:gocv/models/skill.dart';
+import 'package:gocv/models/user.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
-import 'package:gocv/repositories/award.dart';
-import 'package:gocv/repositories/contact.dart';
-import 'package:gocv/repositories/education.dart';
-import 'package:gocv/repositories/experience.dart';
-import 'package:gocv/repositories/personal.dart';
 import 'package:gocv/repositories/resume.dart';
-import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
@@ -36,30 +32,25 @@ class ResumePreviewScreen extends StatefulWidget {
 
 class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   ResumeRepository resumeRepository = ResumeRepository();
-  PersonalRepository personalRepository = PersonalRepository();
-  ContactRepository contactRepository = ContactRepository();
-  EducationRepository educationRepository = EducationRepository();
-  ExperienceRepository experienceRepository = ExperienceRepository();
-  SkillRepository skillRepository = SkillRepository();
-  AwardRepository awardRepository = AwardRepository();
 
   late CurrentResumeProvider currentResumeProvider;
   late String resumeId;
 
-  Resume resume = Resume(name: '');
-  Personal personal = Personal();
-  Contact contact = Contact(
+  ResumePreview resume = ResumePreview(
     id: 0,
-    email: '',
+    name: '',
+    user: UserBase(),
+    personal: Personal(),
+    contact: Contact(id: 0, resume: 0, email: ''),
+    education: [],
+    experience: [],
+    skill: [],
+    language: [],
+    interest: [],
+    reference: [],
+    award: [],
+    certification: [],
   );
-  List<Education> educationList = [];
-  List<Experience> experienceList = [];
-  List<Skill> skillList = [];
-  List<Award> awardList = [];
-  List<Certificate> certificationList = [];
-  List<dynamic> interestList = [];
-  List<Language> languageList = [];
-  List<Reference> referenceList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -89,7 +80,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     });
 
     loadImage();
-    fetchResumeDetails();
+    fetchResumePreview();
   }
 
   loadImage() async {
@@ -97,19 +88,20 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     imageData = (image).buffer.asUint8List();
   }
 
-  fetchResumeDetails() async {
+  fetchResumePreview() async {
     try {
-      final response = await resumeRepository.getResumeDetails(resumeId);
+      final response = await resumeRepository.getResumePreview(resumeId);
 
       if (response['status'] == Constants.httpOkCode) {
-        final Resume fetchedResume = Resume.fromJson(response['data']['data']);
-        currentResumeProvider.setCurrentResume(fetchedResume);
+        final ResumePreview fetchedResume =
+            ResumePreview.fromJson(response['data']);
 
         setState(() {
           resume = fetchedResume;
+          isLoading = false;
+          isError = false;
+          errorText = '';
         });
-
-        fetchPersonalDetails();
       } else {
         if (Helper().isUnauthorizedAccess(response['status'])) {
           if (!mounted) return;
@@ -148,461 +140,6 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       );
     }
   }
-
-  fetchPersonalDetails() async {
-    try {
-      final response = await personalRepository.getPersonalDetails(resumeId);
-
-      if (response['status'] == Constants.httpOkCode) {
-        Personal fetchedPersonalDetails = Personal.fromJson(response['data']);
-
-        setState(() {
-          personal = fetchedPersonalDetails;
-        });
-
-        fetchContactDetails();
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch personal data',
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching personal details: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        'Error fetching personal details',
-        Colors.red,
-      );
-    }
-  }
-
-  fetchContactDetails() async {
-    try {
-      final response = await contactRepository.getContactDetails(resumeId);
-
-      if (response['status'] == Constants.httpOkCode) {
-        Contact fetchedContact = Contact.fromJson(response['data']);
-
-        setState(() {
-          contact = fetchedContact;
-        });
-
-        fetchEducations();
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['message'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.genericErrorMsg,
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      print('Error fetching contact details: $error');
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching contact details';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        Constants.genericErrorMsg,
-        Colors.red,
-      );
-    }
-  }
-
-  fetchEducations() async {
-    Map<String, dynamic> params = {
-      'resume_id': resumeId,
-      'is_active': 'true',
-      'is_deleted': 'false',
-    };
-
-    try {
-      final response = await educationRepository.getEducations(
-        resumeId,
-        params,
-      );
-
-      if (response['status'] == Constants.httpOkCode) {
-        final List<Education> fetchedEducationList =
-            (response['data']['data'] as List).map<Education>((education) {
-          return Education.fromJson(education);
-        }).toList();
-        setState(() {
-          educationList = fetchedEducationList;
-        });
-
-        fetchWorkExperiences();
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['message'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.genericErrorMsg,
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching education list: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        'Error fetching education listr',
-        Colors.red,
-      );
-    }
-  }
-
-  fetchWorkExperiences() async {
-    Map<String, dynamic> params = {
-      'resume_id': resumeId,
-      'is_active': 'true',
-      'is_deleted': 'false',
-    };
-
-    try {
-      final response = await experienceRepository.getExperiences(
-        resumeId,
-        params,
-      );
-
-      if (response['status'] == Constants.httpOkCode) {
-        final List<Experience> fetchedExperiences = (response['data']['data']
-                as List)
-            .map<Experience>((experience) => Experience.fromJson(experience))
-            .toList();
-        setState(() {
-          experienceList = fetchedExperiences;
-        });
-
-        fetchSkills();
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch work experiences',
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching work experiences: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        'Failed to fetch work experiences',
-        Colors.red,
-      );
-    }
-  }
-
-  fetchSkills() async {
-    Map<String, dynamic> params = {
-      'resume': resumeId,
-      'is_active': 'true',
-      'is_deleted': 'false',
-    };
-
-    try {
-      final response = await skillRepository.getSkills(
-        resumeId,
-        params,
-      );
-
-      if (response['status'] == Constants.httpOkCode) {
-        final List<Skill> fetchedSkillList =
-            (response['data']['data'] as List).map<Skill>((skill) {
-          return Skill.fromJson(skill);
-        }).toList();
-
-        setState(() {
-          skillList = fetchedSkillList;
-        });
-
-        fetchAwards();
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch skills',
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching skills: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        'Failed to fetch skills',
-        Colors.red,
-      );
-    }
-  }
-
-  fetchAwards() async {
-    Map<String, dynamic> params = {
-      'resume_id': resumeId,
-      'is_active': 'true',
-      'is_deleted': 'false',
-    };
-
-    try {
-      final response = await awardRepository.getAwards(
-        resumeId,
-        params,
-      );
-
-      if (response['status'] == Constants.httpOkCode) {
-        final List<Award> fetchedAwardList =
-            (response['data']['data'] as List).map<Award>((award) {
-          return Award.fromJson(award);
-        }).toList();
-
-        setState(() {
-          awardList = fetchedAwardList;
-          isLoading = false;
-          isError = false;
-          errorText = '';
-        });
-      } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            isError = true;
-            errorText = response['message'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            'Failed to fetch award list',
-            Colors.red,
-          );
-        }
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error fetching award list: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        'Failed to fetch award list',
-        Colors.red,
-      );
-    }
-  }
-
-  // fetchInterests() {
-  //   final String url = '${URLS.kInterestUrl}$resumeId/list/';
-
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         interestList = data['data'];
-  //       });
-
-  //       fetchLanguages();
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         print(data['error']);
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch interests',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
-
-  // fetchLanguages() {
-  //   final String url = '${URLS.kLanguageUrl}$resumeId/list/';
-
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         languageList = data['data'];
-  //       });
-
-  //       fetchReferences();
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         print(data['error']);
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch languages',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
-
-  // fetchReferences() {
-  //   final String url = '${URLS.kReferenceUrl}$resumeId/list/';
-
-  //   APIService().sendGetRequest(accessToken, url).then((data) async {
-  //     print(data);
-  //     if (data['status'] == Constants.HTTP_OK) {
-  //       setState(() {
-  //         referenceList = data['data'];
-  //         isLoading = false;
-  //         isError = false;
-  //         errorText = '';
-  //       });
-  //     } else {
-  //       if (Helper().isUnauthorizedAccess(data['status'])) {
-  //         Helper().showSnackBar(
-  //           context,
-  //           Constants.SESSION_EXPIRED_MSG,
-  //           Colors.red,
-  //         );
-  //         Helper().logoutUser(context);
-  //       } else {
-  //         print(data['error']);
-  //         setState(() {
-  //           isLoading = false;
-  //           isError = true;
-  //           errorText = data['error'];
-  //         });
-  //         Helper().showSnackBar(
-  //           context,
-  //           'Failed to fetch references',
-  //           Colors.red,
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -659,7 +196,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                '${personal.firstName} ${personal.lastName}',
+                '${resume.personal.firstName} ${resume.personal.lastName}',
                 style: const pw.TextStyle(
                   fontSize: 10,
                 ),
@@ -675,8 +212,10 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
         },
         build: (context) {
           return [
-            pw.Wrap(
-              // crossAxisAlignment: pw.CrossAxisAlignment.start,
+            // pw.Wrap(
+            //   children: [
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Container(
                   color: PdfColors.grey300,
@@ -690,7 +229,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                           pw.Container(
                             alignment: pw.Alignment.centerLeft,
                             child: pw.Text(
-                              '${personal.firstName} ${personal.lastName}',
+                              '${resume.personal.firstName} ${resume.personal.lastName}',
                               style: pw.TextStyle(
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 18,
@@ -701,7 +240,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                           pw.Container(
                             alignment: pw.Alignment.centerLeft,
                             child: pw.Text(
-                              contact.address ?? '',
+                              resume.contact.address ?? '',
                             ),
                           ),
                           pw.SizedBox(height: 3),
@@ -713,7 +252,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                                   pw.Container(
                                     alignment: pw.Alignment.centerLeft,
                                     child: pw.Text(
-                                      contact.phoneNumber ?? '',
+                                      resume.contact.phoneNumber ?? '',
                                     ),
                                   ),
                                   // Put this inside hyperlink
@@ -721,12 +260,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                                   pw.Container(
                                     alignment: pw.Alignment.centerLeft,
                                     child: pw.Text(
-                                      contact.linkedin != null ||
-                                              contact.linkedin != ''
+                                      resume.contact.linkedin != null ||
+                                              resume.contact.linkedin != ''
                                           ? 'LinkedIn'
                                           : '',
-                                      style: contact.linkedin != null ||
-                                              contact.linkedin != ''
+                                      style: resume.contact.linkedin != null ||
+                                              resume.contact.linkedin != ''
                                           ? const pw.TextStyle(
                                               decoration:
                                                   pw.TextDecoration.underline,
@@ -745,7 +284,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                                 children: [
                                   pw.Container(
                                     alignment: pw.Alignment.centerLeft,
-                                    child: pw.Text(contact.email,
+                                    child: pw.Text(resume.contact.email,
                                         style: const pw.TextStyle(
                                           decoration:
                                               pw.TextDecoration.underline,
@@ -755,12 +294,12 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                                   pw.Container(
                                     alignment: pw.Alignment.centerLeft,
                                     child: pw.Text(
-                                      contact.github != null ||
-                                              contact.github != ''
+                                      resume.contact.github != null ||
+                                              resume.contact.github != ''
                                           ? 'GitHub'
                                           : '',
-                                      style: contact.github != null ||
-                                              contact.github != ''
+                                      style: resume.contact.github != null ||
+                                              resume.contact.github != ''
                                           ? const pw.TextStyle(
                                               decoration:
                                                   pw.TextDecoration.underline,
@@ -796,44 +335,51 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                 //   ),
                 // ),
 
-                experienceList.isNotEmpty
+                resume.experience.isNotEmpty
                     ? sectionHeader('EXPERIENCE')
                     : pw.SizedBox(),
-                for (var experience in experienceList)
+                for (var experience in resume.experience)
                   experienceItem(experience),
 
-                educationList.isNotEmpty
+                resume.education.isNotEmpty
                     ? sectionHeader('EDUCATION')
                     : pw.SizedBox(),
-                for (var education in educationList) educationItem(education),
+                for (var education in resume.education)
+                  educationItem(education),
 
-                skillList.isNotEmpty ? sectionHeader('SKILLS') : pw.SizedBox(),
-                skillListView(skillList),
+                resume.skill.isNotEmpty
+                    ? sectionHeader('SKILLS')
+                    : pw.SizedBox(),
+                skillListView(resume.skill),
 
                 // skillListGrid(skillList),
 
-                awardList.isNotEmpty ? sectionHeader('AWARDS') : pw.SizedBox(),
-                // for (var item in awardList) skillItem(item),
+                resume.award.isNotEmpty
+                    ? sectionHeader('AWARDS')
+                    : pw.SizedBox(),
+                for (var award in resume.award) awardItem(award),
 
-                // certificationList.isNotEmpty
-                //     ? sectionHeader('CERTIFICATIONS')
-                //     : pw.SizedBox(),
-                // for (var item in certificationList) skillItem(item),
+                resume.certification.isNotEmpty
+                    ? sectionHeader('CERTIFICATIONS')
+                    : pw.SizedBox(),
+                for (var certification in resume.certification)
+                  certificationItem(certification),
 
-                // interestList.isNotEmpty
-                //     ? sectionHeader('INTERESTS')
-                //     : pw.SizedBox(),
-                // for (var item in interestList) interestItem(item),
+                resume.interest.isNotEmpty
+                    ? sectionHeader('INTERESTS')
+                    : pw.SizedBox(),
+                for (var interest in resume.interest) interestItem(interest),
 
-                // languageList.isNotEmpty
-                //     ? sectionHeader('LANGUAGES')
-                //     : pw.SizedBox(),
-                // for (var item in languageList) languageItem(item),
+                resume.language.isNotEmpty
+                    ? sectionHeader('LANGUAGES')
+                    : pw.SizedBox(),
+                for (var language in resume.language) languageItem(language),
 
-                // referenceList.isNotEmpty
-                //     ? sectionHeader('REFERENCES')
-                //     : pw.SizedBox(),
-                // for (var item in referenceList) referenceItem(item),
+                resume.reference.isNotEmpty
+                    ? sectionHeader('REFERENCES')
+                    : pw.SizedBox(),
+                for (var reference in resume.reference)
+                  referenceItem(reference),
               ],
             )
           ];
@@ -1060,105 +606,143 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     );
   }
 
-  // pw.Container interestItem(Map<String, dynamic> interest) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Text(
-  //           interest['interest'],
-  //           style: pw.TextStyle(
-  //             fontWeight: pw.FontWeight.bold,
-  //           ),
-  //         ),
-  //         pw.Text(
-  //           interest['description'] == null || interest['description'] == ''
-  //               ? ''
-  //               : interest['description'],
-  //           textAlign: pw.TextAlign.justify,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  pw.Container languageItem(Map<String, dynamic> language) {
+  pw.Container awardItem(Award award) {
     return pw.Container(
       margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(language['language'] + ' (${language['proficiency']})'),
+          pw.Text(
+            award.title ?? '',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            award.description ?? '',
+            textAlign: pw.TextAlign.justify,
+          ),
         ],
       ),
     );
   }
 
-  // pw.Container referenceItem(Map<String, dynamic> reference) {
-  //   return pw.Container(
-  //     margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
-  //     child: pw.Column(
-  //       crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //       children: [
-  //         pw.Text(
-  //           reference['name'],
-  //           style: pw.TextStyle(
-  //             fontWeight: pw.FontWeight.bold,
-  //           ),
-  //         ),
-  //         pw.Text(reference['position']),
-  //         pw.Text(reference['company_name']),
-  //         pw.RichText(
-  //           text: pw.TextSpan(
-  //             children: [
-  //               pw.TextSpan(
-  //                 text: 'Email: ',
-  //                 style: const pw.TextStyle(color: PdfColors.black),
-  //                 children: [
-  //                   pw.TextSpan(
-  //                     text: reference['email'],
-  //                     style: const pw.TextStyle(color: PdfColors.blue),
-  //                     annotation: pw.AnnotationUrl(
-  //                       'mailto:${reference['email']}',
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const pw.TextSpan(text: '.'),
-  //             ],
-  //           ),
-  //         ),
-  //         pw.RichText(
-  //           text: pw.TextSpan(
-  //             children: [
-  //               pw.TextSpan(
-  //                 text: 'Phone: ',
-  //                 style: const pw.TextStyle(color: PdfColors.black),
-  //                 children: [
-  //                   pw.TextSpan(
-  //                     text: reference['phone'],
-  //                     style: const pw.TextStyle(color: PdfColors.blue),
-  //                     annotation: pw.AnnotationUrl(
-  //                       'tel:${reference['phone']}',
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const pw.TextSpan(text: '.'),
-  //             ],
-  //           ),
-  //         ),
-  //         // pw.Text('Email: mailto:${reference['email']}'),
-  //         // pw.Text('Phone: tel:${reference['phone']}'),
-  //         pw.Text(
-  //           reference['description'] == null || reference['description'] == ''
-  //               ? ''
-  //               : reference['description'],
-  //           textAlign: pw.TextAlign.justify,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Container certificationItem(Certificate certification) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            certification.title ?? '',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            certification.description ?? '',
+            textAlign: pw.TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Container interestItem(Interest interest) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            interest.name,
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            interest.description ?? '',
+            textAlign: pw.TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Container languageItem(Language language) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text('${language.name} (${language.proficiency})'),
+        ],
+      ),
+    );
+  }
+
+  pw.Container referenceItem(Reference reference) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(left: 20, bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            reference.name,
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(reference.position ?? ''),
+          pw.Text(reference.companyName ?? ''),
+          pw.RichText(
+            text: pw.TextSpan(
+              children: [
+                pw.TextSpan(
+                  text: 'Email: ',
+                  style: const pw.TextStyle(color: PdfColors.black),
+                  children: [
+                    pw.TextSpan(
+                      text: reference.email,
+                      style: const pw.TextStyle(color: PdfColors.blue),
+                      annotation: pw.AnnotationUrl(
+                        'mailto:${reference.email}',
+                      ),
+                    ),
+                  ],
+                ),
+                const pw.TextSpan(text: '.'),
+              ],
+            ),
+          ),
+          pw.RichText(
+            text: pw.TextSpan(
+              children: [
+                pw.TextSpan(
+                  text: 'Phone: ',
+                  style: const pw.TextStyle(color: PdfColors.black),
+                  children: [
+                    pw.TextSpan(
+                      text: reference.phone ?? '',
+                      style: const pw.TextStyle(color: PdfColors.blue),
+                      annotation: pw.AnnotationUrl(
+                        'tel:${reference.phone}',
+                      ),
+                    ),
+                  ],
+                ),
+                const pw.TextSpan(text: '.'),
+              ],
+            ),
+          ),
+          // pw.Text('Email: mailto:${reference['email']}'),
+          // pw.Text('Phone: tel:${reference['phone']}'),
+          pw.Text(
+            reference.description ?? '',
+            textAlign: pw.TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
 }

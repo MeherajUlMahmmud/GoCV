@@ -1,35 +1,47 @@
 class Certificate {
-  final int personId;
-  final int id;
-  final String name;
-  final String issuedBy;
-  final String date;
+  int? resume;
+  String? title;
+  String? description;
+  String? link;
+  String? startDate;
+  String? endDate;
+  int? id;
+  bool? isActive;
+  bool? isDeleted;
+  int? createdBy;
+  String? createdAt;
+  int? updatedBy;
+  String? updatedAt;
 
   Certificate({
-    required this.personId,
-    required this.id,
-    required this.name,
-    required this.issuedBy,
-    required this.date,
+    this.resume,
+    this.title,
+    this.description,
+    this.link,
+    this.startDate,
+    this.endDate,
+    this.id,
+    this.isActive,
+    this.isDeleted,
+    this.createdBy,
+    this.createdAt,
+    this.updatedBy,
+    this.updatedAt,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'personId': personId,
-      'id': id,
-      'name': name,
-      'issuedBy': issuedBy,
-      'date': date,
-    };
-  }
-
-  factory Certificate.fromJson(Map<String, dynamic> json) {
-    return Certificate(
-      personId: json['personId'],
-      id: json['id'],
-      name: json['name'],
-      issuedBy: json['issuedBy'],
-      date: json['date'],
-    );
+  Certificate.fromJson(Map<String, dynamic> json) {
+    resume = json['resume'];
+    title = json['title'];
+    description = json['description'];
+    link = json['link'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+    id = json['id'];
+    isActive = json['is_active'];
+    isDeleted = json['is_deleted'];
+    createdBy = json['created_by'];
+    createdAt = json['created_at'];
+    updatedBy = json['updated_by'];
+    updatedAt = json['updated_at'];
   }
 }

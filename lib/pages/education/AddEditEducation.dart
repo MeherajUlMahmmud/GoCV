@@ -146,7 +146,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            'Failed to fetch education details',
+            errorText,
             Colors.red,
           );
           Navigator.pop(context);
@@ -161,7 +161,7 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching education details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -170,11 +170,9 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
   createEducation() async {
     try {
       final response = await educationRepository.createEducation(educationData);
-      print(response);
 
       if (response['status'] == Constants.httpCreatedCode) {
         setState(() {
-          education = Education.fromJson(response['data']);
           isLoading = false;
           isError = false;
         });
@@ -187,27 +185,35 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
         );
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = response['error'];
-        });
-        if (!mounted) return;
-        Helper().showSnackBar(
-          context,
-          'Failed to add education details',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
       }
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error adding education details: $error';
       });
       Helper().showSnackBar(
         context,
-        'Error adding education details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -234,72 +240,35 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
         );
         Navigator.pop(context);
       } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = response['error'];
-        });
-        if (!mounted) return;
-        Helper().showSnackBar(
-          context,
-          'Failed to update education details',
-          Colors.red,
-        );
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
       }
     } catch (error) {
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error updating education details: $error';
       });
       Helper().showSnackBar(
         context,
-        'Error updating education details',
-        Colors.red,
-      );
-    }
-  }
-
-  deleteEducation(String educationId) async {
-    try {
-      final response = await educationRepository.deleteEducation(
-        educationId,
-      );
-
-      if (response['status'] == Constants.httpNoContentCode) {
-        setState(() {
-          isError = false;
-        });
-
-        if (!mounted) return;
-        Helper().showSnackBar(
-          context,
-          'Education details deleted',
-          Colors.green,
-        );
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          isLoading = false;
-          isError = true;
-          errorText = response['error'];
-        });
-        if (!mounted) return;
-        Helper().showSnackBar(
-          context,
-          'Failed to delete education details',
-          Colors.red,
-        );
-      }
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isError = true;
-        errorText = 'Error deleting education details: $error';
-      });
-      Helper().showSnackBar(
-        context,
-        'Error deleting education details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -312,7 +281,6 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
     if (widget.educationId != null) {
       await updateEducation(widget.educationId!);
     } else {
-      print(educationData);
       await createEducation();
     }
   }
@@ -356,56 +324,6 @@ class _AddEditEducationPageState extends State<AddEditEducationPage> {
             ),
           ),
         ),
-        actions: [
-          widget.educationId != null
-              ? GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Delete Education'),
-                          content: const Text(
-                            'Are you sure you want to delete this education?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                await deleteEducation(widget.educationId!);
-                              },
-                              child: const Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    margin: const EdgeInsets.only(right: 10.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
-                )
-              : Container(),
-        ],
       ),
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: Container(

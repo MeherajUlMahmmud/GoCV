@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/language.dart';
 import 'package:gocv/pages/language/AddEditLanguagePage.dart';
 import 'package:gocv/repositories/language.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 
 class LanguagePage extends StatefulWidget {
   final String resumeId;
@@ -21,7 +20,7 @@ class LanguagePage extends StatefulWidget {
 class _LanguagePageState extends State<LanguagePage> {
   LanguageRepository languageRepository = LanguageRepository();
 
-  List<dynamic> languageList = [];
+  List<Language> languageList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -34,44 +33,59 @@ class _LanguagePageState extends State<LanguagePage> {
     fetchLanguages(widget.resumeId);
   }
 
-  fetchLanguages(String resumeId) {
-    // String url = '${URLS.kLanguageUrl}$resumeId/list/';
-    // APIService()
-    //     .sendGetRequest(
-    //   accessToken,
-    //   url,
-    // )
-    //     .then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       languageList = data['data']['data'];
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       print(data['error']);
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch languages',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+  fetchLanguages(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
+    try {
+      final response = await languageRepository.getLanguages(resumeId, params);
+
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Language> fetchedLanguages =
+            (response['data']['data'] as List)
+                .map((data) => Language.fromJson(data))
+                .toList();
+
+        setState(() {
+          languageList = fetchedLanguages;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        errorText = 'Error fetching data: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
   }
 
   @override
@@ -124,7 +138,7 @@ class _LanguagePageState extends State<LanguagePage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                languageList[index]['uuid'],
+                                languageList[index].id.toString(),
                               );
                             },
                             child: Container(
@@ -160,10 +174,7 @@ class _LanguagePageState extends State<LanguagePage> {
                                       SizedBox(
                                         width: width * 0.7,
                                         child: Text(
-                                          languageList[index]['language'] +
-                                              ' - ' +
-                                              languageList[index]
-                                                  ['proficiency'],
+                                          '${languageList[index].name} - ${languageList[index].proficiency!}',
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -172,9 +183,8 @@ class _LanguagePageState extends State<LanguagePage> {
                                       ),
                                     ],
                                   ),
-                                  languageList[index]['description'] == null ||
-                                          languageList[index]['description'] ==
-                                              ''
+                                  languageList[index].description == null ||
+                                          languageList[index].description == ''
                                       ? const SizedBox()
                                       : Container(
                                           margin:
@@ -190,7 +200,8 @@ class _LanguagePageState extends State<LanguagePage> {
                                                 width: width * 0.7,
                                                 child: Text(
                                                   languageList[index]
-                                                      ['description'],
+                                                          .description ??
+                                                      '',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                   ),

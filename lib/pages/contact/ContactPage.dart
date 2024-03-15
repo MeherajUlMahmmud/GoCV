@@ -110,22 +110,19 @@ class _ContactPageState extends State<ContactPage> {
         } else {
           setState(() {
             isLoading = false;
-            isError = true;
             errorText = response['message'];
           });
           if (!mounted) return;
           Helper().showSnackBar(
             context,
-            Constants.genericErrorMsg,
+            errorText,
             Colors.red,
           );
         }
       }
     } catch (error) {
-      print('Error fetching contact details: $error');
       setState(() {
         isLoading = false;
-        isError = true;
         errorText = 'Error fetching contact details';
       });
       if (!mounted) return;

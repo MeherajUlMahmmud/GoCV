@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/interest.dart';
 import 'package:gocv/pages/interest/AddEditInterestPage.dart';
 import 'package:gocv/repositories/interest.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 
 class InterestPage extends StatefulWidget {
   final String resumeId;
@@ -21,7 +20,7 @@ class InterestPage extends StatefulWidget {
 class _InterestPageState extends State<InterestPage> {
   InterestRepository interestRepository = InterestRepository();
 
-  List<dynamic> interestList = [];
+  List<Interest> interestList = [];
 
   bool isLoading = true;
   bool isError = false;
@@ -34,41 +33,112 @@ class _InterestPageState extends State<InterestPage> {
     fetchInterests(widget.resumeId);
   }
 
-  fetchInterests(String resumeId) {
-    // final String url = '${URLS.kInterestUrl}$resumeId/list/';
+  fetchInterests(String resumeId) async {
+    Map<String, dynamic> params = {
+      'resume_id': resumeId,
+    };
 
-    // APIService().sendGetRequest(accessToken, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     print(data);
-    //     setState(() {
-    //       interestList = data['data']['data'];
-    //       isLoading = false;
-    //       isError = false;
-    //       errorText = '';
-    //     });
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       print(data['error']);
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //       Helper().showSnackBar(
-    //         context,
-    //         'Failed to fetch interests',
-    //         Colors.red,
-    //       );
-    //     }
-    //   }
-    // });
+    try {
+      final response = await interestRepository.getInterests(
+        widget.resumeId,
+        params,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        final List<Interest> fetchedInterestist =
+            (response['data']['data'] as List).map<Interest>((award) {
+          return Interest.fromJson(award);
+        }).toList();
+
+        setState(() {
+          interestList = fetchedInterestist;
+          isLoading = false;
+          isError = false;
+          errorText = '';
+        });
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['message'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        errorText = 'Error fetching skill list: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  deleteInterest(String interestId) async {
+    try {
+      final response = await interestRepository.deleteInterest(
+        widget.resumeId,
+        interestId,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          interestList.removeWhere(
+            (element) => element.id.toString() == interestId,
+          );
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          response['message'],
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            response['message'],
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
   }
 
   @override
@@ -124,7 +194,7 @@ class _InterestPageState extends State<InterestPage> {
                             onTap: () {
                               _showBottomSheet(
                                 context,
-                                interestList[index]['uuid'],
+                                interestList[index].id.toString(),
                               );
                             },
                             child: Container(
@@ -160,7 +230,7 @@ class _InterestPageState extends State<InterestPage> {
                                       SizedBox(
                                         width: width * 0.7,
                                         child: Text(
-                                          interestList[index]['interest'],
+                                          interestList[index].name,
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -169,10 +239,8 @@ class _InterestPageState extends State<InterestPage> {
                                       ),
                                     ],
                                   ),
-                                  interestList[index]['description'] == null ||
-                                          interestList[index]['description'] ==
-                                              ''
-                                      ? const SizedBox()
+                                  interestList[index].description == null
+                                      ? Container()
                                       : Container(
                                           margin:
                                               const EdgeInsets.only(top: 10),
@@ -187,7 +255,8 @@ class _InterestPageState extends State<InterestPage> {
                                                 width: width * 0.7,
                                                 child: Text(
                                                   interestList[index]
-                                                      ['description'],
+                                                          .description ??
+                                                      '',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
@@ -246,13 +315,50 @@ class _InterestPageState extends State<InterestPage> {
               const Divider(),
               TextButton(
                 onPressed: () {
-                  // _showDeleteConfirmationDialog(context, experienceId);
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Delete Education'),
+                        content: const Text(
+                          'Are you sure you want to delete this education?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await deleteInterest(interestId.toString());
+                            },
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 child: const Row(
                   children: [
-                    Icon(Icons.delete),
+                    Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
                     SizedBox(width: 8.0),
-                    Text('Delete'),
+                    Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
                   ],
                 ),
               ),

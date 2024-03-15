@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:gocv/apis/api.dart';
+import 'package:gocv/models/language.dart';
 import 'package:gocv/repositories/language.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
@@ -42,24 +41,26 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
   TextEditingController proficiencyController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  int id = 0;
-  String uuid = '';
-  String language = '';
-  String proficiency = '';
-  String description = '';
+  Language language = Language(
+    id: 0,
+    resume: 0,
+    name: '',
+    proficiency: '',
+    description: '',
+  );
+
+  Map<String, dynamic> languageData = {
+    'resume': '',
+    'name': '',
+    'proficiency': '',
+    'description': '',
+  };
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.languageId != null) {
-      getEducationDetails(widget.languageId!);
-    } else {
-      setState(() {
-        isLoading = false;
-        isError = false;
-      });
-    }
+    fetchData();
   }
 
   @override
@@ -71,112 +72,200 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
     super.dispose();
   }
 
-  getEducationDetails(String educationId) {
-    // final String url = '${URLS.kLanguageUrl}${widget.languageId}/details/';
-
-    // APIService().sendGetRequest(accessToken, url).then((data) {
-    //   print(data);
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = false;
-    //       id = data['data']['id'];
-    //       language = data['data']['language'];
-    //       proficiency = data['data']['proficiency'];
-    //       description = data['data']['description'];
-    //       languageController.text = language;
-    //       proficiencyController.text = proficiency;
-    //       descriptionController.text = description;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       isLoading = false;
-    //       isError = true;
-    //       errorText = data['error'];
-    //     });
-    //   }
-    // });
+  fetchData() async {
+    if (widget.languageId != null) {
+      getLanguageDetails(widget.languageId!);
+    } else {
+      languageData['resume'] = widget.resumeId;
+      setState(() {
+        isLoading = false;
+        isError = false;
+      });
+    }
   }
 
-  createLanguage() {
-    // Map<String, dynamic> data = {
-    //   'language': language,
-    //   'proficiency': proficiency,
-    //   'description': description,
-    // };
-    // final String url = '${URLS.kLanguageUrl}${widget.resumeId}/create/';
+  initiateControllers() {
+    languageController.text = languageData['name'] = language.name;
+    proficiencyController.text =
+        languageData['proficiency'] = language.proficiency!;
+    descriptionController.text =
+        languageData['description'] = language.description!;
 
-    // APIService().sendPostRequest(accessToken, data, url).then((value) {
-    //   if (value['status'] == Constants.HTTP_CREATED) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = value['error'];
-    //       });
-    //     }
-    //   }
-    // }).catchError((error) {
-    //   setState(() {
-    //     isLoading = false;
-    //     isError = true;
-    //     errorText = error.toString();
-    //   });
-    //   Helper().showSnackBar(
-    //     context,
-    //     error.toString(),
-    //     Colors.red,
-    //   );
-    // });
+    languageData['resume'] = language.resume.toString();
+
+    setState(() {
+      isLoading = false;
+      isError = false;
+    });
   }
 
-  updateLanguage() {
-    // Map<String, dynamic> data = {
-    //   'language': language,
-    //   'proficiency': proficiency,
-    //   'description': description,
-    // };
-    // final String url = '${URLS.kLanguageUrl}${widget.languageId}/update/';
+  getLanguageDetails(String educationId) async {
+    try {
+      final response = await languageRepository.getLanguageDetails(educationId);
 
-    // APIService().sendPatchRequest(accessToken, data, url).then((data) async {
-    //   if (data['status'] == Constants.HTTP_OK) {
-    //     Navigator.pop(context);
-    //   } else {
-    //     if (Helper().isUnauthorizedAccess(data['status'])) {
-    //       Helper().showSnackBar(
-    //         context,
-    //         Constants.SESSION_EXPIRED_MSG,
-    //         Colors.red,
-    //       );
-    //       Helper().logoutUser(context);
-    //     } else {
-    //       setState(() {
-    //         isLoading = false;
-    //         isError = true;
-    //         errorText = data['error'];
-    //       });
-    //     }
-    //   }
-    // });
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          language = Language.fromJson(response['data']);
+          isError = false;
+        });
+        initiateControllers();
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+          Navigator.pop(context);
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        isError = true;
+        errorText = 'Error fetching skill details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+      Navigator.pop(context);
+    }
   }
 
-  handleSubmit() {
+  createLanguage() async {
+    try {
+      final response = await languageRepository.createLanguage(languageData);
+
+      if (response['status'] == Constants.httpCreatedCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Language created successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error adding language details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  updateLanguage(String languageId) async {
+    try {
+      final response = await languageRepository.updateLanguage(
+        languageId,
+        languageData,
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Language updated successfully',
+          Colors.green,
+        );
+        Navigator.pop(context);
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error updating language details: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
+  handleSubmit() async {
     setState(() {
       isLoading = true;
     });
     if (widget.languageId != null) {
-      updateLanguage();
+      await updateLanguage(widget.languageId!);
     } else {
-      createLanguage();
+      await createLanguage();
     }
   }
 
@@ -186,17 +275,38 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: widget.languageId == null
-            ? const Text('Add Language')
-            : const Text('Update Language'),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          widget.languageId == null ? 'Add Language' : 'Update Language',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 22,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(left: 10.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.save),
-      //   onPressed: () {
-      //     if (_formKey.currentState!.validate()) handleSubmit();
-      //   },
-      // ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -220,8 +330,8 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
           text: widget.languageId == null ? 'Add Language' : 'Update Language',
           isLoading: isLoading,
           isDisabled: isLoading,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) handleSubmit();
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) await handleSubmit();
           },
         ),
       ),
@@ -307,7 +417,7 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                     onSuggestionSelected: (suggestion) {
                       setState(() {
                         proficiencyController.text = suggestion.toString();
-                        proficiency = suggestion.toString();
+                        languageData['proficiency'] = suggestion.toString();
                       });
                     },
                   ),
@@ -324,7 +434,7 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {
                     setState(() {
-                      description = value!;
+                      languageData['description'] = value;
                     });
                   },
                 ),

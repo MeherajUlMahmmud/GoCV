@@ -56,19 +56,4 @@ class Experience {
     updatedBy = json['updated_by'];
     updatedAt = json['updated_at'];
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['resume'] = resume;
-    data['company_name'] = companyName;
-    data['position'] = position;
-    data['type'] = type;
-    data['start_date'] = startDate;
-    data['is_current'] = isCurrent;
-    data['end_date'] = endDate;
-    data['description'] = description;
-    data['salary'] = salary;
-    data['company_website'] = companyWebsite;
-    return data;
-  }
 }
