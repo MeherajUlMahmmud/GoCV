@@ -81,6 +81,28 @@ class EducationRepository {
     }
   }
 
+  updateSerial(String educationId, String newSerial) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kEducationUrl}$educationId/update-serial/';
+
+      final data = await APIService().sendPatchRequest(
+        accessToken,
+        {
+          'new_serial': newSerial,
+        },
+        url,
+      );
+      return data;
+    } catch (error) {
+      print('Error updating education serial: $error');
+      return {
+        'status': 500,
+        'message': 'Error updating education serial: $error',
+      };
+    }
+  }
+
   deleteEducation(String educationId) async {
     try {
       final String accessToken = getAccessToken();

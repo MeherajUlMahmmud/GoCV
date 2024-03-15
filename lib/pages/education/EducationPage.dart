@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:gocv/models/education.dart';
 import 'package:gocv/pages/education/AddEditEducation.dart';
@@ -93,6 +95,61 @@ class _EducationPageState extends State<EducationPage> {
     }
   }
 
+  updateSerial(String educationId, String newSerial) async {
+    try {
+      final response = await educationRepository.updateSerial(
+        educationId,
+        newSerial,
+      );
+      print(response);
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          isError = false;
+        });
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Education serial updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      print('Error updating education serial: $error');
+      setState(() {
+        isLoading = false;
+        errorText = 'Error updating education serial: $error';
+      });
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
   deleteEducation(String educationId) async {
     try {
       final response = await educationRepository.deleteEducation(
@@ -153,6 +210,27 @@ class _EducationPageState extends State<EducationPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color draggableItemColor = colorScheme.secondary;
+
+    Widget proxyDecorator(
+        Widget child, int index, Animation<double> animation) {
+      return AnimatedBuilder(
+        animation: animation,
+        builder: (BuildContext context, Widget? child) {
+          final double animValue = Curves.easeInOut.transform(animation.value);
+          final double elevation = lerpDouble(0, 6, animValue)!;
+          return Material(
+            elevation: elevation,
+            color: draggableItemColor,
+            shadowColor: draggableItemColor,
+            child: child,
+          );
+        },
+        child: child,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -194,45 +272,41 @@ class _EducationPageState extends State<EducationPage> {
                       onRefresh: () async {
                         fetchEducations(widget.resumeId);
                       },
-                      child: ListView.builder(
-                        itemCount: educationList.length,
-                        itemBuilder: (context, index) {
-                          return EducationItem(
-                            widget: widget,
-                            educationList: educationList,
-                            index: index,
-                            width: width,
-                            onDelete: () {
-                              deleteEducation(
-                                educationList[index].id.toString(),
-                              );
-                            },
+                      child: ReorderableListView(
+                        proxyDecorator: proxyDecorator,
+                        onReorder: (int oldIndex, int newIndex) async {
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          await updateSerial(
+                            educationList[oldIndex].id.toString(),
+                            (newIndex + 1).toString(),
                           );
+                          setState(() {
+                            final Education item =
+                                educationList.removeAt(oldIndex);
+                            educationList.insert(newIndex, item);
+                          });
                         },
+                        children: [
+                          for (int index = 0;
+                              index < educationList.length;
+                              index++)
+                            ReorderableDragStartListener(
+                              index: index,
+                              key: ValueKey(educationList[index]),
+                              child: skillItem(
+                                index,
+                                width,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
     );
   }
-}
 
-class EducationItem extends StatelessWidget {
-  const EducationItem({
-    super.key,
-    required this.widget,
-    required this.educationList,
-    required this.index,
-    required this.width,
-    required this.onDelete,
-  });
-
-  final EducationPage widget;
-  final List<Education> educationList;
-  final int index;
-  final double width;
-  final Function onDelete;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget skillItem(int index, double width) {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -311,8 +385,10 @@ class EducationItem extends StatelessWidget {
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    onDelete();
+                                  onPressed: () async {
+                                    await deleteEducation(
+                                      educationList[index].id.toString(),
+                                    );
                                   },
                                   child: const Text(
                                     'Delete',
