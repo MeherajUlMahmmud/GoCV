@@ -190,89 +190,148 @@ class _InterestPageState extends State<InterestPage> {
                       child: ListView.builder(
                         itemCount: interestList.length,
                         itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              _showBottomSheet(
-                                context,
-                                interestList[index].id.toString(),
-                              );
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.shade300,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.interests_outlined,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          interestList[index].name,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  interestList[index].description == null
-                                      ? Container()
-                                      : Container(
-                                          margin:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.description,
-                                                color: Colors.grey,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              SizedBox(
-                                                width: width * 0.7,
-                                                child: Text(
-                                                  interestList[index]
-                                                          .description ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
-                                                  textAlign: TextAlign.justify,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ),
-                          );
+                          return interestItem(width, index);
                         },
                       ),
                     ),
+    );
+  }
+
+  Widget interestItem(double width, int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.interests_outlined,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  interestList[index].name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return AddEditInterestPage(
+                              resumeId: widget.resumeId,
+                              interestId: interestList[index].id.toString(),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    value: 'update',
+                    child: const Text('Update'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Delete Interest'),
+                            content: const Text(
+                              'Are you sure you want to delete this interest?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  // await deleteLanguage(
+                                  //   languageList[index].id.toString(),
+                                  // );
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    value: 'delete',
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          interestList[index].description == null
+              ? Container()
+              : Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.description,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 10),
+                      SizedBox(
+                        width: width * 0.7,
+                        child: Text(
+                          interestList[index].description ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ],
+      ),
     );
   }
 

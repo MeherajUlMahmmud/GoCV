@@ -199,181 +199,150 @@ class _SkillPageState extends State<SkillPage> {
                       child: ListView.builder(
                         itemCount: skillList.length,
                         itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              _showBottomSheet(
-                                context,
-                                skillList[index].id,
-                              );
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: skillList[index].isActive == true
-                                    ? Colors.white
-                                    : Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.shade300,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.language,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SizedBox(
-                                        width: width * 0.7,
-                                        child: Text(
-                                          '${skillList[index].name} - ${skillList[index].proficiency!}',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  skillList[index].description == null ||
-                                          skillList[index].description == ''
-                                      ? const SizedBox()
-                                      : Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.description,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            SizedBox(
-                                              width: width * 0.7,
-                                              child: Text(
-                                                skillList[index].description ??
-                                                    '',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                                textAlign: TextAlign.justify,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ],
-                              ),
-                            ),
-                          );
+                          return skillItem(index, width);
                         },
                       ),
                     ),
     );
   }
 
-  void _showBottomSheet(BuildContext context, int skillId) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16.0),
-        ),
+  Widget skillItem(int index, double width) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
       ),
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-            horizontal: 16.0,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: skillList[index].isActive == true
+            ? Colors.white
+            : Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return AddEditSkillPage(
-                      resumeId: widget.resumeId,
-                      skillId: skillId.toString(),
-                    );
-                  }));
-                },
-                child: const Row(
-                  children: [
-                    Icon(Icons.edit),
-                    SizedBox(width: 8.0),
-                    Text('Update'),
-                  ],
+              const Icon(
+                Icons.language,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  '${skillList[index].name} - ${skillList[index].proficiency!}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              const Divider(),
-              TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Delete Education'),
-                        content: const Text(
-                          'Are you sure you want to delete this education?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
+              const SizedBox(width: 5),
+              PopupMenuButton(
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return AddEditSkillPage(
+                                resumeId: widget.resumeId,
+                                skillId: skillList[index].id.toString(),
+                              );
                             },
-                            child: const Text('Cancel'),
                           ),
-                          TextButton(
-                            onPressed: () async {
-                              await deleteSkill(skillId.toString());
-                            },
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.delete,
-                      color: Colors.red,
+                        );
+                      },
+                      value: 'update',
+                      child: const Text('Update'),
                     ),
-                    SizedBox(width: 8.0),
-                    Text(
-                      'Delete',
-                      style: TextStyle(
-                        color: Colors.red,
+                    PopupMenuItem(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Delete Education'),
+                              content: const Text(
+                                'Are you sure you want to delete this education?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    await deleteSkill(
+                                      skillList[index].id.toString(),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      value: 'delete',
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ];
+                },
+              )
+            ],
+          ),
+          const SizedBox(height: 10),
+          skillList[index].description == null ||
+                  skillList[index].description == ''
+              ? const SizedBox()
+              : Row(
+                  children: [
+                    const Icon(
+                      Icons.description,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: width * 0.7,
+                      child: Text(
+                        skillList[index].description ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.justify,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

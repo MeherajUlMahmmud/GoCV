@@ -4,7 +4,6 @@ import 'package:gocv/pages/reference/AddEditReferencePage.dart';
 import 'package:gocv/repositories/reference.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/utils/urls.dart';
 
 class ReferencePage extends StatefulWidget {
   final String resumeId;
@@ -193,203 +192,200 @@ class _ReferencePageState extends State<ReferencePage> {
                       child: ListView.builder(
                         itemCount: referenceList.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade300,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.person,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    SizedBox(
-                                      width: width * 0.7,
-                                      child: Text(
-                                        referenceList[index].name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    PopupMenuButton(
-                                      icon: const Icon(Icons.more_vert),
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) {
-                                                  return AddEditReferencePage(
-                                                    resumeId: widget.resumeId,
-                                                    referenceId:
-                                                        referenceList[index]
-                                                            .id
-                                                            .toString(),
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                          value: 'update',
-                                          child: const Text('Update'),
-                                        ),
-                                        PopupMenuItem(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                      'Delete Education'),
-                                                  content: const Text(
-                                                    'Are you sure you want to delete this education?',
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child:
-                                                          const Text('Cancel'),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () async {
-                                                        await deleteReference(
-                                                          referenceList[index]
-                                                              .id
-                                                              .toString(),
-                                                        );
-                                                      },
-                                                      child: const Text(
-                                                        'Delete',
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                          value: 'delete',
-                                          child: const Text(
-                                            'Delete',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.work_outline_rounded,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    SizedBox(
-                                      width: width * 0.7,
-                                      child: Text(
-                                        referenceList[index].position ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.business,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    SizedBox(
-                                      width: width * 0.7,
-                                      child: Text(
-                                        referenceList[index].companyName ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.email_outlined,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    SizedBox(
-                                      width: width * 0.7,
-                                      child: Text(
-                                        referenceList[index].email,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.phone,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    SizedBox(
-                                      width: width * 0.7,
-                                      child: Text(
-                                        referenceList[index].phone ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
+                          return referenceItem(width, index);
                         },
                       ),
                     ),
+    );
+  }
+
+  Widget referenceItem(double width, int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.person,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  referenceList[index].name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return AddEditReferencePage(
+                              resumeId: widget.resumeId,
+                              referenceId: referenceList[index].id.toString(),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    value: 'update',
+                    child: const Text('Update'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Delete Education'),
+                            content: const Text(
+                              'Are you sure you want to delete this education?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await deleteReference(
+                                    referenceList[index].id.toString(),
+                                  );
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    value: 'delete',
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              const Icon(
+                Icons.work_outline_rounded,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  referenceList[index].position ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              const Icon(
+                Icons.business,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  referenceList[index].companyName ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              const Icon(
+                Icons.email_outlined,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  referenceList[index].email,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              const Icon(
+                Icons.phone,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: width * 0.7,
+                child: Text(
+                  referenceList[index].phone ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
