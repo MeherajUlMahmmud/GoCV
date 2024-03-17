@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:gocv/apis/api.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/utils/urls.dart';
@@ -8,7 +10,7 @@ class PersonalRepository {
     return UserProvider().tokens['access'];
   }
 
-  Future<Map<String, dynamic>> getPersonalDetails(String resumeId) async {
+  getPersonalDetails(String resumeId) async {
     try {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kPersonalUrl}$resumeId/details/';
@@ -24,7 +26,7 @@ class PersonalRepository {
     }
   }
 
-  Future<Map<String, dynamic>> updatePersonalDetails(
+  updatePersonalDetails(
     String personalId,
     Map<String, dynamic> updatedData,
   ) async {
@@ -40,6 +42,29 @@ class PersonalRepository {
       return {
         'status': 500,
         'message': 'Error updating personal details: $error',
+      };
+    }
+  }
+
+  updatePersonalImage(String personalId, File imagePath) async {
+    try {
+      final String accessToken = getAccessToken();
+      final String url = '${URLS.kPersonalUrl}$personalId/update-image/';
+
+      final data = await APIService().sendPatchRequest(
+        accessToken,
+        {
+          'resume_picture': imagePath,
+        },
+        url,
+        isMultipart: true,
+      );
+      return data;
+    } catch (error) {
+      print('Error updating personal image: $error');
+      return {
+        'status': 500,
+        'message': 'Error updating personal image: $error',
       };
     }
   }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/repositories/user.dart';
-import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_button.dart';
@@ -243,12 +242,21 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       Stack(
                         children: [
                           SizedBox(
-                            height: 150,
-                            width: 150,
-                            child: ImageFullScreenWrapperWidget(
-                              dark: true,
-                              // child: Image.asset("assets/avatars/rdj.png"),
-                              child: Image.asset(imageFile!.path),
+                            height: 200,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: userProfileProvider.userProfile
+                                          .applicantData?.profilePicture !=
+                                      null
+                                  ? Image.network(
+                                      userProfileProvider.userProfile
+                                          .applicantData!.profilePicture!,
+                                      height: 200.0,
+                                    )
+                                  : Image.asset(
+                                      Constants.defultAvatarPath,
+                                      height: 200.0,
+                                    ),
                             ),
                           ),
                           Positioned(

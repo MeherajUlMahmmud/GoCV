@@ -4,6 +4,7 @@ import 'package:gocv/pages/skill/AddEditSkillPage.dart';
 import 'package:gocv/repositories/skill.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
+import 'package:gocv/widgets/dialog_helper.dart';
 
 class SkillPage extends StatefulWidget {
   final String resumeId;
@@ -206,7 +207,7 @@ class _SkillPageState extends State<SkillPage> {
     );
   }
 
-  Widget skillItem(int index, double width) {
+  skillItem(int index, double width) {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -251,8 +252,34 @@ class _SkillPageState extends State<SkillPage> {
               ),
               const SizedBox(width: 5),
               PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
                 itemBuilder: (BuildContext context) {
                   return [
+                    skillList[index].isActive == true
+                        ? PopupMenuItem(
+                            onTap: () {
+                              showHideDialog(context, widget.resumeId);
+                            },
+                            value: 'hide',
+                            child: const Text(
+                              'Hide',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          )
+                        : PopupMenuItem(
+                            onTap: () {
+                              showUnhideDialog(context, widget.resumeId);
+                            },
+                            value: 'show',
+                            child: const Text(
+                              'Show',
+                              style: TextStyle(
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
                     PopupMenuItem(
                       onTap: () {
                         Navigator.push(
@@ -272,37 +299,9 @@ class _SkillPageState extends State<SkillPage> {
                     ),
                     PopupMenuItem(
                       onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Delete Education'),
-                              content: const Text(
-                                'Are you sure you want to delete this education?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    await deleteSkill(
-                                      skillList[index].id.toString(),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                        showDeleteDialog(
+                          context,
+                          skillList[index].id.toString(),
                         );
                       },
                       value: 'delete',
@@ -343,6 +342,110 @@ class _SkillPageState extends State<SkillPage> {
                 ),
         ],
       ),
+    );
+  }
+
+  showHideDialog(BuildContext context, String resumeId) {
+    String dialogTitle = 'Hide Skill';
+
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    Widget okButton = TextButton(
+      child: const Text('Hide', style: TextStyle(color: Colors.red)),
+      onPressed: () async {
+        // await skillRepository.deactivateSkill(
+        //   skillList[index].id.toString(),
+        // );
+        // Navigator.pop(context);
+        // fetchSkills(widget.resumeId);
+      },
+    );
+
+    Widget dialogContent = const Text(
+      'Are you sure you want to hide this skill?',
+    );
+
+    DialogHelper.showCustomDialog(
+      context: context,
+      title: dialogTitle,
+      content: dialogContent,
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+  }
+
+  showUnhideDialog(BuildContext context, String resumeId) {
+    String dialogTitle = 'Show Skill';
+
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    Widget okButton = TextButton(
+      child: const Text('Show', style: TextStyle(color: Colors.green)),
+      onPressed: () async {
+        // await skillRepository.activateSkill(
+        //   skillList[index].id.toString(),
+        // );
+        // Navigator.pop(context);
+        // fetchSkills(widget.resumeId);
+      },
+    );
+
+    Widget dialogContent = const Text(
+      'Are you sure you want to show this skill?',
+    );
+
+    DialogHelper.showCustomDialog(
+      context: context,
+      title: dialogTitle,
+      content: dialogContent,
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+  }
+
+  showDeleteDialog(BuildContext context, String skillId) {
+    String dialogTitle = 'Delete Skill';
+
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    Widget okButton = TextButton(
+      child: const Text('Delete'),
+      onPressed: () async {
+        await deleteSkill(skillId);
+      },
+    );
+
+    Widget dialogContent = const Text(
+      'Are you sure you want to delete this skill?',
+    );
+
+    DialogHelper.showCustomDialog(
+      context: context,
+      title: dialogTitle,
+      content: dialogContent,
+      actions: [
+        cancelButton,
+        okButton,
+      ],
     );
   }
 }

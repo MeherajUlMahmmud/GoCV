@@ -47,9 +47,19 @@ class _PersonalPageState extends State<PersonalPage> {
   late TextEditingController countryController = TextEditingController();
   late TextEditingController nationalityController = TextEditingController();
 
-  Map<String, dynamic> updatedPersonalData = {};
+  Map<String, dynamic> updatedData = {
+    'first_name': '',
+    'last_name': '',
+    'about_me': '',
+    'date_of_birth': '',
+    'city': '',
+    'state': '',
+    'country': '',
+    'nationality': '',
+  };
 
   // image
+  String imageUrl = '';
   File? updatedImageFile;
 
   @override
@@ -79,15 +89,21 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   initiateControllers() {
-    firstNameController.text =
+    firstNameController.text = updatedData['first_name'] =
         personalDataProvider.personalData.firstName ?? '';
-    lastNameController.text = personalDataProvider.personalData.lastName ?? '';
-    aboutMeController.text = personalDataProvider.personalData.aboutMe ?? '';
-    dobController.text = personalDataProvider.personalData.dateOfBirth ?? '';
-    cityController.text = personalDataProvider.personalData.city ?? '';
-    stateController.text = personalDataProvider.personalData.state ?? '';
-    countryController.text = personalDataProvider.personalData.country ?? '';
-    nationalityController.text =
+    lastNameController.text = updatedData['last_name'] =
+        personalDataProvider.personalData.lastName ?? '';
+    aboutMeController.text = updatedData['about_me'] =
+        personalDataProvider.personalData.aboutMe ?? '';
+    dobController.text = updatedData['date_of_birth'] =
+        personalDataProvider.personalData.dateOfBirth ?? '';
+    cityController.text =
+        updatedData['city'] = personalDataProvider.personalData.city ?? '';
+    stateController.text =
+        updatedData['state'] = personalDataProvider.personalData.state ?? '';
+    countryController.text = updatedData['country'] =
+        personalDataProvider.personalData.country ?? '';
+    nationalityController.text = updatedData['nationality'] =
         personalDataProvider.personalData.nationality ?? '';
 
     setState(() {
@@ -131,6 +147,7 @@ class _PersonalPageState extends State<PersonalPage> {
 
         setState(() {
           personalId = personal.id.toString();
+          imageUrl = personal.resumePicture ?? '';
           updatedImageFile = null;
           isError = false;
           errorText = '';
@@ -173,11 +190,11 @@ class _PersonalPageState extends State<PersonalPage> {
     }
   }
 
-  handleUpdatePersonalDetails() async {
+  updatePersonalDetails() async {
     try {
       final response = await personalRepository.updatePersonalDetails(
         personalId,
-        updatedPersonalData,
+        updatedData,
       );
       if (response['status'] == Constants.httpOkCode) {
         if (!mounted) return;
@@ -223,6 +240,61 @@ class _PersonalPageState extends State<PersonalPage> {
     }
   }
 
+  updateResumeImage(File updatedImageFile) async {
+    try {
+      final response = await personalRepository.updatePersonalImage(
+        personalId,
+        updatedImageFile,
+      );
+      print(response);
+
+      if (response['status'] == Constants.httpOkCode) {
+        Personal personal = personalDataProvider.personalData;
+        personal.resumePicture = response['data']['resume_picture'];
+        personalDataProvider.setPersonalData(personal);
+
+        if (!mounted) return;
+        Helper().showSnackBar(
+          context,
+          'Personal image updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            errorText = response['error'];
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            errorText,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        errorText = 'Error updating personal image: $error';
+      });
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
+        Colors.red,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -232,7 +304,7 @@ class _PersonalPageState extends State<PersonalPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
         onPressed: () {
-          if (_formKey.currentState!.validate()) handleUpdatePersonalDetails();
+          if (_formKey.currentState!.validate()) updatePersonalDetails();
         },
       ),
       body: isLoading
@@ -271,12 +343,21 @@ class _PersonalPageState extends State<PersonalPage> {
                                       color: Theme.of(context).primaryColor,
                                       width: 2,
                                     ),
-                                    image: DecorationImage(
-                                      image: updatedImageFile != null
-                                          ? AssetImage(updatedImageFile!.path)
-                                          : const AssetImage(
-                                              Constants.defultAvatarPath),
-                                    ),
+                                    image: imageUrl.isNotEmpty
+                                        ? DecorationImage(
+                                            image: NetworkImage(imageUrl),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : DecorationImage(
+                                            image: updatedImageFile != null
+                                                ? AssetImage(
+                                                    updatedImageFile!.path,
+                                                  )
+                                                : const AssetImage(
+                                                    Constants.defultAvatarPath,
+                                                  ),
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 Positioned(
@@ -290,6 +371,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                           setState(() {
                                             updatedImageFile = value;
                                           });
+                                          updateResumeImage(value);
                                         });
                                       });
                                     },
@@ -324,7 +406,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.name,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['first_name'] = value;
+                              updatedData['first_name'] = value;
                             });
                           },
                           validator: (value) {
@@ -346,7 +428,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.name,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['last_name'] = value;
+                              updatedData['last_name'] = value;
                             });
                           },
                           validator: (value) {
@@ -368,7 +450,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.multiline,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['about_me'] = value;
+                              updatedData['about_me'] = value;
                             });
                           },
                         ),
@@ -389,10 +471,10 @@ class _PersonalPageState extends State<PersonalPage> {
                               );
                               if (picked != null && picked != DateTime.now()) {
                                 setState(() {
-                                  updatedPersonalData['date_of_birth'] =
+                                  updatedData['date_of_birth'] =
                                       picked.toString().substring(0, 10);
                                   dobController.text =
-                                      updatedPersonalData['date_of_birth']
+                                      updatedData['date_of_birth']
                                           .toString()
                                           .substring(0, 10);
                                 });
@@ -425,7 +507,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['city'] = value;
+                              updatedData['city'] = value;
                             });
                           },
                         ),
@@ -441,7 +523,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['state'] = value;
+                              updatedData['state'] = value;
                             });
                           },
                         ),
@@ -457,7 +539,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['country'] = value;
+                              updatedData['country'] = value;
                             });
                           },
                         ),
@@ -473,7 +555,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
                             setState(() {
-                              updatedPersonalData['nationality'] = value;
+                              updatedData['nationality'] = value;
                             });
                           },
                         ),

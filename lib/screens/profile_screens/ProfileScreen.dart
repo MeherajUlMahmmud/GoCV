@@ -5,7 +5,6 @@ import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/providers/UserProfileProvider.dart';
 import 'package:gocv/repositories/user.dart';
 import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
-import 'package:gocv/screens/utility_screens/ImageViewScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
@@ -150,11 +149,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     const SizedBox(height: 10.0),
                     SizedBox(
-                      height: 150,
-                      width: 150,
-                      child: ImageFullScreenWrapperWidget(
-                        dark: true,
-                        child: Image.asset(Constants.defultAvatarPath),
+                      height: 200,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: userProfileProvider.userProfile.applicantData
+                                    ?.profilePicture !=
+                                null
+                            ? Image.network(
+                                userProfileProvider
+                                    .userProfile.applicantData!.profilePicture!,
+                                height: 200.0,
+                              )
+                            : Image.asset(
+                                Constants.defultAvatarPath,
+                                height: 200.0,
+                              ),
                       ),
                     ),
                     const SizedBox(height: 10.0),

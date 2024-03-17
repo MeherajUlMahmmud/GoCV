@@ -4,12 +4,13 @@ import 'package:gocv/providers/ResumeListProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
 import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
+import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
 import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
 import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:gocv/widgets/resume_card.dart';
 import 'package:flutter/material.dart';
+import 'package:gocv/widgets/dialog_helper.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -153,6 +154,58 @@ class _HomeScreenState extends State<HomeScreen> {
       Helper().showSnackBar(
         context,
         'Failed to create resume: $error',
+        Colors.red,
+      );
+    }
+  }
+
+  updateResumeTitle(int index, String resumeId, String updatedTitle) async {
+    try {
+      final response = await resumeRepository.updateResume(
+        resumeId,
+        {
+          'name': updatedTitle,
+        },
+      );
+
+      if (response['status'] == Constants.httpOkCode) {
+        setState(() {
+          resumeListProvider.resumeList[index].name = updatedTitle;
+        });
+        if (!mounted) return;
+        Navigator.pop(context);
+        Helper().showSnackBar(
+          context,
+          'Resume title updated successfully',
+          Colors.green,
+        );
+      } else {
+        if (Helper().isUnauthorizedAccess(response['status'])) {
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.sessionExpiredMsg,
+            Colors.red,
+          );
+          Helper().logoutUser(context);
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          if (!mounted) return;
+          Helper().showSnackBar(
+            context,
+            Constants.genericErrorMsg,
+            Colors.red,
+          );
+        }
+      }
+    } catch (error) {
+      print('Error updating resume title: $error');
+      if (!mounted) return;
+      Helper().showSnackBar(
+        context,
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -392,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      showAddDialog(context);
+                                      showResumeAddDialog(context);
                                     },
                                     child: Container(
                                       width: width * 0.45,
@@ -469,24 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               shrinkWrap: true,
                               itemCount: resumeListProvider.resumeList.length,
                               itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    currentResumeProvider.setCurrentResume(
-                                      resumeListProvider.resumeList[index],
-                                    );
-                                    Navigator.pushNamed(
-                                      context,
-                                      ResumeDetailsScreen.routeName,
-                                    );
-                                  },
-                                  child: ResumeCard(
-                                    resume:
-                                        resumeListProvider.resumeList[index],
-                                    onDeleteAction: () {
-                                      deleteResume(index);
-                                    },
-                                  ),
-                                );
+                                return resumeCard(index);
                               },
                             ),
                             const SizedBox(height: 10),
@@ -498,7 +534,112 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  showAddDialog(BuildContext context) {
+  Widget resumeCard(int index) {
+    return GestureDetector(
+      onTap: () {
+        currentResumeProvider.setCurrentResume(
+          resumeListProvider.resumeList[index],
+        );
+        Navigator.pushNamed(
+          context,
+          ResumeDetailsScreen.routeName,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: const Icon(
+                Icons.receipt_long,
+                color: Colors.black,
+                size: 30,
+              ),
+            ),
+            const SizedBox(width: 10.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    resumeListProvider.resumeList[index].name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  const SizedBox(height: 5.0),
+                  Text(
+                    Helper().formatDateTime(
+                      resumeListProvider.resumeList[index].createdAt!,
+                    ),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuButton(
+              icon: const Icon(Icons.more_vert),
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    onTap: () {
+                      currentResumeProvider.setCurrentResume(
+                        resumeListProvider.resumeList[index],
+                      );
+                      Navigator.pushNamed(
+                        context,
+                        ResumePreviewScreen.routeName,
+                      );
+                    },
+                    value: 'preview',
+                    child: const Text('Resume Preview'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      showResumeUpdateDialog(
+                        context,
+                        index,
+                      );
+                    },
+                    value: 'update',
+                    child: const Text('Update title'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      showResumeDeleteDialog(
+                        context,
+                        index,
+                      );
+                    },
+                    value: 'delete',
+                    child: const Text('Delete resume'),
+                  ),
+                ];
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  showResumeAddDialog(BuildContext context) {
+    String dialogTitle = 'Create a new resume';
+
     Widget cancelButton = TextButton(
       child: const Text('Cancel'),
       onPressed: () {
@@ -523,45 +664,146 @@ class _HomeScreenState extends State<HomeScreen> {
           isLoading = true;
         });
         titleController.clear();
-        createResume();
+        await createResume();
       },
     );
 
-    AlertDialog alert = AlertDialog(
-      title: const Text('Create a new resume'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Resume title',
-            style: TextStyle(
-              color: Colors.grey,
-            ),
+    Widget dialogContent = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Resume title',
+          style: TextStyle(
+            color: Colors.grey,
           ),
-          const SizedBox(height: 10.0),
-          TextFormField(
-            autofocus: true,
-            controller: titleController,
-            decoration: const InputDecoration(
-              hintText: 'Resume title',
-            ),
-            keyboardType: TextInputType.text,
+        ),
+        const SizedBox(height: 10.0),
+        TextFormField(
+          autofocus: true,
+          controller: titleController,
+          decoration: const InputDecoration(
+            hintText: 'Resume title',
           ),
-        ],
-      ),
+          keyboardType: TextInputType.text,
+        ),
+      ],
+    );
+
+    // show the dialog
+    DialogHelper.showCustomDialog(
+      context: context,
+      title: dialogTitle,
+      content: dialogContent,
       actions: [
         cancelButton,
         okButton,
       ],
     );
+  }
+
+  showResumeUpdateDialog(BuildContext context, int index) {
+    String dialogTitle = 'Update resume title';
+
+    Resume resume = resumeListProvider.resumeList[index];
+    String title = resume.name;
+
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    Widget okButton = TextButton(
+      child: const Text('Update'),
+      onPressed: () async {
+        if (title.isEmpty) {
+          Helper().showSnackBar(
+            context,
+            'Title cannot be empty',
+            Colors.red,
+          );
+          return;
+        }
+        await updateResumeTitle(
+          index,
+          resume.id.toString(),
+          title,
+        );
+      },
+    );
+
+    Widget dialogContent = TextFormField(
+      autofocus: true,
+      controller: TextEditingController(text: title),
+      decoration: const InputDecoration(
+        hintText: 'New title',
+      ),
+      keyboardType: TextInputType.text,
+      onChanged: (value) {
+        title = value;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Title cannot be empty';
+        }
+        return null;
+      },
+    );
 
     // show the dialog
-    showDialog(
+    DialogHelper.showCustomDialog(
       context: context,
-      builder: (BuildContext context) {
-        return alert;
+      title: dialogTitle,
+      content: dialogContent,
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+  }
+
+  showResumeDeleteDialog(BuildContext context, int index) {
+    String dialogTitle = 'Delete resume';
+
+    // set up the button
+    Widget cancelButton = TextButton(
+      child: const Text('Cancel'),
+      onPressed: () {
+        Navigator.pop(context);
       },
+    );
+
+    Widget okButton = TextButton(
+      child: const Text(
+        'Delete',
+        style: TextStyle(
+          color: Colors.red,
+        ),
+      ),
+      onPressed: () {
+        deleteResume(index);
+        Navigator.pop(context);
+      },
+    );
+
+    Widget dialogContent = const Text(
+      'Are you sure about deleting this resume?\nAll the data within this resume will be lost.',
+      style: TextStyle(
+        color: Colors.red,
+      ),
+    );
+
+    // show the dialog
+    DialogHelper.showCustomDialog(
+      context: context,
+      title: dialogTitle,
+      content: dialogContent,
+      actions: [
+        cancelButton,
+        okButton,
+      ],
     );
   }
 }

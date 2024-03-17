@@ -51,22 +51,47 @@ class APIService {
   Future<Map<String, dynamic>> sendPatchRequest(
     String accessToken,
     Map<String, dynamic> data,
-    String url,
-  ) async {
-    print(data);
+    String url, {
+    bool isMultipart = false,
+  }) async {
     try {
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
-      );
-      return {
-        'data': jsonDecode(response.body),
-        'status': response.statusCode,
-      };
+      if (isMultipart == false) {
+        final response = await http.patch(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+          body: jsonEncode(data),
+        );
+        return {
+          'data': jsonDecode(response.body),
+          'status': response.statusCode,
+        };
+      } else {
+        final request = http.MultipartRequest(
+          'PATCH',
+          Uri.parse(url),
+        )
+          ..headers['Content-Type'] = 'multipart/form-data'
+          ..headers['Authorization'] = 'Bearer $accessToken'
+          ..files.add(
+            http.MultipartFile.fromBytes(
+              'resume_picture', // This is the key for the file
+              data['resume_picture'].readAsBytesSync(), // This is the file
+              filename: data['resume_picture']
+                  .path
+                  .split('/')
+                  .last, // This is the file name
+            ),
+          );
+        final response = await request.send();
+
+        return {
+          'data': jsonDecode(response.stream.toString()),
+          'status': response.statusCode,
+        };
+      }
     } catch (e) {
       print(e.toString());
       return {

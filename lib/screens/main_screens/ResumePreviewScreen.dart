@@ -63,6 +63,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     'Legal': PdfPageFormat.legal,
   };
 
+  late String imageUri;
+  dynamic netImage;
+
   late ByteData image;
   late Uint8List imageData;
 
@@ -79,12 +82,11 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       resumeId = currentResumeProvider.currentResume.id.toString();
     });
 
-    loadImage();
     fetchResumePreview();
   }
 
   loadImage() async {
-    image = await rootBundle.load('assets/avatars/rdj.png');
+    image = await rootBundle.load(Constants.defultAvatarPath);
     imageData = (image).buffer.asUint8List();
   }
 
@@ -93,8 +95,30 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       final response = await resumeRepository.getResumePreview(resumeId);
 
       if (response['status'] == Constants.httpOkCode) {
-        final ResumePreview fetchedResume =
-            ResumePreview.fromJson(response['data']);
+        final ResumePreview fetchedResume = ResumePreview.fromJson(
+          response['data'],
+        );
+
+        imageUri = fetchedResume.personal.resumePicture ?? '';
+        if (imageUri != '') {
+          try {
+            final loadedImage = await networkImage(imageUri);
+            setState(() {
+              netImage = loadedImage;
+            });
+          } catch (error) {
+            print('Error loading image: $error');
+            loadImage();
+            if (!mounted) return;
+            Helper().showSnackBar(
+              context,
+              'Error loading image: $error',
+              Colors.red,
+            );
+          }
+        } else {
+          loadImage();
+        }
 
         setState(() {
           resume = fetchedResume;
@@ -135,7 +159,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
       if (!mounted) return;
       Helper().showSnackBar(
         context,
-        'Error fetching resume details',
+        Constants.genericErrorMsg,
         Colors.red,
       );
     }
@@ -217,114 +241,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Container(
-                  color: PdfColors.grey300,
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.Container(
-                            alignment: pw.Alignment.centerLeft,
-                            child: pw.Text(
-                              '${resume.personal.firstName} ${resume.personal.lastName}',
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          pw.SizedBox(height: 3),
-                          pw.Container(
-                            alignment: pw.Alignment.centerLeft,
-                            child: pw.Text(
-                              resume.contact.address ?? '',
-                            ),
-                          ),
-                          pw.SizedBox(height: 3),
-                          pw.Row(
-                            children: [
-                              pw.Column(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Container(
-                                    alignment: pw.Alignment.centerLeft,
-                                    child: pw.Text(
-                                      resume.contact.phoneNumber ?? '',
-                                    ),
-                                  ),
-                                  // Put this inside hyperlink
-                                  // 'https: //www.linkedin.com/in/${contact.linkedin}'
-                                  pw.Container(
-                                    alignment: pw.Alignment.centerLeft,
-                                    child: pw.Text(
-                                      resume.contact.linkedin != null ||
-                                              resume.contact.linkedin != ''
-                                          ? 'LinkedIn'
-                                          : '',
-                                      style: resume.contact.linkedin != null ||
-                                              resume.contact.linkedin != ''
-                                          ? const pw.TextStyle(
-                                              decoration:
-                                                  pw.TextDecoration.underline,
-                                              color: PdfColors.blue900,
-                                            )
-                                          : const pw.TextStyle(
-                                              color: PdfColors.black,
-                                            ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              pw.SizedBox(width: 30),
-                              pw.Column(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Container(
-                                    alignment: pw.Alignment.centerLeft,
-                                    child: pw.Text(resume.contact.email,
-                                        style: const pw.TextStyle(
-                                          decoration:
-                                              pw.TextDecoration.underline,
-                                          color: PdfColors.blue900,
-                                        )),
-                                  ),
-                                  pw.Container(
-                                    alignment: pw.Alignment.centerLeft,
-                                    child: pw.Text(
-                                      resume.contact.github != null ||
-                                              resume.contact.github != ''
-                                          ? 'GitHub'
-                                          : '',
-                                      style: resume.contact.github != null ||
-                                              resume.contact.github != ''
-                                          ? const pw.TextStyle(
-                                              decoration:
-                                                  pw.TextDecoration.underline,
-                                              color: PdfColors.blue900,
-                                            )
-                                          : const pw.TextStyle(
-                                              color: PdfColors.black,
-                                            ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              pw.SizedBox(width: 30),
-                            ],
-                          ),
-                        ],
-                      ),
-                      pw.Image(
-                        pw.MemoryImage(imageData),
-                        height: 70,
-                        width: 70,
-                      ),
-                    ],
-                  ),
-                ),
+                personalAndContactInfo(resume),
 
                 // sectionHeader('OBJECTIVE'),
                 // pw.Container(
@@ -388,6 +305,114 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
     );
 
     return pdf.save();
+  }
+
+  pw.Container personalAndContactInfo(ResumePreview resume) {
+    return pw.Container(
+      color: PdfColors.grey300,
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisAlignment: pw.MainAxisAlignment.start,
+            children: [
+              pw.Container(
+                alignment: pw.Alignment.centerLeft,
+                child: pw.Text(
+                  '${resume.personal.firstName} ${resume.personal.lastName}',
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 3),
+              pw.Container(
+                alignment: pw.Alignment.centerLeft,
+                child: pw.Text(
+                  resume.contact.address ?? '',
+                ),
+              ),
+              pw.SizedBox(height: 3),
+              pw.Row(
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Container(
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(
+                          resume.contact.phoneNumber ?? '',
+                        ),
+                      ),
+                      // Put this inside hyperlink
+                      // 'https: //www.linkedin.com/in/${contact.linkedin}'
+                      pw.Container(
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(
+                          resume.contact.linkedin != null ||
+                                  resume.contact.linkedin != ''
+                              ? 'LinkedIn'
+                              : '',
+                          style: resume.contact.linkedin != null ||
+                                  resume.contact.linkedin != ''
+                              ? const pw.TextStyle(
+                                  decoration: pw.TextDecoration.underline,
+                                  color: PdfColors.blue900,
+                                )
+                              : const pw.TextStyle(
+                                  color: PdfColors.black,
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(width: 30),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Container(
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(resume.contact.email,
+                            style: const pw.TextStyle(
+                              decoration: pw.TextDecoration.underline,
+                              color: PdfColors.blue900,
+                            )),
+                      ),
+                      pw.Container(
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(
+                          resume.contact.github != null ||
+                                  resume.contact.github != ''
+                              ? 'GitHub'
+                              : '',
+                          style: resume.contact.github != null ||
+                                  resume.contact.github != ''
+                              ? const pw.TextStyle(
+                                  decoration: pw.TextDecoration.underline,
+                                  color: PdfColors.blue900,
+                                )
+                              : const pw.TextStyle(
+                                  color: PdfColors.black,
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(width: 30),
+                ],
+              ),
+            ],
+          ),
+          pw.Image(
+            netImage ?? pw.MemoryImage(imageData),
+            height: 70,
+            width: 70,
+          ),
+        ],
+      ),
+    );
   }
 
   pw.Container sectionHeader(String text) {
