@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:gocv/models/experience.dart';
 import 'package:gocv/pages/work_experience/AddEditWorkExperiencePage.dart';
+import 'package:gocv/providers/ExperienceListProvider.dart';
 import 'package:gocv/repositories/experience.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -19,7 +21,7 @@ class WorkExperiencePage extends StatefulWidget {
 class _WorkExperiencePageState extends State<WorkExperiencePage> {
   ExperienceRepository experienceRepository = ExperienceRepository();
 
-  List<Experience> experienceList = [];
+  late ExperienceListProvider experienceListProvider;
 
   bool isLoading = true;
   bool isError = false;
@@ -28,6 +30,11 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
   @override
   void initState() {
     super.initState();
+
+    experienceListProvider = Provider.of<ExperienceListProvider>(
+      context,
+      listen: false,
+    );
 
     fetchWorkExperiences(widget.resumeId);
   }
@@ -47,8 +54,8 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                 as List)
             .map<Experience>((experience) => Experience.fromJson(experience))
             .toList();
+        experienceListProvider.setExperienceList(fetchedExperiences);
         setState(() {
-          experienceList = fetchedExperiences;
           isLoading = false;
           isError = false;
           errorText = '';
@@ -98,10 +105,11 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
       );
 
       if (response['status'] == Constants.httpNoContentCode) {
+        experienceListProvider.removeExperience(
+          experienceListProvider.experienceList.firstWhere(
+              (experience) => experience.id.toString() == experienceId),
+        );
         setState(() {
-          experienceList.removeWhere(
-            (experience) => experience.id.toString() == experienceId,
-          );
           isError = false;
         });
 
@@ -180,7 +188,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                     ),
                   ),
                 )
-              : experienceList.isEmpty
+              : experienceListProvider.experienceList.isEmpty
                   ? const Center(
                       child: Text(
                         'No work experiences added',
@@ -194,44 +202,19 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                         fetchWorkExperiences(widget.resumeId);
                       },
                       child: ListView.builder(
-                        itemCount: experienceList.length,
+                        itemCount: experienceListProvider.experienceList.length,
                         itemBuilder: (context, index) {
-                          return ExperienceItem(
-                            widget: widget,
-                            experienceList: experienceList,
-                            index: index,
-                            width: width,
-                            onDelete: () {
-                              deleteWorkExperience(
-                                experienceList[index].id.toString(),
-                              );
-                            },
+                          return experienceItem(
+                            index,
+                            width,
                           );
                         },
                       ),
                     ),
     );
   }
-}
 
-class ExperienceItem extends StatelessWidget {
-  const ExperienceItem({
-    super.key,
-    required this.widget,
-    required this.experienceList,
-    required this.index,
-    required this.width,
-    required this.onDelete,
-  });
-
-  final WorkExperiencePage widget;
-  final List<Experience> experienceList;
-  final int index;
-  final double width;
-  final Function onDelete;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget experienceItem(int index, double width) {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -242,7 +225,7 @@ class ExperienceItem extends StatelessWidget {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: experienceList[index].isActive!
+        color: experienceListProvider.experienceList[index].isActive!
             ? Colors.white
             : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(10),
@@ -265,7 +248,7 @@ class ExperienceItem extends StatelessWidget {
                   SizedBox(
                     width: width * 0.7,
                     child: Text(
-                      '${experienceList[index].position} - ${experienceList[index].type}',
+                      '${experienceListProvider.experienceList[index].position} - ${experienceListProvider.experienceList[index].type}',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -276,8 +259,21 @@ class ExperienceItem extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) {
                   return [
+                    experienceListProvider.experienceList[index].isActive ==
+                            true
+                        ? PopupMenuItem(
+                            onTap: () {},
+                            value: 'hide',
+                            child: const Text('Hide'),
+                          )
+                        : PopupMenuItem(
+                            onTap: () {},
+                            value: 'show',
+                            child: const Text('Show'),
+                          ),
                     PopupMenuItem(
                       onTap: () {
                         Navigator.push(
@@ -286,8 +282,9 @@ class ExperienceItem extends StatelessWidget {
                             builder: (context) {
                               return AddEditWorkExperiencePage(
                                 resumeId: widget.resumeId,
-                                experienceId:
-                                    experienceList[index].id.toString(),
+                                experienceId: experienceListProvider
+                                    .experienceList[index].id
+                                    .toString(),
                               );
                             },
                           ),
@@ -314,8 +311,12 @@ class ExperienceItem extends StatelessWidget {
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    onDelete();
+                                  onPressed: () async {
+                                    await deleteWorkExperience(
+                                      experienceListProvider
+                                          .experienceList[index].id
+                                          .toString(),
+                                    );
                                   },
                                   child: const Text(
                                     'Delete',
@@ -339,7 +340,6 @@ class ExperienceItem extends StatelessWidget {
                     ),
                   ];
                 },
-                icon: const Icon(Icons.more_vert),
               ),
             ],
           ),
@@ -358,21 +358,21 @@ class ExperienceItem extends StatelessWidget {
                     SizedBox(
                       width: width * 0.7,
                       child: Text(
-                        experienceList[index].companyName,
+                        experienceListProvider
+                            .experienceList[index].companyName,
                         style: const TextStyle(
                           fontSize: 18,
                         ),
                       ),
                     ),
-                    experienceList[index].companyWebsite != null
+                    Helper().isNullEmptyOrFalse(experienceListProvider
+                            .experienceList[index].companyWebsite)
                         ? Container(
-                            margin: const EdgeInsets.only(
-                              left: 10,
-                            ),
+                            margin: const EdgeInsets.only(left: 10),
                             child: GestureDetector(
                               onTap: () {
-                                Helper().launchInBrowser(
-                                    experienceList[index].companyWebsite!);
+                                Helper().launchInBrowser(experienceListProvider
+                                    .experienceList[index].companyWebsite!);
                               },
                               child: const Icon(
                                 Icons.open_in_new,
@@ -396,16 +396,16 @@ class ExperienceItem extends StatelessWidget {
               SizedBox(
                 width: width * 0.8,
                 child: Helper().isNullEmptyOrFalse(
-                  experienceList[index].endDate,
+                  experienceListProvider.experienceList[index].endDate,
                 )
                     ? Text(
-                        '${Helper().formatMonthYear(experienceList[index].startDate)} - Present',
+                        '${Helper().formatMonthYear(experienceListProvider.experienceList[index].startDate)} - Present',
                         style: const TextStyle(
                           fontSize: 16,
                         ),
                       )
                     : Text(
-                        '${Helper().formatMonthYear(experienceList[index].startDate)} - ${Helper().formatMonthYear(experienceList[index].endDate ?? '')}',
+                        '${Helper().formatMonthYear(experienceListProvider.experienceList[index].startDate)} - ${Helper().formatMonthYear(experienceListProvider.experienceList[index].endDate ?? '')}',
                         style: const TextStyle(
                           fontSize: 16,
                         ),
@@ -415,7 +415,7 @@ class ExperienceItem extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Helper().isNullEmptyOrFalse(
-            experienceList[index].description,
+            experienceListProvider.experienceList[index].description,
           )
               ? const SizedBox()
               : Row(
@@ -428,7 +428,8 @@ class ExperienceItem extends StatelessWidget {
                     SizedBox(
                       width: width * 0.8,
                       child: Text(
-                        experienceList[index].description!,
+                        experienceListProvider
+                            .experienceList[index].description!,
                         style: const TextStyle(
                           fontSize: 16,
                         ),

@@ -295,7 +295,7 @@ class _EducationPageState extends State<EducationPage> {
                             ReorderableDragStartListener(
                               index: index,
                               key: ValueKey(educationList[index]),
-                              child: skillItem(
+                              child: educationItem(
                                 index,
                                 width,
                               ),
@@ -306,7 +306,7 @@ class _EducationPageState extends State<EducationPage> {
     );
   }
 
-  Widget skillItem(int index, double width) {
+  Widget educationItem(int index, double width) {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,

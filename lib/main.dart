@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gocv/providers/ContactDataProvider.dart';
 import 'package:gocv/providers/CurrentResumeProvider.dart';
+import 'package:gocv/providers/ExperienceListProvider.dart';
 import 'package:gocv/providers/PersonalDataProvider.dart';
 import 'package:gocv/providers/ResumeListProvider.dart';
 import 'package:gocv/providers/UserDataProvider.dart';
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => CurrentResumeProvider()),
         ChangeNotifierProvider(create: (context) => PersonalDataProvider()),
         ChangeNotifierProvider(create: (context) => ContactDataProvider()),
+        ChangeNotifierProvider(create: (context) => ExperienceListProvider()),
       ],
       child: const MyApp(),
     ),

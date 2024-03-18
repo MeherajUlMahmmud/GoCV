@@ -149,6 +149,7 @@ class _PersonalPageState extends State<PersonalPage> {
           personalId = personal.id.toString();
           imageUrl = personal.resumePicture ?? '';
           updatedImageFile = null;
+          isLoading = false;
           isError = false;
           errorText = '';
         });
