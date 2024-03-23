@@ -1,6 +1,6 @@
 import 'package:gocv/apis/auth.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
+import 'package:gocv/providers/user_data_provider.dart';
+import 'package:gocv/screens/auth_screens/login_screen.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';

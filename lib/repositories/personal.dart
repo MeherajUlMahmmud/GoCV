@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/UserDataProvider.dart';
+import 'package:gocv/providers/user_data_provider.dart';
 import 'package:gocv/utils/urls.dart';
 
 class PersonalRepository {

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/screens/auth_screens/LoginScreen.dart';
-import 'package:gocv/screens/auth_screens/SignUpScreen.dart';
+import 'package:gocv/screens/auth_screens/login_screen.dart';
+import 'package:gocv/screens/auth_screens/sign_up_screen.dart';
 import 'package:gocv/screens/home_screen.dart';
-import 'package:gocv/screens/main_screens/ResumeDetailsScreen.dart';
-import 'package:gocv/screens/main_screens/ResumePreviewScreen.dart';
-import 'package:gocv/screens/profile_screens/ProfileScreen.dart';
-import 'package:gocv/screens/profile_screens/UpdateProfileScreen.dart';
-import 'package:gocv/screens/utility_screens/AccountSettingsScreen.dart';
-import 'package:gocv/screens/utility_screens/NotFoundScreen.dart';
-import 'package:gocv/screens/utility_screens/SettingsScreen.dart';
-import 'package:gocv/screens/utility_screens/SplashScreen.dart';
+import 'package:gocv/screens/main_screens/resume_details/resume_details_screen.dart';
+import 'package:gocv/screens/main_screens/resume_preview_screen.dart';
+import 'package:gocv/screens/profile_screens/profile_screen.dart';
+import 'package:gocv/screens/profile_screens/update_profile_screen.dart';
+import 'package:gocv/screens/utility_screens/account_settings_screen.dart';
+import 'package:gocv/screens/utility_screens/not_found_screen.dart';
+import 'package:gocv/screens/utility_screens/settings_screen.dart';
+import 'package:gocv/screens/utility_screens/splash_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
