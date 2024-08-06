@@ -24,13 +24,13 @@ void main() {
         ChangeNotifierProvider(create: (context) => ContactDataProvider()),
         ChangeNotifierProvider(create: (context) => ExperienceListProvider()),
       ],
-      child: const MyApp(),
+      child: const App(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
