@@ -12,7 +12,8 @@ import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const routeName = '/login';
+  static const routeName = Constants.loginScreenRouteName;
+
   const LoginScreen({Key? key}) : super(key: key);
 
   @override

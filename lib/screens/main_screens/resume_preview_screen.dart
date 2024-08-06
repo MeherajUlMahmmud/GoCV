@@ -22,7 +22,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class ResumePreviewScreen extends StatefulWidget {
-  static const String routeName = '/resume-preview';
+  static const String routeName = Constants.resumePreviewScreenRouteName;
 
   const ResumePreviewScreen({Key? key}) : super(key: key);
 

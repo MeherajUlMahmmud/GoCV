@@ -7,6 +7,18 @@ class Constants {
 
   static const String defultAvatarPath = 'assets/avatars/rdj.png';
 
+  static const String splashScreenRouteName = '/splash-screen';
+  static const String loginScreenRouteName = '/login-screen';
+  static const String signUpScreenRouteName = '/signup-screen';
+  static const String homeScreenRouteName = '/';
+  static const String resumePreviewScreenRouteName = '/resume-preview';
+  static const String profileScreenRouteName = '/profile-screen';
+  static const String updateProfileScreenRouteName = '/update-profile';
+  static const String settingsScreenRouteName = '/settings';
+  static const String accountSettingsScreenRouteName = '/account-settings';
+  static const String emailUpdateScreenRouteName = '/email-update';
+  static const String notFoundScreenRouteName = '/not-found';
+
   static const int httpOkCode = 200;
   static const int httpCreatedCode = 201;
   static const int httpNoContentCode = 204;

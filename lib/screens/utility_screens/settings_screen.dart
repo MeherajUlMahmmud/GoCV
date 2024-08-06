@@ -1,11 +1,13 @@
 import 'package:gocv/screens/auth_screens/login_screen.dart';
 import 'package:gocv/screens/utility_screens/account_settings_screen.dart';
+import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
-  static const routeName = '/settings';
+  static const routeName = Constants.settingsScreenRouteName;
+
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override
@@ -58,48 +60,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: ListView(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              leading: const Icon(Icons.account_box_outlined, size: 30),
-              title: const Text('Account'),
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  AccountSettingsScreen.routeName,
-                );
-              },
-            ),
+          SettingsListItem(
+            title: 'Account',
+            icon: Icons.account_box_outlined,
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                AccountSettingsScreen.routeName,
+              );
+            },
           ),
           const Divider(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              leading: const Icon(Icons.contact_page_outlined, size: 30),
-              title: const Text('Contact Us'),
-              onTap: () {},
-            ),
+          SettingsListItem(
+            title: 'Contact Us',
+            icon: Icons.contact_page_outlined,
+            onTap: () {},
           ),
           const Divider(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              leading: const Icon(Icons.privacy_tip, size: 30),
-              title: const Text('About'),
-              onTap: () {},
-            ),
+          SettingsListItem(
+            title: 'About',
+            icon: Icons.privacy_tip,
+            onTap: () {},
           ),
           const Divider(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              leading: const Icon(Icons.privacy_tip, size: 30),
-              title: const Text('Licenses'),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LicensePage(),
-                ));
-              },
-            ),
+          SettingsListItem(
+            title: 'Licenses',
+            icon: Icons.privacy_tip,
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const LicensePage(),
+              ));
+            },
           ),
           const Divider(),
           Container(
@@ -118,6 +108,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SettingsListItem extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function()? onTap;
+
+  const SettingsListItem({
+    required this.title,
+    required this.icon,
+    this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ListTile(
+        leading: Icon(icon, size: 30),
+        title: Text(title),
+        onTap: onTap,
+        // onTap: () {
+        //   Navigator.of(context).pushNamed(
+        //     AccountSettingsScreen.routeName,
+        //   );
+        // },
       ),
     );
   }

@@ -14,7 +14,8 @@ import 'package:gocv/widgets/dialog_helper.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = '/home';
+  static const routeName = Constants.homeScreenRouteName;
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -672,18 +673,17 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Resume title',
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-        ),
-        const SizedBox(height: 10.0),
         TextFormField(
           autofocus: true,
           controller: titleController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Resume title',
+            border: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
           ),
           keyboardType: TextInputType.text,
         ),
@@ -737,8 +737,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget dialogContent = TextFormField(
       autofocus: true,
       controller: TextEditingController(text: title),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: 'New title',
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
       ),
       keyboardType: TextInputType.text,
       onChanged: (value) {

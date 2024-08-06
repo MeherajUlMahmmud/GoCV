@@ -13,7 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
-  static const String routeName = '/update-profile';
+  static const String routeName = Constants.updateProfileScreenRouteName;
 
   const UpdateProfileScreen({super.key});
 

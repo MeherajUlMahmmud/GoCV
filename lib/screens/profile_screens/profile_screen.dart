@@ -10,7 +10,8 @@ import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  static const String routeName = '/profile';
+  static const String routeName = Constants.profileScreenRouteName;
+
   const ProfileScreen({super.key});
 
   @override

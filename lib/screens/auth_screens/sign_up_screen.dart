@@ -7,7 +7,8 @@ import 'package:gocv/widgets/custom_button.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static const routeName = '/signup';
+  static const routeName = Constants.signUpScreenRouteName;
+
   const SignUpScreen({Key? key}) : super(key: key);
 
   @override
