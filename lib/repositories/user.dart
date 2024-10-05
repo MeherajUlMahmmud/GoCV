@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class UserRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -16,11 +16,7 @@ class UserRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting user profile: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting user profile: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -36,11 +32,7 @@ class UserRepository {
       );
       return response;
     } catch (error) {
-      print('Error updating user profile: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating user profile: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

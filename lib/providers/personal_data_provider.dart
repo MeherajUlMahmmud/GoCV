@@ -15,6 +15,7 @@ class PersonalDataProvider extends ChangeNotifier {
     _personalData.city = personalData.city;
     _personalData.state = personalData.state;
     _personalData.country = personalData.country;
+    _personalData.nationality = personalData.nationality;
     _personalData.resumePicture = personalData.resumePicture;
     notifyListeners();
   }

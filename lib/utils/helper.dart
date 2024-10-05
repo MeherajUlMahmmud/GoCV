@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
 import 'package:gocv/apis/auth.dart';
 import 'package:gocv/providers/user_data_provider.dart';
 import 'package:gocv/screens/auth_screens/login_screen.dart';
@@ -10,6 +13,34 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Helper {
+  Map<String, dynamic> handleApiError(dynamic error) {
+    if (error is http.ClientException) {
+      print('Client error: $error');
+      return {
+        'status': 400,
+        'message': 'Client error occurred: ${error.message}',
+      };
+    } else if (error is SocketException) {
+      print('No internet connection: $error');
+      return {
+        'status': 503,
+        'message': 'No internet connection',
+      };
+    } else if (error is HttpException) {
+      print('HTTP error: $error');
+      return {
+        'status': 500,
+        'message': 'HTTP error occurred: $error',
+      };
+    } else {
+      print('Unexpected error: $error');
+      return {
+        'status': 500,
+        'message': 'Unexpected error occurred: $error',
+      };
+    }
+  }
+
   static bool checkConnectionError(e) {
     if (e.toString().contains('SocketException') ||
         e.toString().contains('HandshakeException')) {

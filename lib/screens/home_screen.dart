@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   fetchResumes() async {
+    print('fetch resumes');
     try {
       final response = await resumeRepository.getResumes(userId, {});
 
@@ -73,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           errorText = '';
         });
       } else {
+        print(response);
         if (Helper().isUnauthorizedAccess(response['status'])) {
           if (!mounted) return;
           Helper().showSnackBar(
@@ -80,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Constants.sessionExpiredMsg,
             Colors.red,
           );
-          Helper().logoutUser(context);
+          // Helper().logoutUser(context);
         } else {
           setState(() {
             isLoading = false;

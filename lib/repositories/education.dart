@@ -1,6 +1,7 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class EducationRepository {
   // Method to get the access token from UserProvider
@@ -17,11 +18,7 @@ class EducationRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting education list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting education list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -33,11 +30,7 @@ class EducationRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting education details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting education details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -53,11 +46,7 @@ class EducationRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating education: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating education: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -73,11 +62,7 @@ class EducationRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating education: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating education: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -95,11 +80,7 @@ class EducationRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating education serial: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating education serial: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -114,11 +95,7 @@ class EducationRepository {
       );
       return data;
     } catch (error) {
-      print('Error deleting education: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting education: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

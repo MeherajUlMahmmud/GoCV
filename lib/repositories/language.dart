@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class LanguageRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -14,14 +14,13 @@ class LanguageRepository {
       String queryString = Uri(queryParameters: params).query;
       final String url = '${URLS.kLanguageUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting language list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting language list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -30,14 +29,13 @@ class LanguageRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kLanguageUrl}$languageId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting language details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting language details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -53,11 +51,7 @@ class LanguageRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating language: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating language: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -73,11 +67,7 @@ class LanguageRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating language: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating language: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

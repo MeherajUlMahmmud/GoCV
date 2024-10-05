@@ -5,12 +5,12 @@ class Constants {
   static const String appSupportEmail = '';
   static const String appContactNumber = '+1234567890';
 
-  static const String defultAvatarPath = 'assets/avatars/rdj.png';
+  static const String defaultAvatarPath = 'assets/avatars/rdj.png';
 
-  static const String splashScreenRouteName = '/splash-screen';
+  static const String splashScreenRouteName = '/';
   static const String loginScreenRouteName = '/login-screen';
   static const String signUpScreenRouteName = '/signup-screen';
-  static const String homeScreenRouteName = '/';
+  static const String homeScreenRouteName = '/home_screen';
   static const String resumePreviewScreenRouteName = '/resume-preview';
   static const String profileScreenRouteName = '/profile-screen';
   static const String updateProfileScreenRouteName = '/update-profile';

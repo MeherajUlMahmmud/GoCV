@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class ContactRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -13,14 +13,13 @@ class ContactRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kContactUrl}$resumeId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting contact details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting contact details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -32,15 +31,14 @@ class ContactRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kContactUrl}$contactId/update/';
 
-      final data =
-          await APIService().sendPatchRequest(accessToken, updatedData, url);
+      final data = await APIService().sendPatchRequest(
+        accessToken,
+        updatedData,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error updating contact details: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating contact details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

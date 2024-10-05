@@ -87,7 +87,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
   }
 
   loadImage() async {
-    image = await rootBundle.load(Constants.defultAvatarPath);
+    image = await rootBundle.load(Constants.defaultAvatarPath);
     imageData = (image).buffer.asUint8List();
   }
 
@@ -374,11 +374,13 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
                     children: [
                       pw.Container(
                         alignment: pw.Alignment.centerLeft,
-                        child: pw.Text(resume.contact.email,
-                            style: const pw.TextStyle(
-                              decoration: pw.TextDecoration.underline,
-                              color: PdfColors.blue900,
-                            )),
+                        child: pw.Text(
+                          resume.contact.email,
+                          style: const pw.TextStyle(
+                            decoration: pw.TextDecoration.underline,
+                            color: PdfColors.blue900,
+                          ),
+                        ),
                       ),
                       pw.Container(
                         alignment: pw.Alignment.centerLeft,

@@ -58,19 +58,16 @@ class _PersonalPageState extends State<PersonalPage> {
     'nationality': '',
   };
 
-  // image
   String imageUrl = '';
   File? updatedImageFile;
 
   @override
   void initState() {
     super.initState();
-
     personalDataProvider = Provider.of<PersonalDataProvider>(
       context,
       listen: false,
     );
-
     fetchPersonalDetails();
   }
 
@@ -84,31 +81,51 @@ class _PersonalPageState extends State<PersonalPage> {
     stateController.dispose();
     countryController.dispose();
     nationalityController.dispose();
-
     super.dispose();
   }
 
-  initiateControllers() {
-    firstNameController.text = updatedData['first_name'] =
-        personalDataProvider.personalData.firstName ?? '';
-    lastNameController.text = updatedData['last_name'] =
-        personalDataProvider.personalData.lastName ?? '';
-    aboutMeController.text = updatedData['about_me'] =
-        personalDataProvider.personalData.aboutMe ?? '';
-    dobController.text = updatedData['date_of_birth'] =
-        personalDataProvider.personalData.dateOfBirth ?? '';
-    cityController.text =
-        updatedData['city'] = personalDataProvider.personalData.city ?? '';
-    stateController.text =
-        updatedData['state'] = personalDataProvider.personalData.state ?? '';
-    countryController.text = updatedData['country'] =
-        personalDataProvider.personalData.country ?? '';
-    nationalityController.text = updatedData['nationality'] =
-        personalDataProvider.personalData.nationality ?? '';
+  void handleSessionExpired() {
+    if (!mounted) return;
+    Helper().showSnackBar(
+      context,
+      Constants.sessionExpiredMsg,
+      Colors.red,
+    );
+    Helper().logoutUser(context);
+  }
 
+  void setLoading(bool loading) {
     setState(() {
+      isLoading = loading;
+    });
+  }
+
+  void setError(String error) {
+    setState(() {
+      isError = true;
+      errorText = error;
       isLoading = false;
     });
+    Helper().showSnackBar(context, error, Colors.red);
+  }
+
+  void initiateControllers() {
+    final personalData = personalDataProvider.personalData;
+    firstNameController.text =
+        updatedData['first_name'] = personalData.firstName ?? '';
+    lastNameController.text =
+        updatedData['last_name'] = personalData.lastName ?? '';
+    aboutMeController.text =
+        updatedData['about_me'] = personalData.aboutMe ?? '';
+    dobController.text =
+        updatedData['date_of_birth'] = personalData.dateOfBirth ?? '';
+    cityController.text = updatedData['city'] = personalData.city ?? '';
+    stateController.text = updatedData['state'] = personalData.state ?? '';
+    countryController.text =
+        updatedData['country'] = personalData.country ?? '';
+    nationalityController.text =
+        updatedData['nationality'] = personalData.nationality ?? '';
+    setLoading(false);
   }
 
   Future<File> getFromGallery() async {
@@ -117,12 +134,11 @@ class _PersonalPageState extends State<PersonalPage> {
       maxWidth: 1800,
       maxHeight: 1800,
     );
-    File file = File(image!.path);
-    return file;
+    return File(image!.path);
   }
 
   Future<File> cropImage({required File imageFile}) async {
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
+    final CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: imageFile.path,
       aspectRatioPresets: [
         CropAspectRatioPreset.original,
@@ -135,63 +151,33 @@ class _PersonalPageState extends State<PersonalPage> {
     return File(croppedFile!.path);
   }
 
-  fetchPersonalDetails() async {
+  Future<void> fetchPersonalDetails() async {
     try {
-      final response = await personalRepository.getPersonalDetails(
-        widget.resumeId,
-      );
-
+      final response =
+          await personalRepository.getPersonalDetails(widget.resumeId);
       if (response['status'] == Constants.httpOkCode) {
-        Personal personal = Personal.fromJson(response['data']);
+        final Personal personal = Personal.fromJson(response['data']);
         personalDataProvider.setPersonalData(personal);
-
         setState(() {
           personalId = personal.id.toString();
           imageUrl = personal.resumePicture ?? '';
           updatedImageFile = null;
-          isLoading = false;
           isError = false;
           errorText = '';
         });
-
         initiateControllers();
+      } else if (Helper().isUnauthorizedAccess(response['status'])) {
+        handleSessionExpired();
       } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            errorText,
-            Colors.red,
-          );
-        }
+        setError(response['error']);
       }
     } catch (error) {
-      setState(() {
-        isLoading = false;
-        errorText = 'Error fetching personal details: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        Constants.genericErrorMsg,
-        Colors.red,
-      );
+      setError('Error fetching personal details: $error');
     }
   }
 
-  updatePersonalDetails() async {
+  Future<void> updatePersonalDetails() async {
+    setLoading(true);
     try {
       final response = await personalRepository.updatePersonalDetails(
         personalId,
@@ -204,96 +190,62 @@ class _PersonalPageState extends State<PersonalPage> {
           'Personal details updated successfully',
           Colors.green,
         );
+      } else if (Helper().isUnauthorizedAccess(response['status'])) {
+        handleSessionExpired();
       } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            errorText,
-            Colors.red,
-          );
-          Navigator.pop(context);
-        }
+        setError(response['error']);
+        if (!mounted) return;
+        Navigator.pop(context);
       }
     } catch (error) {
-      setState(() {
-        isLoading = false;
-        errorText = 'Error updating personal details: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        Constants.genericErrorMsg,
-        Colors.red,
-      );
+      setError('Error updating personal details: $error');
+    } finally {
+      setLoading(false);
     }
   }
 
-  updateResumeImage(File updatedImageFile) async {
+  Future<void> updateResumeImage(File updatedImageFile) async {
+    setLoading(true);
     try {
       final response = await personalRepository.updatePersonalImage(
-        personalId,
-        updatedImageFile,
-      );
-      print(response);
-
+          personalId, updatedImageFile);
       if (response['status'] == Constants.httpOkCode) {
-        Personal personal = personalDataProvider.personalData;
+        final personal = personalDataProvider.personalData;
         personal.resumePicture = response['data']['resume_picture'];
         personalDataProvider.setPersonalData(personal);
-
         if (!mounted) return;
         Helper().showSnackBar(
           context,
           'Personal image updated successfully',
           Colors.green,
         );
+      } else if (Helper().isUnauthorizedAccess(response['status'])) {
+        handleSessionExpired();
       } else {
-        if (Helper().isUnauthorizedAccess(response['status'])) {
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            Constants.sessionExpiredMsg,
-            Colors.red,
-          );
-          Helper().logoutUser(context);
-        } else {
-          setState(() {
-            isLoading = false;
-            errorText = response['error'];
-          });
-          if (!mounted) return;
-          Helper().showSnackBar(
-            context,
-            errorText,
-            Colors.red,
-          );
-        }
+        setError(response['error']);
       }
     } catch (error) {
-      setState(() {
-        isLoading = false;
-        errorText = 'Error updating personal image: $error';
-      });
-      if (!mounted) return;
-      Helper().showSnackBar(
-        context,
-        Constants.genericErrorMsg,
-        Colors.red,
-      );
+      setError('Error updating personal image: $error');
+    } finally {
+      setLoading(false);
     }
+  }
+
+  validatePersonalDetails() {
+    if (firstNameController.text.isEmpty) {
+      setError('Please enter first name');
+      return false;
+    }
+    if (lastNameController.text.isEmpty) {
+      setError('Please enter last name');
+      return false;
+    }
+    if (dobController.text.isEmpty) {
+      setError('Please enter date of birth');
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -337,13 +289,13 @@ class _PersonalPageState extends State<PersonalPage> {
                               children: [
                                 Container(
                                   height: 180,
-                                  width: 160,
+                                  width: 180,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: Theme.of(context).primaryColor,
-                                      width: 2,
-                                    ),
+                                    borderRadius: BorderRadius.circular(100),
+                                    // border: Border.all(
+                                    //   color: Theme.of(context).primaryColor,
+                                    //   width: 2,
+                                    // ),
                                     image: imageUrl.isNotEmpty
                                         ? DecorationImage(
                                             image: NetworkImage(imageUrl),
@@ -355,7 +307,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                                     updatedImageFile!.path,
                                                   )
                                                 : const AssetImage(
-                                                    Constants.defultAvatarPath,
+                                                    Constants.defaultAvatarPath,
                                                   ),
                                             fit: BoxFit.cover,
                                           ),
@@ -381,7 +333,8 @@ class _PersonalPageState extends State<PersonalPage> {
                                       width: 40,
                                       decoration: BoxDecoration(
                                         color: Theme.of(context).primaryColor,
-                                        borderRadius: BorderRadius.circular(15),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                       ),
                                       child: const Icon(
                                         Icons.edit,
@@ -421,8 +374,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: lastNameController,
-                          labelText: 'Surname',
-                          hintText: 'Surname',
+                          labelText: 'Last Name',
+                          hintText: 'Last Name',
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.words,
                           borderRadius: 10,
@@ -434,7 +387,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter surname';
+                              return 'Please enter last name';
                             }
                             return null;
                           },
@@ -492,6 +445,12 @@ class _PersonalPageState extends State<PersonalPage> {
                                   ),
                                 ),
                                 keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter date of birth';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
                           ),

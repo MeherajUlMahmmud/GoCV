@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class CertificateRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -15,14 +15,13 @@ class CertificateRepository {
       final String url =
           '${URLS.kCertificationUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting certificate list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting certificate list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -31,14 +30,13 @@ class CertificateRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kCertificationUrl}$certificateId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting certificate details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting certificate details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -54,11 +52,7 @@ class CertificateRepository {
       );
       return response;
     } catch (error) {
-      print('Error creating certificate: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating certificate: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -76,11 +70,7 @@ class CertificateRepository {
       );
       return response;
     } catch (error) {
-      print('Error updating certificate: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating certificate: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

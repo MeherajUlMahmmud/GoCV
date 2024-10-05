@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class InterestRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -14,14 +14,13 @@ class InterestRepository {
       String queryString = Uri(queryParameters: params).query;
       final String url = '${URLS.kInterestUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting interest list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting interest list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -30,14 +29,13 @@ class InterestRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kInterestUrl}$resumeId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting interest details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting interest details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -53,11 +51,7 @@ class InterestRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating interest: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating interest: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -74,11 +68,7 @@ class InterestRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating interest: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating interest: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -87,14 +77,13 @@ class InterestRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kInterestUrl}$resumeId/$interestId/destroy/';
 
-      final data = await APIService().sendDeleteRequest(accessToken, url);
+      final data = await APIService().sendDeleteRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error deleting interest: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting interest: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class ReferenceRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -17,11 +17,7 @@ class ReferenceRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting reference list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting reference list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -33,11 +29,7 @@ class ReferenceRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting reference details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting reference details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -53,11 +45,7 @@ class ReferenceRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating reference: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating reference: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -76,11 +64,7 @@ class ReferenceRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating reference: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating reference: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -92,11 +76,7 @@ class ReferenceRepository {
       final data = await APIService().sendDeleteRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error deleting reference: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting reference: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

@@ -184,10 +184,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           child: Container(
             padding: const EdgeInsets.all(10.0),
             margin: const EdgeInsets.only(left: 10.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300),
-            ),
             child: Container(
               margin: const EdgeInsets.only(left: 5.0),
               child: const Icon(
@@ -254,7 +250,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                       height: 200.0,
                                     )
                                   : Image.asset(
-                                      Constants.defultAvatarPath,
+                                      Constants.defaultAvatarPath,
                                       height: 200.0,
                                     ),
                             ),

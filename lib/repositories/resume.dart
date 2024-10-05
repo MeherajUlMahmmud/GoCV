@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class ResumeRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -37,12 +37,7 @@ class ResumeRepository {
         };
       }
     } catch (error) {
-      // Handle errors
-      return {
-        'status': 500,
-        'message': 'Internal Server Error: $error',
-        'data': [],
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -57,11 +52,7 @@ class ResumeRepository {
       );
       return data;
     } catch (error) {
-      print('Error getting resume details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting resume details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -76,11 +67,7 @@ class ResumeRepository {
       );
       return data;
     } catch (error) {
-      print('Error getting resume preview: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting resume preview: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -95,11 +82,7 @@ class ResumeRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating resume: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating resume: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -115,11 +98,7 @@ class ResumeRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating resume: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating resume: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -128,14 +107,13 @@ class ResumeRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kResumeUrl}$resumeId/destroy/';
 
-      final data = await APIService().sendDeleteRequest(accessToken, url);
+      final data = await APIService().sendDeleteRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error deleting resume: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting resume: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

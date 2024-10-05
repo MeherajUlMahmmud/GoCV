@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class ExperienceRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -14,14 +14,13 @@ class ExperienceRepository {
       String queryString = Uri(queryParameters: params).query;
       final String url = '${URLS.kExperienceUrl}$resumeId/list/?$queryString';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting experience list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting experience list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -30,14 +29,13 @@ class ExperienceRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kExperienceUrl}$resumeId/details/';
 
-      final data = await APIService().sendGetRequest(accessToken, url);
+      final data = await APIService().sendGetRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error getting experience details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting experience details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -56,11 +54,7 @@ class ExperienceRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating experience: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating experience: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -77,11 +71,7 @@ class ExperienceRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating experience: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating experience: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -90,14 +80,13 @@ class ExperienceRepository {
       final String accessToken = getAccessToken();
       final String url = '${URLS.kExperienceUrl}$experienceId/destroy/';
 
-      final data = await APIService().sendDeleteRequest(accessToken, url);
+      final data = await APIService().sendDeleteRequest(
+        accessToken,
+        url,
+      );
       return data;
     } catch (error) {
-      print('Error deleting experience: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting experience: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

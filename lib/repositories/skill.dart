@@ -1,9 +1,9 @@
-import 'package:gocv/apis/api.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/utils/urls.dart';
+import '../apis/api.dart';
+import '../providers/user_data_provider.dart';
+import '../utils/helper.dart';
+import '../utils/urls.dart';
 
 class SkillRepository {
-  // Method to get the access token from UserProvider
   String getAccessToken() {
     return UserProvider().tokens['access'];
   }
@@ -17,11 +17,7 @@ class SkillRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting skill list: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting skill list: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -33,11 +29,7 @@ class SkillRepository {
       final data = await APIService().sendGetRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error getting skill details: $error');
-      return {
-        'status': 500,
-        'message': 'Error getting skill details: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -53,11 +45,7 @@ class SkillRepository {
       );
       return data;
     } catch (error) {
-      print('Error creating skill: $error');
-      return {
-        'status': 500,
-        'message': 'Error creating skill: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -73,11 +61,7 @@ class SkillRepository {
       );
       return data;
     } catch (error) {
-      print('Error updating skill: $error');
-      return {
-        'status': 500,
-        'message': 'Error updating skill: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 
@@ -89,11 +73,7 @@ class SkillRepository {
       final data = await APIService().sendDeleteRequest(accessToken, url);
       return data;
     } catch (error) {
-      print('Error deleting skill: $error');
-      return {
-        'status': 500,
-        'message': 'Error deleting skill: $error',
-      };
+      return Helper().handleApiError(error);
     }
   }
 }

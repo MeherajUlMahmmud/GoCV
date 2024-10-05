@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/models/experience.dart';
-import 'package:gocv/repositories/experience.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
-import 'package:gocv/widgets/custom_button.dart';
-import 'package:gocv/widgets/custom_text_form_field.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:provider/provider.dart';
+
+import '../../../../models/experience.dart';
+import '../../../../repositories/experience.dart';
+import '../../../../utils/constants.dart';
+import '../../../../utils/helper.dart';
+import '../../../../widgets/custom_button.dart';
+import '../../../../widgets/custom_text_form_field.dart';
 
 class AddEditWorkExperiencePage extends StatefulWidget {
   final String resumeId;
@@ -34,7 +34,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
     'Freelance',
     'Volunteer',
     'Apprenticeship',
-    'Traineeship',
   ];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -376,10 +375,6 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
           child: Container(
             padding: const EdgeInsets.all(10.0),
             margin: const EdgeInsets.only(left: 10.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300),
-            ),
             child: Container(
               margin: const EdgeInsets.only(left: 5.0),
               child: const Icon(

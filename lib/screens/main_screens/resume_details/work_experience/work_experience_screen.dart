@@ -389,7 +389,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
           Row(
             children: [
               const Icon(
@@ -413,7 +412,8 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                     ),
                     Helper().isNullEmptyOrFalse(experienceListProvider
                             .experienceList[index].companyWebsite)
-                        ? Container(
+                        ? const SizedBox()
+                        : Container(
                             margin: const EdgeInsets.only(left: 10),
                             child: GestureDetector(
                               onTap: () {
@@ -424,8 +424,7 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                                 Icons.open_in_new,
                               ),
                             ),
-                          )
-                        : const SizedBox(),
+                          ),
                   ],
                 ),
               ),
