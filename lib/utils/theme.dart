@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/utils/colors.dart';
+
+import 'colors.dart';
 
 ThemeData createTheme() {
   return ThemeData(

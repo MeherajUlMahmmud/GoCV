@@ -1,4 +1,4 @@
-import 'package:gocv/models/applicant.dart';
+import 'applicant.dart';
 
 class UserBase {
   int? id;

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/models/applicant.dart';
-import 'package:gocv/models/user.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/providers/user_profile_provider.dart';
-import 'package:gocv/repositories/user.dart';
-import 'package:gocv/screens/profile_screens/update_profile_screen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
+
+import '../../models/applicant.dart';
+import '../../models/user.dart';
+import '../../providers/user_data_provider.dart';
+import '../../providers/user_profile_provider.dart';
+import '../../repositories/user.dart';
+import '../../utils/constants.dart';
+import '../../utils/helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = Constants.profileScreenRouteName;
@@ -120,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, UpdateProfileScreen.routeName)
+          Navigator.pushNamed(context, Constants.updateProfileScreenRouteName)
               .then((value) => {if (value == true) fetchUserProfile()});
         },
         child: const Icon(Icons.edit),

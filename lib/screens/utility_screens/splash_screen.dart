@@ -1,11 +1,12 @@
-import 'package:gocv/models/user.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/screens/auth_screens/login_screen.dart';
-import 'package:gocv/screens/home_screen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../models/user.dart';
+import '../../providers/user_data_provider.dart';
+import '../../utils/constants.dart';
+import '../../utils/local_storage.dart';
+import '../auth_screens/login_screen.dart';
+import '../home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = Constants.splashScreenRouteName;

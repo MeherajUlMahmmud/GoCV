@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/apis/auth.dart';
-import 'package:gocv/screens/auth_screens/login_screen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
-import 'package:gocv/widgets/custom_button.dart';
-import 'package:gocv/widgets/custom_text_form_field.dart';
+
+import '../../repositories/auth.dart';
+import '../../utils/constants.dart';
+import '../../utils/helper.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/custom_text_form_field.dart';
+import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = Constants.signUpScreenRouteName;
@@ -50,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       isLoading = true;
     });
 
-    AuthService()
+    AuthRepository()
         .registerUser(
       firstName,
       lastName,

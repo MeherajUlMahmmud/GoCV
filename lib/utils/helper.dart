@@ -1,16 +1,17 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-import 'package:gocv/apis/auth.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/screens/auth_screens/login_screen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../providers/user_data_provider.dart';
+import '../repositories/auth.dart';
+import '../screens/auth_screens/login_screen.dart';
+import 'constants.dart';
+import 'local_storage.dart';
 
 class Helper {
   Map<String, dynamic> handleApiError(dynamic error) {
@@ -125,7 +126,7 @@ class Helper {
 
   void refreshToken(BuildContext context, String refreshToken) {
     LocalStorage localStorage = LocalStorage();
-    AuthService().refreshToken(refreshToken).then((data) {
+    AuthRepository().refreshToken(refreshToken).then((data) {
       if (data['status'] == Constants.httpOkCode) {
         localStorage.writeData('tokens', {
           'access': data['data']['access'],

@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/urls.dart';
 import 'package:http/http.dart' as http;
 
-class AuthService {
+import '../utils/constants.dart';
+import '../utils/urls.dart';
+
+class AuthRepository {
   Future<Map<String, dynamic>> registerUser(
     String firstName,
     String lastName,

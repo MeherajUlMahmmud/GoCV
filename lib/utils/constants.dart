@@ -10,6 +10,9 @@ class Constants {
   static const String splashScreenRouteName = '/';
   static const String loginScreenRouteName = '/login-screen';
   static const String signUpScreenRouteName = '/signup-screen';
+  static const String otpScreenRouteName = '/otp-screen';
+  static const String forgotPasswordScreenRouteName = '/forgot-password';
+
   static const String homeScreenRouteName = '/home_screen';
   static const String resumePreviewScreenRouteName = '/resume-preview';
   static const String profileScreenRouteName = '/profile-screen';

@@ -1,17 +1,18 @@
-import 'package:gocv/models/resume.dart';
-import 'package:gocv/providers/current_resume_provider.dart';
-import 'package:gocv/providers/resume_list_provider.dart';
-import 'package:gocv/providers/user_data_provider.dart';
-import 'package:gocv/repositories/resume.dart';
-import 'package:gocv/screens/main_screens/resume_details/resume_details_screen.dart';
-import 'package:gocv/screens/main_screens/resume_preview_screen.dart';
-import 'package:gocv/screens/profile_screens/profile_screen.dart';
-import 'package:gocv/screens/utility_screens/settings_screen.dart';
-import 'package:gocv/utils/constants.dart';
-import 'package:gocv/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:gocv/widgets/dialog_helper.dart';
 import 'package:provider/provider.dart';
+
+import '../models/resume.dart';
+import '../providers/current_resume_provider.dart';
+import '../providers/resume_list_provider.dart';
+import '../providers/user_data_provider.dart';
+import '../repositories/resume.dart';
+import '../utils/constants.dart';
+import '../utils/helper.dart';
+import '../widgets/dialog_helper.dart';
+import 'main_screens/resume_details/resume_details_screen.dart';
+import 'main_screens/resume_preview_screen.dart';
+import 'profile_screens/profile_screen.dart';
+import 'utility_screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = Constants.homeScreenRouteName;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gocv/models/user.dart';
+
+import '../models/user.dart';
 
 class UserProvider with ChangeNotifier {
   // Singleton instance

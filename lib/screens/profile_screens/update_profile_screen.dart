@@ -121,7 +121,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         userId,
         updatedProfileData,
       );
-      print(response);
 
       if (response['status'] == Constants.httpOkCode) {
         setState(() {
