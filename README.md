@@ -74,7 +74,7 @@ This Flutter project aims to enable the people to build resumes easily. It is de
 
 ### Additional Features
 
--   [x] **Multiple Languages**:
+-   [x] **Multiple Language Support**:
     -   [x] Bengali
     -   [x] English
 -   [x] **Theme Change**
