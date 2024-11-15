@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/providers/user_data_provider.dart';
 import 'package:gocv/providers/user_profile_provider.dart';
 import 'package:gocv/repositories/user.dart';
@@ -166,31 +167,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Update Profile',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-          ),
-        ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            padding: const EdgeInsets.all(10.0),
-            margin: const EdgeInsets.only(left: 10.0),
-            child: Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              ),
-            ),
-          ),
+        title: Text(
+          AppLocalizations.of(context)!.update_profile,
         ),
       ),
       bottomNavigationBar: Container(
@@ -199,21 +177,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           vertical: 30.0,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10),
             topRight: Radius.circular(10),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
               blurRadius: 5,
               offset: Offset(0, -2),
             ),
           ],
         ),
         child: CustomButton(
-          text: 'Update Profile',
+          text: AppLocalizations.of(context)!.update_profile,
           isLoading: isSubmitting,
           isDisabled: isLoading,
           onPressed: () {
@@ -288,8 +264,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: firstNameController,
-                        labelText: 'First Name',
-                        hintText: 'First Name',
+                        labelText: AppLocalizations.of(context)!.first_name,
+                        hintText: AppLocalizations.of(context)!.first_name,
                         prefixIcon: Icons.person_outline,
                         textCapitalization: TextCapitalization.words,
                         borderRadius: 10,
@@ -310,8 +286,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: lastNameController,
-                        labelText: 'Surname',
-                        hintText: 'Surname',
+                        labelText: AppLocalizations.of(context)!.last_name,
+                        hintText: AppLocalizations.of(context)!.last_name,
                         prefixIcon: Icons.person_outline,
                         textCapitalization: TextCapitalization.words,
                         borderRadius: 10,
@@ -332,8 +308,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextFormField(
                         width: width,
                         controller: phoneController,
-                        labelText: 'Phone Number',
-                        hintText: 'Phone Number',
+                        labelText: AppLocalizations.of(context)!.phone_number,
+                        hintText: AppLocalizations.of(context)!.phone_number,
                         prefixIcon: Icons.phone,
                         textCapitalization: TextCapitalization.none,
                         borderRadius: 10,

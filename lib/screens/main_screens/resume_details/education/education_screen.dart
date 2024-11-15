@@ -232,7 +232,6 @@ class _EducationPageState extends State<EducationPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -317,9 +316,6 @@ class _EducationPageState extends State<EducationPage> {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: educationList[index].isActive!
-            ? Colors.white
-            : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Colors.grey.shade200,
@@ -332,7 +328,6 @@ class _EducationPageState extends State<EducationPage> {
             children: [
               const Icon(
                 Icons.business,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -420,7 +415,6 @@ class _EducationPageState extends State<EducationPage> {
             children: [
               const Icon(
                 Icons.business,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -439,7 +433,6 @@ class _EducationPageState extends State<EducationPage> {
             children: [
               const Icon(
                 Icons.money,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -460,7 +453,6 @@ class _EducationPageState extends State<EducationPage> {
                   children: [
                     const Icon(
                       Icons.date_range,
-                      color: Colors.grey,
                     ),
                     const SizedBox(width: 10),
                     SizedBox(
@@ -489,7 +481,6 @@ class _EducationPageState extends State<EducationPage> {
                   children: [
                     const Icon(
                       Icons.description,
-                      color: Colors.grey,
                     ),
                     const SizedBox(width: 10),
                     SizedBox(

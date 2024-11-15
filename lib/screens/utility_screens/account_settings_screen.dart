@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/screens/utility_screens/email_update_screen.dart';
 import 'package:gocv/utils/constants.dart';
 
@@ -15,43 +16,15 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          elevation: 0,
-          title: const Text(
-            'Account Settings',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-            ),
-          ),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(10.0),
-              margin: const EdgeInsets.only(left: 10.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(left: 5.0),
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
-                ),
-              ),
-            ),
+          title:  Text(
+            AppLocalizations.of(context)!.update_email_address,
           ),
         ),
         body: ListView(
           children: [
             SettingsListItem(
-              title: 'Update Email Address',
+              title: AppLocalizations.of(context)!.update_email_address,
               icon: Icons.email_outlined,
               onTap: () {
                 Navigator.of(context).pushNamed(

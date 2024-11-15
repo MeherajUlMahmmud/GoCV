@@ -208,13 +208,11 @@ class _InterestPageState extends State<InterestPage> {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.grey.shade300,
             blurRadius: 5,
-            offset: const Offset(0, 3),
+            offset: Offset(0, 3),
           ),
         ],
       ),
@@ -225,7 +223,6 @@ class _InterestPageState extends State<InterestPage> {
             children: [
               const Icon(
                 Icons.interests_outlined,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -314,7 +311,6 @@ class _InterestPageState extends State<InterestPage> {
                     children: [
                       const Icon(
                         Icons.description,
-                        color: Colors.grey,
                       ),
                       const SizedBox(width: 10),
                       SizedBox(

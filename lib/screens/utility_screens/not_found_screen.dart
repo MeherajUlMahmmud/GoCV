@@ -9,17 +9,9 @@ class NotFoundScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
         title: const Text(
           'Not Found',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-          ),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -32,7 +24,6 @@ class NotFoundScreen extends StatelessWidget {
               margin: const EdgeInsets.only(left: 5.0),
               child: const Icon(
                 Icons.arrow_back_ios,
-                color: Colors.black,
               ),
             ),
           ),
@@ -56,7 +47,6 @@ class NotFoundScreen extends StatelessWidget {
               'Page not found',
               style: TextStyle(
                 fontSize: 24,
-                color: Colors.black,
               ),
             ),
           ],

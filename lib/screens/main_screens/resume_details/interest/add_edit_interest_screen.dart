@@ -198,14 +198,12 @@ class _AddEditInterestPageState extends State<AddEditInterestPage> {
           vertical: 30.0,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10),
             topRight: Radius.circular(10),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
               blurRadius: 5,
               offset: Offset(0, -2),
             ),

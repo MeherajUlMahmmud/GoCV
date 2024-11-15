@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/models/resume.dart';
+import 'package:gocv/providers/current_resume_provider.dart';
+import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/screens/main_screens/resume_details/award/award_screen.dart';
 import 'package:gocv/screens/main_screens/resume_details/certification/certification_screen.dart';
 import 'package:gocv/screens/main_screens/resume_details/contact_screen.dart';
@@ -9,10 +13,7 @@ import 'package:gocv/screens/main_screens/resume_details/personal_screen.dart';
 import 'package:gocv/screens/main_screens/resume_details/reference/reference_screen.dart';
 import 'package:gocv/screens/main_screens/resume_details/skill/skill_screen.dart';
 import 'package:gocv/screens/main_screens/resume_details/work_experience/work_experience_screen.dart';
-import 'package:gocv/providers/current_resume_provider.dart';
-import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/screens/main_screens/resume_preview_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:provider/provider.dart';
@@ -113,32 +114,13 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
         title: Text(
-          isLoading ? 'Loading...' : currentResumeProvider.currentResume.name,
+          isLoading
+              ? AppLocalizations.of(context)!.loading
+              : currentResumeProvider.currentResume.name,
           style: const TextStyle(
-            color: Colors.black,
             fontSize: 22,
-          ),
-        ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            padding: const EdgeInsets.all(10.0),
-            margin: const EdgeInsets.only(left: 10.0),
-            child: Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              ),
-            ),
           ),
         ),
         actions: [
@@ -153,7 +135,7 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: const Icon(Icons.visibility, color: Colors.black),
+              child: const Icon(Icons.visibility),
             ),
           ),
         ],
@@ -176,65 +158,65 @@ class _ResumeDetailsScreenState extends State<ResumeDetailsScreen>
                         labelColor: Theme.of(context).primaryColor,
                         unselectedLabelColor: Colors.grey,
                         isScrollable: true,
-                        tabs: const [
+                        tabs: [
                           Tab(
                             child: Text(
-                              'Personal',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.personal,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Contact',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.contact,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Work Experience',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.work_experience,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Education',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.education,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Skills',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.skills,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Awards',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.awards,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Certifications',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.certifications,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Interests',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.interests,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'Languages',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.language,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                           Tab(
                             child: Text(
-                              'References',
-                              style: TextStyle(fontSize: 16.0),
+                              AppLocalizations.of(context)!.references,
+                              style: const TextStyle(fontSize: 16.0),
                             ),
                           ),
                         ],

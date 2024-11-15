@@ -16,10 +16,10 @@ import 'package:gocv/providers/current_resume_provider.dart';
 import 'package:gocv/repositories/resume.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
-import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:provider/provider.dart';
 
 class ResumePreviewScreen extends StatefulWidget {
   static const String routeName = Constants.resumePreviewScreenRouteName;
@@ -171,8 +171,9 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resume Preview'),
-        centerTitle: true,
+        title: const Text(
+          'Resume Preview',
+        ),
       ),
       body: isLoading
           ? const Center(
@@ -309,7 +310,7 @@ class _ResumePreviewScreenState extends State<ResumePreviewScreen> {
 
   pw.Container personalAndContactInfo(ResumePreview resume) {
     return pw.Container(
-      color: PdfColors.grey300,
+      // color: PdfColors.grey300,
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [

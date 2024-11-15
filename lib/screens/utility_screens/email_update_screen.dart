@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/providers/user_data_provider.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
@@ -58,7 +59,7 @@ class _EmailUpdateScreenState extends State<EmailUpdateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Email Update'),
+        title: Text(AppLocalizations.of(context)!.update_email_address),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

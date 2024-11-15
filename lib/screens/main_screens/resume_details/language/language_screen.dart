@@ -152,11 +152,9 @@ class _LanguagePageState extends State<LanguagePage> {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade300,
             blurRadius: 5,
             offset: const Offset(0, 3),
           ),
@@ -169,7 +167,6 @@ class _LanguagePageState extends State<LanguagePage> {
             children: [
               const Icon(
                 Icons.language,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -259,7 +256,6 @@ class _LanguagePageState extends State<LanguagePage> {
                     children: [
                       const Icon(
                         Icons.description,
-                        color: Colors.grey,
                       ),
                       const SizedBox(width: 10),
                       SizedBox(

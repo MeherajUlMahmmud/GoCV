@@ -162,7 +162,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -225,12 +224,11 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: experienceListProvider.experienceList[index].isActive!
-            ? Colors.white
-            : Colors.grey.shade200,
+        // color: experienceListProvider.experienceList[index].isActive!
+        //     ? Colors.white
+        //     : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Colors.grey.shade200,
         ),
       ),
       child: Column(
@@ -240,7 +238,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
             children: [
               const Icon(
                 Icons.work_outline_rounded,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               Row(
@@ -283,13 +280,11 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                         children: [
                           Icon(
                             Icons.edit,
-                            color: Colors.blue,
                           ),
                           SizedBox(width: 5),
                           Text(
                             'Update',
                             style: TextStyle(
-                              color: Colors.blue,
                             ),
                           ),
                         ],
@@ -393,7 +388,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
             children: [
               const Icon(
                 Icons.business,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -435,7 +429,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
             children: [
               const Icon(
                 Icons.date_range,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -467,7 +460,6 @@ class _WorkExperiencePageState extends State<WorkExperiencePage> {
                   children: [
                     const Icon(
                       Icons.description,
-                      color: Colors.grey,
                     ),
                     const SizedBox(width: 10),
                     SizedBox(

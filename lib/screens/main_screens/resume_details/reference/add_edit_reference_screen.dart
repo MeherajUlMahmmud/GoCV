@@ -290,31 +290,8 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
         title: Text(
           widget.referenceId == null ? 'Add Reference' : 'Update Reference',
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-          ),
-        ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            padding: const EdgeInsets.all(10.0),
-            margin: const EdgeInsets.only(left: 10.0),
-            child: Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              ),
-            ),
-          ),
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -324,14 +301,12 @@ class _AddEditReferencePageState extends State<AddEditReferencePage> {
           vertical: 30.0,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10),
             topRight: Radius.circular(10),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
               blurRadius: 5,
               offset: Offset(0, -2),
             ),

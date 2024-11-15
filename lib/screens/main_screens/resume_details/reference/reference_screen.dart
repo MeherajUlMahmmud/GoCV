@@ -210,13 +210,11 @@ class _ReferencePageState extends State<ReferencePage> {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.grey.shade300,
             blurRadius: 5,
-            offset: const Offset(0, 3),
+            offset: Offset(0, 3),
           ),
         ],
       ),
@@ -227,7 +225,6 @@ class _ReferencePageState extends State<ReferencePage> {
             children: [
               const Icon(
                 Icons.person,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -313,7 +310,6 @@ class _ReferencePageState extends State<ReferencePage> {
             children: [
               const Icon(
                 Icons.work_outline_rounded,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -332,7 +328,6 @@ class _ReferencePageState extends State<ReferencePage> {
             children: [
               const Icon(
                 Icons.business,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -351,7 +346,6 @@ class _ReferencePageState extends State<ReferencePage> {
             children: [
               const Icon(
                 Icons.email_outlined,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(
@@ -370,7 +364,6 @@ class _ReferencePageState extends State<ReferencePage> {
             children: [
               const Icon(
                 Icons.phone,
-                color: Colors.grey,
               ),
               const SizedBox(width: 10),
               SizedBox(

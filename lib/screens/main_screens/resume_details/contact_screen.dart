@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/models/contact.dart';
 import 'package:gocv/providers/contact_data_provider.dart';
 import 'package:gocv/repositories/contact.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:gocv/utils/helper.dart';
 import 'package:gocv/widgets/custom_text_form_field.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ContactPage extends StatefulWidget {
@@ -204,8 +205,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: phoneNumberController,
-                          labelText: 'Phone Number',
-                          hintText: 'Phone Number',
+                          labelText: AppLocalizations.of(context)!.phone_number,
+                          hintText: AppLocalizations.of(context)!.phone_number,
                           prefixIcon: Icons.phone,
                           textCapitalization: TextCapitalization.none,
                           borderRadius: 10,
@@ -220,8 +221,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: emailController,
-                          labelText: 'Email',
-                          hintText: 'Email Address',
+                          labelText: AppLocalizations.of(context)!.email,
+                          hintText: AppLocalizations.of(context)!.email,
                           prefixIcon: Icons.mail,
                           textCapitalization: TextCapitalization.none,
                           borderRadius: 10,
@@ -242,8 +243,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: addressController,
-                          labelText: 'Address',
-                          hintText: 'Address',
+                          labelText: AppLocalizations.of(context)!.address,
+                          hintText: AppLocalizations.of(context)!.address,
                           prefixIcon: Icons.navigation,
                           textCapitalization: TextCapitalization.sentences,
                           borderRadius: 10,
@@ -258,8 +259,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: linkedinController,
-                          labelText: 'LinkedIn',
-                          hintText: 'LinkedIn',
+                          labelText: AppLocalizations.of(context)!.linkedin,
+                          hintText: AppLocalizations.of(context)!.linkedin,
                           prefixIcon: Icons.link,
                           textCapitalization: TextCapitalization.none,
                           borderRadius: 10,
@@ -274,8 +275,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: facebookController,
-                          labelText: 'Facebook',
-                          hintText: 'Facebook',
+                          labelText: AppLocalizations.of(context)!.facebook,
+                          hintText: AppLocalizations.of(context)!.facebook,
                           prefixIcon: Icons.facebook,
                           textCapitalization: TextCapitalization.none,
                           borderRadius: 10,
@@ -290,8 +291,8 @@ class _ContactPageState extends State<ContactPage> {
                         CustomTextFormField(
                           width: width,
                           controller: githubController,
-                          labelText: 'Github',
-                          hintText: 'Github',
+                          labelText: AppLocalizations.of(context)!.github,
+                          hintText: AppLocalizations.of(context)!.github,
                           prefixIcon: Icons.code,
                           textCapitalization: TextCapitalization.none,
                           borderRadius: 10,

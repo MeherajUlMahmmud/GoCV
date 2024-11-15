@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gocv/repositories/personal.dart';
 import 'package:gocv/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -352,8 +353,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: firstNameController,
-                          labelText: 'First Name',
-                          hintText: 'First Name',
+                          labelText: AppLocalizations.of(context)!.first_name,
+                          hintText: AppLocalizations.of(context)!.first_name,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.words,
                           borderRadius: 10,
@@ -374,8 +375,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: lastNameController,
-                          labelText: 'Last Name',
-                          hintText: 'Last Name',
+                          labelText: AppLocalizations.of(context)!.last_name,
+                          hintText: AppLocalizations.of(context)!.last_name,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.words,
                           borderRadius: 10,
@@ -396,8 +397,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: aboutMeController,
-                          labelText: 'About Me',
-                          hintText: 'About Me',
+                          labelText: AppLocalizations.of(context)!.about_me,
+                          hintText: AppLocalizations.of(context)!.about_me,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.sentences,
                           borderRadius: 10,
@@ -439,7 +440,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                 controller: dobController,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.calendar_today),
-                                  labelText: 'Date of Birth',
+                                  labelText: AppLocalizations.of(context)!.date_of_birth,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -459,8 +460,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: cityController,
-                          labelText: 'City',
-                          hintText: 'City',
+                          labelText: AppLocalizations.of(context)!.city,
+                          hintText: AppLocalizations.of(context)!.city,
                           prefixIcon: Icons.location_city,
                           textCapitalization: TextCapitalization.sentences,
                           borderRadius: 10,
@@ -475,8 +476,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: stateController,
-                          labelText: 'State',
-                          hintText: 'State',
+                          labelText: AppLocalizations.of(context)!.state,
+                          hintText: AppLocalizations.of(context)!.state,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.sentences,
                           borderRadius: 10,
@@ -491,8 +492,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: countryController,
-                          labelText: 'Country',
-                          hintText: 'Country',
+                          labelText: AppLocalizations.of(context)!.country,
+                          hintText: AppLocalizations.of(context)!.country,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.words,
                           borderRadius: 10,
@@ -507,8 +508,8 @@ class _PersonalPageState extends State<PersonalPage> {
                         CustomTextFormField(
                           width: width,
                           controller: nationalityController,
-                          labelText: 'Nationality',
-                          hintText: 'Nationality',
+                          labelText: AppLocalizations.of(context)!.nationality,
+                          hintText: AppLocalizations.of(context)!.nationality,
                           prefixIcon: Icons.person_outline,
                           textCapitalization: TextCapitalization.sentences,
                           borderRadius: 10,

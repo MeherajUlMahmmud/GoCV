@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gocv/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/contact_data_provider.dart';
@@ -17,6 +20,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => SettingsProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => UserProfileProvider()),
         ChangeNotifierProvider(create: (context) => ResumeListProvider()),
@@ -35,10 +39,26 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: Constants.appName,
-      theme: createTheme(),
+      theme: createLightTheme(),
+      darkTheme: createDarkTheme(),
+      themeMode: settingsProvider.themeMode,
+      locale: Locale(settingsProvider.language),
+      // Use the current language
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('bn'), // Bengali
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       onGenerateRoute: generateRoute,
       home: const SplashScreen(),
     );

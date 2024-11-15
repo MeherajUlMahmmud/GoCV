@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../models/resume.dart';
@@ -259,17 +260,10 @@ class _HomeScreenState extends State<HomeScreen> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
         title: const Text(
           Constants.appName,
-          style: TextStyle(
-            color: Colors.black,
-          ),
         ),
       ),
       drawer: Drawer(
@@ -312,9 +306,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.home, size: 24),
-              title: const Text(
-                'Home',
-                style: TextStyle(
+              title: Text(
+                AppLocalizations.of(context)!.home,
+                style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
@@ -324,9 +318,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.person_2_outlined, size: 24),
-              title: const Text(
-                'Profile',
-                style: TextStyle(
+              title: Text(
+                AppLocalizations.of(context)!.profile,
+                style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
@@ -340,9 +334,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.list,
                 size: 24,
               ),
-              title: const Text(
-                'Settings',
-                style: TextStyle(
+              title: Text(
+                AppLocalizations.of(context)!.settings,
+                style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
@@ -360,9 +354,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 24,
                 ),
               ),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
+              title: Text(
+                AppLocalizations.of(context)!.logout,
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
@@ -377,13 +371,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       content: const Text('Would you like to logout?'),
                       actions: [
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text(AppLocalizations.of(context)!.cancel),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                         ),
                         TextButton(
-                          child: const Text('Logout'),
+                          child: Text(
+                            AppLocalizations.of(context)!.logout,
+                            style: const TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
                           onPressed: () {
                             Helper().logoutUser(context);
                           },
@@ -432,91 +431,76 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Column(
                           children: [
-                            const SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.only(bottom: 15.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade100,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                  // width: width * 0.45,
+                                  // padding: const EdgeInsets.all(15.0),
+                                  // decoration: BoxDecoration(
+                                  //   borderRadius:
+                                  //       BorderRadius.circular(10.0),
+                                  // ),
+                                  onPressed: () {
+                                    showResumeAddDialog(context);
+                                  },
+                                  style: const ButtonStyle(),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.receipt_long),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .new_resume,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      showResumeAddDialog(context);
-                                    },
-                                    child: Container(
-                                      width: width * 0.45,
-                                      padding: const EdgeInsets.all(15.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.receipt_long),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            'New Resume',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  // GestureDetector(
-                                  //   onTap: () {
-                                  //     // Navigator.pushNamed(
-                                  //     //   context,
-                                  //     //   CoverLetterScreen.routeName,
-                                  //     // );
-                                  //   },
-                                  //   child: Container(
-                                  //     width: width * 0.45,
-                                  //     padding: const EdgeInsets.all(15.0),
-                                  //     decoration: BoxDecoration(
-                                  //       color: Colors.grey.shade100,
-                                  //       borderRadius:
-                                  //           BorderRadius.circular(10.0),
-                                  //     ),
-                                  //     child: const Row(
-                                  //       mainAxisAlignment:
-                                  //           MainAxisAlignment.center,
-                                  //       children: [
-                                  //         Icon(Icons.receipt_long),
-                                  //         SizedBox(width: 10),
-                                  //         Text(
-                                  //           'Cover Letter',
-                                  //           style: TextStyle(
-                                  //             fontSize: 16,
-                                  //           ),
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
+                                // GestureDetector(
+                                //   onTap: () {
+                                //     // Navigator.pushNamed(
+                                //     //   context,
+                                //     //   CoverLetterScreen.routeName,
+                                //     // );
+                                //   },
+                                //   child: Container(
+                                //     width: width * 0.45,
+                                //     padding: const EdgeInsets.all(15.0),
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.grey.shade100,
+                                //       borderRadius:
+                                //           BorderRadius.circular(10.0),
+                                //     ),
+                                //     child: const Row(
+                                //       mainAxisAlignment:
+                                //           MainAxisAlignment.center,
+                                //       children: [
+                                //         Icon(Icons.receipt_long),
+                                //         SizedBox(width: 10),
+                                //         Text(
+                                //           'Cover Letter',
+                                //           style: TextStyle(
+                                //             fontSize: 16,
+                                //           ),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
+                              ],
                             ),
                             const SizedBox(height: 10),
+                            const Divider(),
                             SizedBox(
                               width: width,
-                              child: const Text(
-                                'My Resumes',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.my_resumes,
+                                style: const TextStyle(
                                   fontSize: 22,
-                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -553,21 +537,18 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: const Icon(
                 Icons.receipt_long,
-                color: Colors.black,
                 size: 30,
               ),
             ),
@@ -588,9 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Helper().formatDateTime(
                       resumeListProvider.resumeList[index].createdAt!,
                     ),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(),
                   ),
                 ],
               ),
@@ -610,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     value: 'preview',
-                    child: const Text('Resume Preview'),
+                    child: Text(AppLocalizations.of(context)!.resume_preview),
                   ),
                   PopupMenuItem(
                     onTap: () {
@@ -620,7 +599,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     value: 'update',
-                    child: const Text('Update title'),
+                    child:
+                        Text(AppLocalizations.of(context)!.update_resume_title),
                   ),
                   PopupMenuItem(
                     onTap: () {
@@ -630,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     value: 'delete',
-                    child: const Text('Delete resume'),
+                    child: Text(AppLocalizations.of(context)!.delete_resume),
                   ),
                 ];
               },
@@ -679,13 +659,13 @@ class _HomeScreenState extends State<HomeScreen> {
         TextFormField(
           autofocus: true,
           controller: titleController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Resume title',
             border: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(),
             ),
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(),
             ),
           ),
           keyboardType: TextInputType.text,
@@ -706,20 +686,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   showResumeUpdateDialog(BuildContext context, int index) {
-    String dialogTitle = 'Update resume title';
+    String dialogTitle = AppLocalizations.of(context)!.update_resume_title;
 
     Resume resume = resumeListProvider.resumeList[index];
     String title = resume.name;
 
     Widget cancelButton = TextButton(
-      child: const Text('Cancel'),
+      child: Text(AppLocalizations.of(context)!.cancel),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: const Text('Update'),
+      child: Text(AppLocalizations.of(context)!.update),
       onPressed: () async {
         if (title.isEmpty) {
           Helper().showSnackBar(
@@ -740,13 +720,13 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget dialogContent = TextFormField(
       autofocus: true,
       controller: TextEditingController(text: title),
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         hintText: 'New title',
         border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(),
         ),
       ),
       keyboardType: TextInputType.text,
@@ -774,20 +754,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   showResumeDeleteDialog(BuildContext context, int index) {
-    String dialogTitle = 'Delete resume';
+    String dialogTitle = AppLocalizations.of(context)!.delete_resume;
 
     // set up the button
     Widget cancelButton = TextButton(
-      child: const Text('Cancel'),
+      child: Text(AppLocalizations.of(context)!.cancel),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
     Widget okButton = TextButton(
-      child: const Text(
-        'Delete',
-        style: TextStyle(
+      child: Text(
+        AppLocalizations.of(context)!.delete,
+        style: const TextStyle(
           color: Colors.red,
         ),
       ),
