@@ -75,11 +75,11 @@ This Flutter project aims to enable the people to build resumes easily. It is de
 ### Additional Features
 
 -   [x] **Multiple Languages**:
-  -   [x] Bengali
-  -   [x] English
+    -   [x] Bengali
+    -   [x] English
 -   [x] **Theme Change**
 -   [ ] **Customizable Templates**:
-  -   [ ] Provide different resume templates for users to choose from.
+    -   [ ] Provide different resume templates for users to choose from.
 -   [ ] **Integration with LinkedIn/GitHub**:
     -   [ ] Allow users to import data from their LinkedIn or GitHub profiles.
 -   [ ] **Collaboration**:
