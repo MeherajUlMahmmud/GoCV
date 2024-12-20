@@ -261,7 +261,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           Constants.appName,
         ),
@@ -435,16 +434,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
-                                  // width: width * 0.45,
-                                  // padding: const EdgeInsets.all(15.0),
-                                  // decoration: BoxDecoration(
-                                  //   borderRadius:
-                                  //       BorderRadius.circular(10.0),
-                                  // ),
                                   onPressed: () {
                                     showResumeAddDialog(context);
                                   },
-                                  style: const ButtonStyle(),
+                                  style: ButtonStyle(
+                                    padding: const WidgetStatePropertyAll(
+                                      EdgeInsets.all(10.0),
+                                    ),
+                                    shape: WidgetStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                  ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [

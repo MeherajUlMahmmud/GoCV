@@ -514,21 +514,22 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                           vertical: 5.0,
                         ),
                         child: TypeAheadField(
-                          textFieldConfiguration: TextFieldConfiguration(
-                            style: const TextStyle(fontSize: 16),
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                              errorText: typeError == '' ? null : typeError,
-                              labelText: 'Job Type',
-                              hintText: 'Job Type',
-                              prefixIcon:
-                                  const Icon(Icons.work_outline_rounded),
-                            ),
-                            controller: typeController,
-                          ),
+                          // textFieldConfiguration: TextFieldConfiguration(
+                          //   style: const TextStyle(fontSize: 16),
+                          //   decoration: InputDecoration(
+                          //     border: const OutlineInputBorder(
+                          //       borderRadius:
+                          //           BorderRadius.all(Radius.circular(10)),
+                          //     ),
+                          //     errorText: typeError == '' ? null : typeError,
+                          //     labelText: 'Job Type',
+                          //     hintText: 'Job Type',
+                          //     prefixIcon:
+                          //         const Icon(Icons.work_outline_rounded),
+                          //   ),
+                          //   controller: typeController,
+                          // ),
+                          controller: typeController,
                           suggestionsCallback: (pattern) {
                             List<String> matches = <String>[];
                             matches.addAll(types);
@@ -561,7 +562,7 @@ class _AddEditWorkExperiencePageState extends State<AddEditWorkExperiencePage> {
                               ),
                             );
                           },
-                          onSuggestionSelected: (suggestion) {
+                          onSelected: (suggestion) {
                             setState(() {
                               typeController.text = suggestion.toString();
                               experienceData['type'] = suggestion.toString();

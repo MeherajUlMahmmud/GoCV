@@ -345,19 +345,20 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                     vertical: 5.0,
                   ),
                   child: TypeAheadField(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      style: const TextStyle(fontSize: 16),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                        // errorText: typeError == "" ? null : typeError,
-                        labelText: 'Proficiency Type',
-                        hintText: 'Proficiency Type',
-                        prefixIcon: Icon(Icons.work_outline_rounded),
-                      ),
-                      controller: proficiencyController,
-                    ),
+                    controller: proficiencyController,
+                    // textFieldConfiguration: TextFieldConfiguration(
+                    //   style: const TextStyle(fontSize: 16),
+                    //   decoration: const InputDecoration(
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.all(Radius.circular(10)),
+                    //     ),
+                    //     // errorText: typeError == "" ? null : typeError,
+                    //     labelText: 'Proficiency Type',
+                    //     hintText: 'Proficiency Type',
+                    //     prefixIcon: Icon(Icons.work_outline_rounded),
+                    //   ),
+                    //   controller: proficiencyController,
+                    // ),
                     suggestionsCallback: (pattern) {
                       List<String> matches = <String>[];
                       matches.addAll(proficiencyTypes);
@@ -388,7 +389,7 @@ class _AddEditLanguagePageState extends State<AddEditLanguagePage> {
                         ),
                       );
                     },
-                    onSuggestionSelected: (suggestion) {
+                    onSelected: (suggestion) {
                       setState(() {
                         proficiencyController.text = suggestion.toString();
                         languageData['proficiency'] = suggestion.toString();
